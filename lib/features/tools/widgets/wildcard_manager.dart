@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../../core/services/naia_wildcard_zip_importer.dart';
-import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
 import '../../../core/l10n/l10n_extensions.dart';
 import '../../../l10n/app_localizations.dart';
