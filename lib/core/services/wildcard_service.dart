@@ -206,7 +206,9 @@ class WildcardService {
     final newFile = File(p.join(wildcardDir, '$newName.txt'));
     final root = p.normalize(p.absolute(wildcardDir));
     if (!p.isWithin(root, p.normalize(oldFile.absolute.path)) ||
-        !p.isWithin(root, p.normalize(newFile.absolute.path))) return false;
+        !p.isWithin(root, p.normalize(newFile.absolute.path))) {
+      return false;
+    }
     if (await newFile.exists()) return false;
     if (!await oldFile.exists()) return false;
 
