@@ -5,13 +5,18 @@
 class NaiaConditionalProcessor {
   const NaiaConditionalProcessor();
 
-  String apply(String prompt, String rules) {
+  String apply(String prompt, String rules, {
+    List<String> characterPrompts = const [],
+    List<bool> characterEnabled = const [],
+  }) {
     var tags = _splitTags(prompt);
     for (final line in rules.split(RegExp(r'\r?\n'))) {
       final rule = line.trim();
       if (rule.isEmpty || rule.startsWith('#')) continue;
       final match = RegExp(r'^\((.+)\):(.+)$').firstMatch(rule);
-      if (match == null || !_matches(match.group(1)!, tags)) continue;
+      if (match == null || !_matches(match.group(1)!, tags,
+          characterPrompts: characterPrompts,
+          characterEnabled: characterEnabled)) continue;
       final action = match.group(2)!.trim();
       final append = RegExp(r'^(.+?)(?:\+=|\+:)(.*)
       if (append != null) {
@@ -64,21 +69,84 @@ class NaiaConditionalProcessor {
     return partial ? needle.isNotEmpty && value.contains(needle) : value == needle;
   }
 
-  bool _matches(String condition, List<String> tags) {
-    return condition.split('|').any((orPart) => orPart.split('&').every((part) {
-      var term = part.trim();
-      var negative = false;
+  // Match NAIA's precedence: parentheses, then AND, then OR.
+  // Character predicates use expanded character prompt values supplied by caller.
+  bool _matches(String condition, List<String> tags,
+      {List<String> characterPrompts = const [],
+       List<bool> characterEnabled = const []}) {
+    bool evaluate(String expression) {
+      var value = expression.trim();
+      if (value.isEmpty || RegExp(r'(^|[(&|])\\s*[&|]|[&|]\\s*([)&|]|$)').hasMatch(value)) {
+        return false;
+      }
+      while (value.startsWith('(') && value.endsWith(')') &&
+          _matchingParen(value, 0) == value.length - 1) {
+        value = value.substring(1, value.length - 1).trim();
+      }
+      final ors = _splitTopLevel(value, '|');
+      if (ors.length > 1) return ors.any(evaluate);
+      final ands = _splitTopLevel(value, '&');
+      if (ands.length > 1) return ands.every(evaluate);
+
+      final on = RegExp(r'^(~?)char_on\\s*\\(\\s*(\\d+)\\s*\\)$',
+          caseSensitive: false).firstMatch(value);
+      if (on != null) {
+        final index = int.parse(on.group(2)!) - 1;
+        final active = index >= 0 && index < characterEnabled.length &&
+            characterEnabled[index];
+        return on.group(1) == '~' ? !active : active;
+      }
+      final inside = RegExp(r'^(~?)char_in\\s*\\(\\s*(\\d+)\\s*,\\s*(.*?)\\s*\\)$',
+          caseSensitive: false).firstMatch(value);
+      if (inside != null) {
+        final index = int.parse(inside.group(2)!) - 1;
+        final found = index >= 0 && index < characterPrompts.length &&
+            _splitTags(characterPrompts[index])
+                .any((tag) => _tagMatches(tag, inside.group(3)!));
+        return inside.group(1) == '~' ? !found : found;
+      }
+      var term = value;
+      var negate = false;
       if (term.startsWith('~!')) {
-        negative = true;
+        negate = true;
         term = term.substring(2);
       } else if (term.startsWith('~')) {
-        negative = true;
+        negate = true;
         term = term.substring(1);
       }
-      if (term.isEmpty) return false;
-      final found = tags.any((tag) => _tagMatches(tag, term));
-      return negative ? !found : found;
-    }));
+      final found = tags.any((tag) => _tagMatches(tag, term.trim()));
+      return negate ? !found : found;
+    }
+    return evaluate(condition);
+  }
+
+  static int _matchingParen(String text, int start) {
+    var depth = 0;
+    for (var i = start; i < text.length; i++) {
+      if (text[i] == '(') depth++;
+      if (text[i] == ')') {
+        depth--;
+        if (depth == 0) return i;
+      }
+    }
+    return -1;
+  }
+
+  static List<String> _splitTopLevel(String value, String separator) {
+    final parts = <String>[];
+    var depth = 0;
+    var begin = 0;
+    for (var i = 0; i < value.length; i++) {
+      if (value[i] == '(') depth++;
+      if (value[i] == ')') depth--;
+      if (value[i] == separator && depth == 0) {
+        parts.add(value.substring(begin, i).trim());
+        begin = i + 1;
+      }
+    }
+    if (parts.isEmpty) return [value];
+    parts.add(value.substring(begin).trim());
+    return parts;
   }
 
   List<String> _splitTags(String text) {
