@@ -76,7 +76,7 @@ class _WildcardManagerState extends State<WildcardManager> {
             final next = <String>[];
             try {
               for (var i = 0; i < previewCount; i++) {
-                next.add(await processor.process('__$name__'));
+                next.add(await processor.process('__${name}__'));
               }
             } catch (error) {
               next.add('미리보기 오류: $error');
@@ -97,7 +97,7 @@ class _WildcardManagerState extends State<WildcardManager> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SelectableText('__$name__'),
+                  SelectableText('__${name}__'),
                   const SizedBox(height: 8),
                   DropdownButton<int>(
                     value: previewCount,
