@@ -501,10 +501,10 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('규칙 구조 검사: ${diagnostics.length}건 확인 필요',
+                Text('규칙 검사: ${diagnostics.where((d) => !d.warning).length}개 오류 · ${diagnostics.where((d) => d.warning).length}개 경고',
                     style: const TextStyle(color: Colors.orange)),
                 for (final diagnostic in diagnostics.take(8))
-                  Text('${diagnostic.line}행: ${diagnostic.message}',
+                  Text('${diagnostic.line}행 ${diagnostic.warning ? '[경고]' : '[오류]'}: ${diagnostic.message}',
                       style: const TextStyle(color: Colors.orange)),
               ],
             );
