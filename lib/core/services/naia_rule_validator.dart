@@ -18,12 +18,11 @@ class NaiaRuleValidator {
       if (original.isEmpty || original.startsWith('#')) continue;
       final line = i + 1;
       var rule = original;
-      final scope = RegExp(r'^char:\d+\s+').firstMatch(rule);
+      // The generation pipeline routes char:N rules to the corresponding
+      // character prompt before the ordered main rules are evaluated.
+      final scope = RegExp(r'^char:([1-9]\\d*)\\s+').firstMatch(rule);
       if (scope != null) {
-        issues.add(NaiaRuleDiagnostic(line,
-            'char:N 행 범위 접두사는 현재 실행 엔진에서 처리되지 않아 규칙 전체가 무시됩니다.',
-            warning: true));
-        continue;
+        rule = rule.substring(scope.end).trimLeft();
       }
       if (!rule.startsWith('(')) {
         issues.add(NaiaRuleDiagnostic(line, '조건은 ( 로 시작해야 합니다.'));
