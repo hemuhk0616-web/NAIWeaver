@@ -97,7 +97,7 @@ class WildcardNotifier extends ChangeNotifier {
       final fileMap = <String, File>{};
       for (final f in directory.listSync(recursive: true, followLinks: false).whereType<File>()) {
         if (p.extension(f.path) == '.txt') {
-          fileMap[p.withoutExtension(p.relative(f.path, from: wildcardDir)).replaceAll('\\\\', '/')] = f;
+          fileMap[p.withoutExtension(p.relative(f.path, from: wildcardDir)).replaceAll(r'\', '/')] = f;
         }
       }
 
