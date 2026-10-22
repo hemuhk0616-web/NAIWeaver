@@ -1246,10 +1246,31 @@ class GenerationNotifier extends ChangeNotifier {
     return (prompt: resolvedPrompt, negative: _tagService.resolveAliases(ordered.negative), characters: processedCharacters, interactions: processedInteractions, width: naiaResolution.width, height: naiaResolution.height);
   }
 
+  // Include wildcard file metadata so edited packs invalidate locked samples.
+  String _naiaWildcardRevision() {
+    if (kIsWeb) return 'web';
+    try {
+      final root = Directory(_wildcardService.wildcardDir);
+      if (!root.existsSync()) return 'missing';
+      final files = root.listSync(recursive: true, followLinks: false)
+          .whereType<File>()
+          .where((file) => p.extension(file.path).toLowerCase() == '.txt')
+          .toList()..sort((a, b) => a.path.compareTo(b.path));
+      return files.map((file) {
+        final stat = file.statSync();
+        return '${p.relative(file.path, from: root.path)}:${stat.size}:${stat.modified.microsecondsSinceEpoch}';
+      }).join('\u0002');
+    } catch (_) {
+      // Fail closed: never reuse a sample if the wildcard directory is unreadable.
+      return DateTime.now().microsecondsSinceEpoch.toString();
+    }
+  }
+
   String _naiaPreviewSignature() => [
     promptController.text,
     negativePromptController.text,
     naiaConditionalRules,
+    _naiaWildcardRevision(),
     _state.characters.map((c) => [c.prompt, c.uc, c.center.x, c.center.y].join('\u0002')).join('\u0003'),
     _state.interactions.map((item) => item.toJson().toString()).join('\u0003'),
     _state.width.toString(),
