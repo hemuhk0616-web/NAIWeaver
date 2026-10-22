@@ -21,16 +21,46 @@ class NaiaPromptPipeline {
       characterEnabled: characterEnabled);
   }
 
+  /// Expand only assigned action values. Conditions and function arguments
+  /// must remain intact so a wildcard cannot silently rewrite rule syntax.
   Future<String> expandActionValues(String rules) async {
     final output = <String>[];
     for (final line in rules.split(RegExp(r'\r?\n'))) {
-      final match = RegExp(r'^(\(.*\):.*?(?:\+=|\+:|(?<![+])=))(.*)$').firstMatch(line);
-      if (match == null) {
+      final trimmed = line.trimLeft();
+      if (!trimmed.startsWith('(')) {
         output.add(line);
-      } else {
-        final value = await wildcards.process(match.group(2)!);
-        output.add('${match.group(1)}$value');
+        continue;
       }
+      var depth = 0;
+      var closing = -1;
+      for (var i = 0; i < trimmed.length; i++) {
+        if (trimmed[i] == '(') depth++;
+        if (trimmed[i] == ')') {
+          depth--;
+          if (depth == 0) {
+            closing = i;
+            break;
+          }
+        }
+      }
+      if (closing < 0 || closing + 1 >= trimmed.length ||
+          trimmed[closing + 1] != ':') {
+        output.add(line);
+        continue;
+      }
+      final actionStart = line.length - trimmed.length + closing + 2;
+      final action = line.substring(actionStart);
+      final assignment = RegExp(r'^\s*([^=]+?)(\+=|\+:|=)(.*)$')
+          .firstMatch(action);
+      if (assignment == null ||
+          assignment.group(1)!.trim().startsWith('char_')) {
+        output.add(line);
+        continue;
+      }
+      final valueStart = actionStart + assignment.start +
+          assignment.group(0)!.length - assignment.group(3)!.length;
+      final value = await wildcards.process(line.substring(valueStart));
+      output.add('${line.substring(0, valueStart)}$value');
     }
     return output.join('\n');
   }
