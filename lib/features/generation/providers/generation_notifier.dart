@@ -25,6 +25,7 @@ import '../../../core/services/novel_ai_service.dart';
 import '../../../core/services/nai_text_service.dart';
 import '../../../core/services/wildcard_processor.dart';
 import '../../../core/services/naia_prompt_pipeline.dart';
+import '../../../core/services/naia_resolution_directive.dart';
 import '../../../core/services/presets.dart';
 import '../../../core/services/tag_service.dart';
 import '../../../core/utils/image_utils.dart';
@@ -1199,7 +1200,8 @@ class GenerationNotifier extends ChangeNotifier {
       final pipeline = NaiaPromptPipeline(_wildcardProcessor);
       final processedPrompt = await pipeline.process(
         promptController.text, rules: naiaConditionalRules);
-      final resolvedPrompt = _tagService.resolveAliases(processedPrompt);
+      final naiaResolution = NaiaResolutionDirective.extract(processedPrompt);
+      final resolvedPrompt = _tagService.resolveAliases(naiaResolution.prompt);
 
       String finalPrompt = resolvedPrompt;
       if (_galleryNotifier?.demoMode == true) {
@@ -1256,8 +1258,8 @@ class GenerationNotifier extends ChangeNotifier {
       final result = await _service.generateImage(
         prompt: finalPrompt,
         negativePrompt: fullNegativePrompt,
-        width: _state.width.toInt(),
-        height: _state.height.toInt(),
+        width: naiaResolution.width ?? _state.width.toInt(),
+        height: naiaResolution.height ?? _state.height.toInt(),
         scale: _state.scale,
         steps: _state.steps.toInt(),
         sampler: _state.sampler,
