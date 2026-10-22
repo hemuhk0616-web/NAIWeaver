@@ -408,24 +408,73 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
               label: const Text('최종 프롬프트 미리보기'),
               onPressed: () async {
                 try {
-                  final result = await notifier.previewNaiaPrompt();
+                  final previews = <String>[];
+                  for (var i = 0; i < 3; i++) {
+                    previews.add(await notifier.previewNaiaPrompt());
+                  }
                   if (!context.mounted) return;
+                  var selected = 2;
                   await showDialog<void>(
                     context: context,
-                    builder: (dialogContext) => AlertDialog(
-                      title: const Text('프롬프트 미리보기'),
-                      content: SizedBox(
-                        width: 500,
-                        child: SingleChildScrollView(
-                          child: SelectableText(result),
+                    builder: (dialogContext) => StatefulBuilder(
+                      builder: (dialogContext, updateDialog) => AlertDialog(
+                        title: const Text('프롬프트 미리보기 · 3회 추첨'),
+                        content: SizedBox(
+                          width: 500,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              DropdownButton<int>(
+                                value: selected,
+                                isExpanded: true,
+                                items: [
+                                  for (var i = 0; i < previews.length; i++)
+                                    DropdownMenuItem(
+                                      value: i,
+                                      child: Text('추첨 결과 ${i + 1}'),
+                                    ),
+                                ],
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    updateDialog(() => selected = value);
+                                  }
+                                },
+                              ),
+                              Flexible(
+                                child: SingleChildScrollView(
+                                  child: SelectableText(previews[selected]),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              notifier.clearLockedNaiaPreview();
+                              Navigator.pop(dialogContext);
+                            },
+                            child: const Text('고정 해제'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(dialogContext),
+                            child: const Text('닫기'),
+                          ),
+                          FilledButton(
+                            onPressed: () async {
+                              if (selected != previews.length - 1) {
+                                await notifier.previewNaiaPrompt();
+                              }
+                              if (!dialogContext.mounted) return;
+                              Navigator.pop(dialogContext);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('마지막 추첨 결과가 생성 1회에 고정되었습니다.')),
+                              );
+                            },
+                            child: const Text('생성용으로 고정'),
+                          ),
+                        ],
                       ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(dialogContext),
-                          child: const Text('닫기'),
-                        ),
-                      ],
                     ),
                   );
                 } catch (error) {
