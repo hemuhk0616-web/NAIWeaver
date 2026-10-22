@@ -54,13 +54,21 @@ class NaiaOrderedRuleEngine {
           [currentNegative, value].where((v) => v.isNotEmpty).join(', ');
         continue;
       }
-      final uc = RegExp(r'^uc:(\d+)(\+=|\+:|=)(.*)$').firstMatch(action);
-      if (uc != null) {
-        final index = int.parse(uc.group(1)!) - 1;
-        if (index >= 0 && index < currentUc.length) {
-          final value = uc.group(3)!.trim();
-          currentUc[index] = uc.group(2) == '=' ? value :
-            [currentUc[index], value].where((v) => v.isNotEmpty).join(', ');
+      final scoped = RegExp(r'^(char|uc):(\d+|\*)(\+=|\+:|=)(.*)$',
+          caseSensitive: false).firstMatch(action);
+      if (scoped != null) {
+        final kind = scoped.group(1)!.toLowerCase();
+        final rawIndex = scoped.group(2)!;
+        final operator = scoped.group(3)!;
+        final value = scoped.group(4)!.trim();
+        final target = kind == 'char' ? currentCharacters : currentUc;
+        final indexes = rawIndex == '*'
+            ? List<int>.generate(target.length, (i) => i)
+            : [int.parse(rawIndex) - 1];
+        for (final index in indexes) {
+          if (index < 0 || index >= target.length) continue;
+          target[index] = operator == '=' ? value :
+              [target[index], value].where((v) => v.isNotEmpty).join(', ');
         }
         continue;
       }
