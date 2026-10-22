@@ -62,4 +62,26 @@ void main() {
     expect(result.characterUc, ['lowres, bad hands', 'blurry, bad hands']);
   });
 
+  test('global UC remains unsupported as in NAIA runtime', () {
+    final result = engine.apply('solo', ['pink hair'],
+      '(solo):global_uc+=bad hands',
+      negative: 'lowres', characterUc: ['blurry']);
+    expect(result.main, 'solo');
+    expect(result.negative, 'lowres');
+    expect(result.characterUc, ['blurry']);
+  });
+
+  test('unknown plus-colon target appends combined text to main', () {
+    final result = engine.apply('solo', [],
+      '(solo):mystery+:smile');
+    expect(result.main, 'solo, mysterysmile');
+  });
+
+  test('negative replacement differs from append', () {
+    final result = engine.apply('solo', [],
+      '(solo):neg+=blurry\n(solo):neg=lowres',
+      negative: 'bad anatomy');
+    expect(result.negative, 'lowres');
+  });
+
 }
