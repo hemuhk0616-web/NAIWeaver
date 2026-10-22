@@ -62,26 +62,84 @@ class _WildcardManagerState extends State<WildcardManager> {
       wildcardDir: notifier.wildcardDir,
       wildcardService: notifier.wildcardService,
     );
-    String result;
-    try {
-      result = await processor.process('__$name__');
-    } catch (error) {
-      result = '미리보기 오류: $error';
-    }
+    final results = <String>[];
+    var isRunning = false;
+    var previewCount = 5;
     if (!mounted) return;
     await showDialog<void>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('와일드카드 확장 미리보기'),
-        content: SingleChildScrollView(
-          child: SelectableText('__$name__\n\n→ $result'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('닫기'),
-          ),
-        ],
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) {
+          Future<void> draw() async {
+            if (isRunning) return;
+            setDialogState(() => isRunning = true);
+            final next = <String>[];
+            try {
+              for (var i = 0; i < previewCount; i++) {
+                next.add(await processor.process('__$name__'));
+              }
+            } catch (error) {
+              next.add('미리보기 오류: $error');
+            }
+            if (!dialogContext.mounted) return;
+            setDialogState(() {
+              results
+                ..clear()
+                ..addAll(next);
+              isRunning = false;
+            });
+          }
+
+          return AlertDialog(
+            title: const Text('와일드카드 확장 미리보기'),
+            content: SizedBox(
+              width: 440,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SelectableText('__$name__'),
+                  const SizedBox(height: 8),
+                  DropdownButton<int>(
+                    value: previewCount,
+                    items: const [
+                      DropdownMenuItem(value: 1, child: Text('1회')),
+                      DropdownMenuItem(value: 5, child: Text('5회')),
+                      DropdownMenuItem(value: 10, child: Text('10회')),
+                    ],
+                    onChanged: isRunning ? null : (value) {
+                      if (value != null) {
+                        setDialogState(() => previewCount = value);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      child: SelectableText(
+                        results.isEmpty
+                            ? '추첨 버튼을 누르면 확장 결과를 표시합니다.'
+                            : [
+                                for (var i = 0; i < results.length; i++)
+                                  '${i + 1}. ${results[i]}',
+                              ].join('\n\n'),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('닫기'),
+              ),
+              TextButton(
+                onPressed: isRunning ? null : draw,
+                child: Text(isRunning ? '추첨 중...' : '다시 추첨'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
