@@ -25,6 +25,8 @@ class WildcardManager extends StatefulWidget {
 class _WildcardManagerState extends State<WildcardManager> {
   bool _showingEditor = false;
   bool _importingZip = false;
+  String _selectedWildcardFolder = '';
+  String _wildcardSearch = '';
 
   Future<void> _importZip() async {
     if (_importingZip) return;
@@ -166,6 +168,20 @@ class _WildcardManagerState extends State<WildcardManager> {
 
   Widget _buildFileList(BuildContext context, WildcardNotifier notifier, VisionTokens t, {bool fullWidth = false}) {
     final state = notifier.state;
+    final folders = state.files.map((file) {
+      final path = notifier.wildcardKey(file);
+      final index = path.lastIndexOf('/');
+      return index < 0 ? '' : path.substring(0, index);
+    }).toSet().toList()..sort();
+    final selectedFolder = folders.contains(_selectedWildcardFolder)
+        ? _selectedWildcardFolder : '';
+    final visibleFiles = state.files.where((file) {
+      final path = notifier.wildcardKey(file);
+      final inFolder = selectedFolder.isEmpty ||
+          path == selectedFolder || path.startsWith('$selectedFolder/');
+      return inFolder && path.toLowerCase().contains(_wildcardSearch.toLowerCase());
+    }).toList();
+    final filtered = selectedFolder.isNotEmpty || _wildcardSearch.isNotEmpty;
     return Container(
       width: fullWidth ? double.infinity : 220,
       color: t.surfaceMid,
@@ -190,12 +206,37 @@ class _WildcardManagerState extends State<WildcardManager> {
               ],
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            child: Column(children: [
+              DropdownButton<String>(
+                isExpanded: true,
+                value: selectedFolder,
+                items: [
+                  const DropdownMenuItem(value: '', child: Text('전체 폴더')),
+                  for (final folder in folders)
+                    if (folder.isNotEmpty)
+                      DropdownMenuItem(value: folder, child: Text(folder,
+                        overflow: TextOverflow.ellipsis)),
+                ],
+                onChanged: (value) => setState(() => _selectedWildcardFolder = value ?? ''),
+              ),
+              TextField(
+                decoration: const InputDecoration(
+                  hintText: '와일드카드 검색', prefixIcon: Icon(Icons.search),
+                  isDense: true),
+                onChanged: (value) => setState(() => _wildcardSearch = value),
+              ),
+            ]),
+          ),
           Divider(height: 1, color: t.textMinimal),
           Expanded(
             child: ReorderableListView.builder(
               buildDefaultDragHandles: false,
-              itemCount: state.files.length,
-              onReorder: notifier.reorderFiles,
+              itemCount: visibleFiles.length,
+              onReorder: (oldIndex, newIndex) {
+                if (!filtered) notifier.reorderFiles(oldIndex, newIndex);
+              },
               proxyDecorator: (child, index, animation) {
                 return Material(
                   color: t.surfaceHigh,
@@ -205,7 +246,7 @@ class _WildcardManagerState extends State<WildcardManager> {
                 );
               },
               itemBuilder: (context, index) {
-                final file = state.files[index];
+                final file = visibleFiles[index];
                 final isSelected = state.selectedFile?.path == file.path;
                 final fileName = notifier.wildcardKey(file);
 
@@ -222,10 +263,11 @@ class _WildcardManagerState extends State<WildcardManager> {
                     color: isSelected ? t.borderSubtle : Colors.transparent,
                     child: Row(
                       children: [
-                        ReorderableDragStartListener(
-                          index: index,
-                          child: Icon(Icons.drag_handle, size: 14, color: t.textDisabled),
-                        ),
+                        if (!filtered)
+                          ReorderableDragStartListener(
+                            index: index,
+                            child: Icon(Icons.drag_handle, size: 14, color: t.textDisabled),
+                          ),
                         const SizedBox(width: 6),
                         Icon(
                           isFav ? Icons.star : Icons.description_outlined,
