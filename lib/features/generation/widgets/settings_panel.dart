@@ -400,6 +400,45 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
       subtitle: const Text('규칙은 기기에 자동 저장됩니다'),
       children: [
         Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.preview_outlined),
+              label: const Text('최종 프롬프트 미리보기'),
+              onPressed: () async {
+                try {
+                  final result = await notifier.previewNaiaPrompt();
+                  if (!context.mounted) return;
+                  await showDialog<void>(
+                    context: context,
+                    builder: (dialogContext) => AlertDialog(
+                      title: const Text('프롬프트 미리보기'),
+                      content: SizedBox(
+                        width: 500,
+                        child: SingleChildScrollView(
+                          child: SelectableText(result),
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(dialogContext),
+                          child: const Text('닫기'),
+                        ),
+                      ],
+                    ),
+                  );
+                } catch (error) {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('미리보기 실패: $error')),
+                  );
+                }
+              },
+            ),
+          ),
+        ),
+        Padding(
           padding: const EdgeInsets.all(12),
           child: TextFormField(
             key: const ValueKey('naia_conditional_rules_editor'),
