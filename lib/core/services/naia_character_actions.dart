@@ -7,9 +7,12 @@ class NaiaCharacterActions {
     List<String> prompts,
     String rules, {
     required bool Function(String, List<String>, List<bool>) matches,
+    List<bool>? initialEnabled,
   }) {
     final current = List<String>.from(prompts);
-    final enabled = List<bool>.filled(prompts.length, true);
+    final enabled = initialEnabled == null
+        ? List<bool>.filled(prompts.length, true)
+        : List<bool>.from(initialEnabled);
     for (final line in rules.split(RegExp(r'\r?\n'))) {
       final parsed = _parseRule(line);
       if (parsed == null ||
