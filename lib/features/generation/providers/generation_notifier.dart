@@ -1233,9 +1233,36 @@ class GenerationNotifier extends ChangeNotifier {
     return (prompt: resolvedPrompt, negative: _tagService.resolveAliases(ordered.negative), characters: processedCharacters, interactions: processedInteractions, width: naiaResolution.width, height: naiaResolution.height);
   }
 
+  String _naiaPreviewSignature() => [
+    promptController.text,
+    negativePromptController.text,
+    naiaConditionalRules,
+    _state.characters.map((c) => [c.prompt, c.uc, c.enabled].join('\u0002')).join('\u0003'),
+    _state.interactions.toString(),
+    _state.width.toString(),
+    _state.height.toString(),
+  ].join('\u0001');
+
+  ({String prompt, String negative, List<NaiCharacter> characters, List<NaiInteraction> interactions, int? width, int? height})? _lockedNaiaPreview;
+  String? _lockedNaiaSignature;
+
+  bool get hasLockedNaiaPreview =>
+      _lockedNaiaPreview != null &&
+      _lockedNaiaSignature == _naiaPreviewSignature();
+
+  void clearLockedNaiaPreview() {
+    _lockedNaiaPreview = null;
+    _lockedNaiaSignature = null;
+    notifyListeners();
+  }
+
   /// Resolves the same NAIA inputs used by image generation.
   Future<String> previewNaiaPrompt() async {
+    final signature = _naiaPreviewSignature();
     final inputs = await _resolveNaiaGenerationInputs();
+    _lockedNaiaPreview = inputs;
+    _lockedNaiaSignature = signature;
+    notifyListeners();
     final styleResult = resolveStyles(
       isStyleEnabled: _state.isStyleEnabled,
       activeStyleNames: _state.activeStyleNames,
@@ -1279,7 +1306,11 @@ class GenerationNotifier extends ChangeNotifier {
     }
 
     try {
-      final naiaInputs = await _resolveNaiaGenerationInputs();
+      final naiaInputs = hasLockedNaiaPreview
+          ? _lockedNaiaPreview!
+          : await _resolveNaiaGenerationInputs();
+      _lockedNaiaPreview = null;
+      _lockedNaiaSignature = null;
       final resolvedPrompt = naiaInputs.prompt;
       final processedCharacters = naiaInputs.characters;
       final processedInteractions = naiaInputs.interactions;
