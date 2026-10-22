@@ -1,10 +1,12 @@
 import 'naia_character_actions.dart';
 import 'naia_conditional_processor.dart';
 
+/// Source-ordered NAIA rule subset; inputs are already wildcard-expanded.
 class NaiaOrderedRuleEngine {
   const NaiaOrderedRuleEngine();
 
-  ({String main, String negative, List<String> characters, List<String> characterUc, List<bool> enabled}) apply(
+  ({String main, String negative, List<String> characters,
+    List<String> characterUc, List<bool> enabled}) apply(
     String main, List<String> characters, String rules, {
     String negative = '',
     List<String> characterUc = const [],
@@ -13,8 +15,8 @@ class NaiaOrderedRuleEngine {
     const actions = NaiaCharacterActions();
     var currentMain = main;
     var currentNegative = negative;
-    final currentUc = List<String>.from(characterUc);
     var currentCharacters = List<String>.from(characters);
+    final currentUc = List<String>.from(characterUc);
     var enabled = List<bool>.filled(characters.length, true);
     for (final line in rules.split(RegExp(r'\r?\n'))) {
       final rule = line.trim();
@@ -27,48 +29,45 @@ class NaiaOrderedRuleEngine {
             characterPrompts: prompts, characterEnabled: states));
         currentCharacters = result.prompts;
         enabled = result.enabled;
-      } else if (RegExp(r'^\([^\n]*\):neg(?:\+=|\+:|=)').hasMatch(rule)) {
-        final parsed = RegExp(r'^\((.*)\):neg(\+=|\+:|=)(.*)(currentMain, rule,
-          characterPrompts: currentCharacters,
-          characterEnabled: enabled);
+        continue;
       }
+      if (!rule.startsWith('(')) continue;
+      var depth = 0;
+      var end = -1;
+      for (var i = 0; i < rule.length; i++) {
+        if (rule[i] == '(') depth++;
+        if (rule[i] == ')') {
+          depth--;
+          if (depth == 0) { end = i; break; }
+        }
+      }
+      if (end < 0 || end + 1 >= rule.length || rule[end + 1] != ':') continue;
+      final condition = rule.substring(1, end);
+      final action = rule.substring(end + 2).trim();
+      if (!conditions.matches(condition, currentMain,
+          characterPrompts: currentCharacters, characterEnabled: enabled)) continue;
+
+      final neg = RegExp(r'^neg(\+=|\+:|=)(.*)$').firstMatch(action);
+      if (neg != null) {
+        final value = neg.group(2)!.trim();
+        currentNegative = neg.group(1) == '=' ? value :
+          [currentNegative, value].where((v) => v.isNotEmpty).join(', ');
+        continue;
+      }
+      final uc = RegExp(r'^uc:(\d+)(\+=|\+:|=)(.*)$').firstMatch(action);
+      if (uc != null) {
+        final index = int.parse(uc.group(1)!) - 1;
+        if (index >= 0 && index < currentUc.length) {
+          final value = uc.group(3)!.trim();
+          currentUc[index] = uc.group(2) == '=' ? value :
+            [currentUc[index], value].where((v) => v.isNotEmpty).join(', ');
+        }
+        continue;
+      }
+      currentMain = conditions.apply(currentMain, rule,
+        characterPrompts: currentCharacters, characterEnabled: enabled);
     }
     return (main: currentMain, negative: currentNegative,
       characters: currentCharacters, characterUc: currentUc, enabled: enabled);
-  }
-}
-).firstMatch(rule);
-        if (parsed != null && conditions.matches(parsed.group(1)!, currentMain,
-            characterPrompts: currentCharacters, characterEnabled: enabled)) {
-          final value = parsed.group(3)!.trim();
-          currentNegative = parsed.group(2) == '=' ? value :
-              [currentNegative, value].where((v) => v.isNotEmpty).join(', ');
-        }
-      } else if (RegExp(r'^\([^\n]*\):uc:\d+(?:\+=|\+:|=)').hasMatch(rule)) {
-        final parsed = RegExp(r'^\((.*)\):uc:(\d+)(\+=|\+:|=)(.*)(currentMain, rule,
-          characterPrompts: currentCharacters,
-          characterEnabled: enabled);
-      }
-    }
-    return (main: currentMain, characters: currentCharacters, enabled: enabled);
-  }
-}
-).firstMatch(rule);
-        if (parsed != null && conditions.matches(parsed.group(1)!, currentMain,
-            characterPrompts: currentCharacters, characterEnabled: enabled)) {
-          final index = int.parse(parsed.group(2)!) - 1;
-          if (index >= 0 && index < currentUc.length) {
-            final value = parsed.group(4)!.trim();
-            currentUc[index] = parsed.group(3) == '=' ? value :
-                [currentUc[index], value].where((v) => v.isNotEmpty).join(', ');
-          }
-        }
-      } else {
-        currentMain = conditions.apply(currentMain, rule,
-          characterPrompts: currentCharacters,
-          characterEnabled: enabled);
-      }
-    }
-    return (main: currentMain, characters: currentCharacters, enabled: enabled);
   }
 }
