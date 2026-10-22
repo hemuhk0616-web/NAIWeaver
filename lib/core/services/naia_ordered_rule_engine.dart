@@ -115,6 +115,41 @@ class NaiaOrderedRuleEngine {
         }
         continue;
       }
+      // A matching condition can inspect all three prompt segments.
+      final appendTag = RegExp(r'^(.+?)\+=(.*)$').firstMatch(action);
+      final replaceTag = RegExp(r'^(.+?)=(.*)$').firstMatch(action);
+      if (appendTag != null &&
+          !const {'main', 'neg', 'global_uc'}.contains(appendTag.group(1)!.trim()) &&
+          !RegExp(r'^(char|uc):(\d+|\*)$').hasMatch(appendTag.group(1)!.trim())) {
+        final target = appendTag.group(1)!.trim();
+        if (target != 'prefix' && target != 'postfix') {
+          final value = appendTag.group(2)!.trim();
+          bool insertAfter(List<String> tags) {
+            final index = tags.indexWhere((tag) => tag.trim() == target);
+            if (index < 0) return false;
+            tags.insert(index + 1, value);
+            return true;
+          }
+          if (insertAfter(prefixTags) || insertAfter(postfixTags)) continue;
+        }
+      }
+      if (replaceTag != null &&
+          !const {'main', 'neg', 'global_uc'}.contains(replaceTag.group(1)!.trim()) &&
+          !RegExp(r'^(char|uc):(\d+|\*)$').hasMatch(replaceTag.group(1)!.trim())) {
+        final target = replaceTag.group(1)!.trim();
+        final value = replaceTag.group(2)!.trim();
+        bool replaceIn(List<String> tags) {
+          var changed = false;
+          for (var i = 0; i < tags.length; i++) {
+            if (tags[i].trim() == target) {
+              tags[i] = value;
+              changed = true;
+            }
+          }
+          return changed;
+        }
+        if (replaceIn(prefixTags) || replaceIn(postfixTags)) continue;
+      }
       final neg = RegExp(r'^neg(\+=|\+:|=)(.*)$').firstMatch(action);
       if (neg != null) {
         final value = neg.group(2)!.trim();
