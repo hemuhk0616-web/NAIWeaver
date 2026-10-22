@@ -1,25 +1,22 @@
-/// A deterministic, pure-Dart prompt-rule pass for NAIA-style conditional rules.
-/// The full NAIA grammar is implemented incrementally; unsupported expressions
-/// remain untouched rather than silently changing generation semantics.
+/// A pure Dart subset of NAIA's conditional prompt rules.
+///
+/// Supported actions: main/prefix/postfix+=, tag+=, tag=, and *tag=.
+/// Unsupported actions are deliberately ignored, not misinterpreted.
 class NaiaConditionalProcessor {
   const NaiaConditionalProcessor();
 
   String apply(String prompt, String rules) {
-    var tags = _split(prompt);
+    var tags = _splitTags(prompt);
     for (final line in rules.split(RegExp(r'\r?\n'))) {
       final rule = line.trim();
       if (rule.isEmpty || rule.startsWith('#')) continue;
-      final match = RegExp(r'^\((.+)\):(.+)
-          .firstMatch(rule);
-      if (match == null) continue;
-      final condition = match.group(1)!.trim();
-      if (!_matches(condition, tags)) continue;
+      final match = RegExp(r'^\((.+)\):(.+)$').firstMatch(rule);
+      if (match == null || !_matches(match.group(1)!, tags)) continue;
       final action = match.group(2)!.trim();
-      final append = RegExp(r'^([^=]+)\\+=(.*)$').firstMatch(action);
+      final append = RegExp(r'^(.+?)\+=(.*)$').firstMatch(action);
       if (append != null) {
         final target = append.group(1)!.trim();
-        final values = _split(append.group(2)!);
-        if (values.isEmpty) continue;
+        final values = _splitTags(append.group(2)!);
         if (target == 'prefix') {
           tags = [...values, ...tags];
         } else if (target == 'main' || target == 'postfix') {
@@ -30,10 +27,13 @@ class NaiaConditionalProcessor {
         }
         continue;
       }
-      final replace = RegExp(r'^([^=]+)=(.*)$').firstMatch(action);
+      final replace = RegExp(r'^(.+?)=(.*)$').firstMatch(action);
       if (replace == null) continue;
       final target = replace.group(1)!.trim();
-      final values = _split(replace.group(2)!);
+      if (const {'prefix', 'main', 'postfix', 'neg', 'global_uc'}.contains(target)) {
+        continue; // These have different semantics in NAIA.
+      }
+      final values = _splitTags(replace.group(2)!);
       final next = <String>[];
       for (final tag in tags) {
         if (_tagMatches(tag, target)) {
@@ -47,65 +47,53 @@ class NaiaConditionalProcessor {
     return tags.join(', ');
   }
 
-  bool _tagMatches(String tag, String target) {\n    final clean = (String value) => value.trim().replaceFirst(RegExp(r\'^[-+]?\\d+(?:\\.\\d+)?::(.*?)\\s*::$\'), r\'$1\');\n    final needle = clean(target.startsWith(\'*\') ? target.substring(1) : target);\n    final value = clean(tag);\n    return target.startsWith(\'*\') ? needle.isNotEmpty && value.contains(needle) : value == needle;\n  }\n\n  bool _matches(String condition, List<String> tags) {
-    final orParts = condition.split('|');
-    return orParts.any((orPart) => orPart.split('&').every((term) {
-      var token = term.trim();
-      var negate = false;
-      if (token.startsWith('~!')) {
-        negate = true;
-        token = token.substring(2);
-      } else if (token.startsWith('~')) {
-        negate = true;
-        token = token.substring(1);
-      }
-      if (token.startsWith('*')) token = token.substring(1);
-      if (token.isEmpty) return false;
-      final matched = tags.any((tag) => tag.toLowerCase().contains(token.toLowerCase()));
-      return negate ? !matched : matched;
-    }));
+  static String _stripWeight(String value) {
+    final trimmed = value.trim();
+    final match = RegExp(r'^[-+]?\d+(?:\.\d+)?::(.*?)\s*::$').firstMatch(trimmed);
+    return match == null ? trimmed : match.group(1)!.trim();
   }
 
-  List<String> _split(String input) =>
-      input.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
-}
-)
-          .firstMatch(rule);
-      if (match == null) continue;
-      final condition = match.group(1)!.trim();
-      if (!_matches(condition, tags)) continue;
-      final values = _split(match.group(4)!);
-      if (values.isEmpty) continue;
-      final location = match.group(2)!;
-      final append = match.group(3) == '+=';
-      if (location == 'prefix') {
-        tags = append ? [...values, ...tags] : [...values, ...tags];
-      } else {
-        tags = append ? [...tags, ...values] : [...tags, ...values];
-      }
-    }
-    return tags.join(', ');
+  bool _tagMatches(String tag, String target) {
+    final partial = target.startsWith('*');
+    final needle = _stripWeight(partial ? target.substring(1) : target);
+    final value = _stripWeight(tag);
+    return partial ? needle.isNotEmpty && value.contains(needle) : value == needle;
   }
 
   bool _matches(String condition, List<String> tags) {
-    final orParts = condition.split('|');
-    return orParts.any((orPart) => orPart.split('&').every((term) {
-      var token = term.trim();
-      var negate = false;
-      if (token.startsWith('~!')) {
-        negate = true;
-        token = token.substring(2);
-      } else if (token.startsWith('~')) {
-        negate = true;
-        token = token.substring(1);
+    return condition.split('|').any((orPart) => orPart.split('&').every((part) {
+      var term = part.trim();
+      var negative = false;
+      if (term.startsWith('~!')) {
+        negative = true;
+        term = term.substring(2);
+      } else if (term.startsWith('~')) {
+        negative = true;
+        term = term.substring(1);
       }
-      if (token.startsWith('*')) token = token.substring(1);
-      if (token.isEmpty) return false;
-      final matched = tags.any((tag) => tag.toLowerCase().contains(token.toLowerCase()));
-      return negate ? !matched : matched;
+      if (term.isEmpty) return false;
+      final found = tags.any((tag) => _tagMatches(tag, term));
+      return negative ? !found : found;
     }));
   }
 
-  List<String> _split(String input) =>
-      input.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+  List<String> _splitTags(String text) {
+    final result = <String>[];
+    final buffer = StringBuffer();
+    var depth = 0;
+    for (final char in text.split('')) {
+      if (char == '<') depth++;
+      if (char == '>' && depth > 0) depth--;
+      if (char == ',' && depth == 0) {
+        final tag = buffer.toString().trim();
+        if (tag.isNotEmpty) result.add(tag);
+        buffer.clear();
+      } else {
+        buffer.write(char);
+      }
+    }
+    final last = buffer.toString().trim();
+    if (last.isNotEmpty) result.add(last);
+    return result;
+  }
 }
