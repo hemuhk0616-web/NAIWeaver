@@ -1259,14 +1259,18 @@ class GenerationNotifier extends ChangeNotifier {
 
   final List<({String preview, ({String prompt, String negative, List<NaiCharacter> characters, List<NaiInteraction> interactions, int? width, int? height}) inputs})> _naiaPreviewSamples = [];
 
-  void selectNaiaPreviewSample(int index) {
-    if (index < 0 || index >= _naiaPreviewSamples.length) return;
+  bool selectNaiaPreviewSample(int index, String signature) {
+    if (signature != _naiaPreviewSignature()) return false;
+    if (index < 0 || index >= _naiaPreviewSamples.length) return false;
     final offset = _naiaPreviewSamples.length - 3 + index;
-    if (offset < 0 || offset >= _naiaPreviewSamples.length) return;
+    if (offset < 0 || offset >= _naiaPreviewSamples.length) return false;
     _lockedNaiaPreview = _naiaPreviewSamples[offset].inputs;
-    _lockedNaiaSignature = _naiaPreviewSignature();
+    _lockedNaiaSignature = signature;
     notifyListeners();
+    return true;
   }
+
+  String get naiaPreviewSignature => _naiaPreviewSignature();
 
   void clearLockedNaiaPreview() {
     _lockedNaiaPreview = null;
@@ -1278,9 +1282,6 @@ class GenerationNotifier extends ChangeNotifier {
   Future<String> previewNaiaPrompt() async {
     final signature = _naiaPreviewSignature();
     final inputs = await _resolveNaiaGenerationInputs();
-    _lockedNaiaPreview = inputs;
-    _lockedNaiaSignature = signature;
-    notifyListeners();
     final styleResult = resolveStyles(
       isStyleEnabled: _state.isStyleEnabled,
       activeStyleNames: _state.activeStyleNames,
@@ -1310,6 +1311,9 @@ class GenerationNotifier extends ChangeNotifier {
         ..writeln('UC: ${inputs.characters[i].uc}');
     }
     final preview = buffer.toString().trimRight();
+    if (signature != _naiaPreviewSignature()) {
+      throw StateError('미리보기 중 설정이 변경되었습니다. 다시 추첨해 주세요.');
+    }
     _naiaPreviewSamples.add((preview: preview, inputs: inputs));
     if (_naiaPreviewSamples.length > 10) _naiaPreviewSamples.removeAt(0);
     return preview;
