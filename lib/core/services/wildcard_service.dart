@@ -49,10 +49,10 @@ class WildcardService {
       }
 
       final diskNames = dir
-          .listSync()
+          .listSync(recursive: true, followLinks: false)
           .whereType<File>()
-          .where((f) => p.extension(f.path) == '.txt')
-          .map((f) => p.basenameWithoutExtension(f.path))
+          .where((f) => p.extension(f.path).toLowerCase() == '.txt')
+          .map((f) => p.withoutExtension(p.relative(f.path, from: wildcardDir)).replaceAll('\\', '/'))
           .toSet();
 
       if (_customOrder.isNotEmpty) {
