@@ -1236,6 +1236,26 @@ class GenerationNotifier extends ChangeNotifier {
         for (var i = 0; i < processedCharacters.length; i++)
           processedCharacters[i].copyWith(prompt: replacedPrompts[i]),
       ];
+      final enabledSlots = const NaiaCharacterActions().applyEnabled(
+        processedCharacters.map((c) => c.prompt).toList(),
+        naiaConditionalRules,
+        matches: (condition, prompts, enabled) => pipeline.conditions.matches(
+          condition, processedPrompt,
+          characterPrompts: prompts,
+          characterEnabled: enabled,
+        ),
+      );
+      // Interaction indices refer to original slots. Refuse an unsafe
+      // reindexing rather than silently sending incorrect interactions.
+      if (enabledSlots.contains(false) && _state.interactions.isNotEmpty) {
+        throw StateError(
+          'char_set(disabled)는 캐릭터 상호작용이 설정된 경우 아직 지원되지 않습니다.',
+        );
+      }
+      processedCharacters = [
+        for (var i = 0; i < processedCharacters.length; i++)
+          if (enabledSlots[i]) processedCharacters[i],
+      ];
       final naiaResolution = NaiaResolutionDirective.extract(processedPrompt);
       final resolvedPrompt = _tagService.resolveAliases(naiaResolution.prompt);
 
@@ -1305,7 +1325,7 @@ class GenerationNotifier extends ChangeNotifier {
         promptSuffix: combinedSuffix,
         characters: processedCharacters,
         interactions: _state.interactions,
-        useCoords: _state.characters.isNotEmpty ? !_state.autoPositioning : false,
+        useCoords: processedCharacters.isNotEmpty ? !_state.autoPositioning : false,
         directorRefImages: dirPayload?.images,
         directorRefDescriptions: dirPayload?.descriptions,
         directorRefStrengths: dirPayload?.strengths,
