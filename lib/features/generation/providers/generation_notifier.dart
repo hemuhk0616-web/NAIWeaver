@@ -1176,11 +1176,11 @@ class GenerationNotifier extends ChangeNotifier {
 
   /// Conditional rules are kept separately from user-authored prompt text.
   /// An empty rule set retains NAIWeaver's existing generation behavior.
-  String naiaConditionalRules = '';
+  String get naiaConditionalRules => _prefs.naiaConditionalRules;
 
   void setNaiaConditionalRules(String rules) {
     if (naiaConditionalRules == rules) return;
-    naiaConditionalRules = rules;
+    _prefs.setNaiaConditionalRules(rules);
     notifyListeners();
   }
 
