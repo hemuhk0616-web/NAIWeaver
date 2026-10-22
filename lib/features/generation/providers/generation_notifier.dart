@@ -1274,8 +1274,11 @@ class GenerationNotifier extends ChangeNotifier {
 
   bool selectNaiaPreviewSample(int index, String signature) {
     if (signature != _naiaPreviewSignature()) return false;
-    if (index < 0 || index >= _naiaPreviewSamples.length) return false;
-    final offset = _naiaPreviewSamples.length - 3 + index;
+    // The preview dialog shows at most the latest three samples.
+    final firstVisible = math.max(0, _naiaPreviewSamples.length - 3);
+    final visibleCount = _naiaPreviewSamples.length - firstVisible;
+    if (index < 0 || index >= visibleCount) return false;
+    final offset = firstVisible + index;
     if (offset < 0 || offset >= _naiaPreviewSamples.length) return false;
     _lockedNaiaPreview = _naiaPreviewSamples[offset].inputs;
     _lockedNaiaSignature = signature;
