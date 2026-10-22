@@ -94,4 +94,30 @@ void main() {
     expect(result.main, 'start tag, solo, smile, end tag');
   });
 
+  test('weighted duplicate tags are replaced across prompt segments', () {
+    final result = engine.apply(
+      '1.5::hat::, hat', [],
+      '(hat):prefix+=hat\n'
+      '(hat):postfix+=hat\n'
+      '(hat):hat=cap',
+    );
+    expect(result.main, 'cap, cap, cap, cap');
+  });
+
+  test('insertion searches prefix before main and postfix', () {
+    final result = engine.apply('hat', [],
+      '(hat):prefix+=hat\n'
+      '(hat):hat+=ribbon',
+    );
+    expect(result.main, 'hat, ribbon, hat');
+  });
+
+  test('conditions can read earlier prefix tags', () {
+    final result = engine.apply('solo', [],
+      '(solo):prefix+=hat\n'
+      '(hat):main+=smile',
+    );
+    expect(result.main, 'hat, solo, smile');
+  });
+
 }
