@@ -10,6 +10,11 @@ void main() {
         'solo, pink hair, blue eyes');
   });
 
+  test('NAIA plus-colon appends to fixed targets', () {
+    expect(engine.apply('solo', '(solo):main+:smile'), 'solo, smile');
+    expect(engine.apply('solo', '(solo):postfix+:blush'), 'solo, blush');
+  });
+
   test('NAIA replacement handles weighted tags', () {
     expect(engine.apply('1.2::solo::, smile', '(solo):solo=1girl'),
         '1girl, smile');
