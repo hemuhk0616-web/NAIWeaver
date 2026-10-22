@@ -8,11 +8,17 @@ class NaiaPromptPipeline {
   final WildcardProcessor wildcards;
   final NaiaConditionalProcessor conditions = const NaiaConditionalProcessor();
 
-  Future<String> process(String prompt, {String rules = ''}) async {
+  Future<String> process(String prompt, {
+    String rules = '',
+    List<String> characterPrompts = const [],
+    List<bool> characterEnabled = const [],
+  }) async {
     final expanded = await wildcards.process(prompt);
     if (rules.trim().isEmpty) return expanded;
     final expandedRules = await _expandActionValues(rules);
-    return conditions.apply(expanded, expandedRules);
+    return conditions.apply(expanded, expandedRules,
+      characterPrompts: characterPrompts,
+      characterEnabled: characterEnabled);
   }
 
   Future<String> _expandActionValues(String rules) async {
