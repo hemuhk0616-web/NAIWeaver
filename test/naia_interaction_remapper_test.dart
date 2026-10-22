@@ -45,4 +45,24 @@ void main() {
     expect(item.sourceCharacterIndices, [0, 2]);
   });
 
+  test('drops an interaction when one of several sources is disabled', () {
+    final item = NaiInteraction(
+      sourceCharacterIndices: [0, 1],
+      targetCharacterIndices: [2],
+      actionName: 'group',
+      type: InteractionType.sourceTarget,
+    );
+    expect(remapper.remap([item], [true, false, true]), isEmpty);
+  });
+
+  test('drops an interaction referencing a missing character', () {
+    final item = NaiInteraction(
+      sourceCharacterIndices: [0],
+      targetCharacterIndices: [4],
+      actionName: 'group',
+      type: InteractionType.sourceTarget,
+    );
+    expect(remapper.remap([item], [true, true]), isEmpty);
+  });
+
 }
