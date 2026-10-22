@@ -1237,8 +1237,8 @@ class GenerationNotifier extends ChangeNotifier {
     promptController.text,
     negativePromptController.text,
     naiaConditionalRules,
-    _state.characters.map((c) => [c.prompt, c.uc, c.enabled].join('\u0002')).join('\u0003'),
-    _state.interactions.toString(),
+    _state.characters.map((c) => [c.prompt, c.uc, c.center.x, c.center.y].join('\u0002')).join('\u0003'),
+    _state.interactions.map((item) => item.toJson().toString()).join('\u0003'),
     _state.width.toString(),
     _state.height.toString(),
   ].join('\u0001');
