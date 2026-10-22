@@ -52,18 +52,28 @@ class WildcardProcessor {
       return null;
     }
     try {
-      final resolved = p.normalize(p.join(wildcardDir, '$name.txt'));
+      final normalizedName = name.replaceAll('\\', '/');
+      if (normalizedName.startsWith('/') || normalizedName.split('/').contains('..')) return null;
+      final root = p.normalize(p.absolute(wildcardDir));
+      var resolved = p.normalize(p.join(root, '$normalizedName.txt'));
+      if (!p.isWithin(root, resolved)) return null;
+      if (!await File(resolved).exists() && !normalizedName.contains('/')) {
+        final matches = wildcardService?.wildcardNames
+            .where((item) => item == normalizedName || item.endsWith('/$normalizedName'))
+            .toList() ?? [];
+        if (matches.length == 1) resolved = p.normalize(p.join(root, '${matches.single}.txt'));
+      }
       if (!p.isWithin(wildcardDir, resolved)) return null;
       final file = File(resolved);
       if (await file.exists()) {
         final lines = await file.readAsLines();
-        final validLines = lines.where((l) => l.trim().isNotEmpty).toList();
+        final validLines = lines.where((l) => l.trim().isNotEmpty && !l.trimLeft().startsWith('#')).toList();
 
         if (validLines.isNotEmpty) {
           final mode = wildcardService?.getMode(name) ?? WildcardMode.random;
           switch (mode) {
             case WildcardMode.random:
-              return validLines[_random.nextInt(validLines.length)].trim();
+              return _selectWeighted(validLines);
             case WildcardMode.sequential:
               return _selectSequential(name, validLines);
             case WildcardMode.shuffle:
@@ -103,7 +113,28 @@ class WildcardProcessor {
 
     for (final line in lines) {
       final trimmed = line.trim();
-      final match = RegExp(r'^(\d+)::(.+)$').firstMatch(trimmed);
+      final match = RegExp(r'^(\d+(?:\.\d+)?)\s*:(?!=|:)\s*(.+)
+      if (match != null) {
+        final weight = (double.parse(match.group(1)!) * 1000).round();
+        weights.add(weight);
+        values.add(match.group(2)!.trim());
+        totalWeight += weight;
+      } else {
+        weights.add(1000);
+        values.add(trimmed);
+        totalWeight += 1000;
+      }
+    }
+
+    var roll = _random.nextInt(totalWeight);
+    for (int i = 0; i < weights.length; i++) {
+      roll -= weights[i];
+      if (roll < 0) return values[i];
+    }
+    return values.last;
+  }
+}
+).firstMatch(trimmed);
       if (match != null) {
         final weight = int.parse(match.group(1)!);
         weights.add(weight);
