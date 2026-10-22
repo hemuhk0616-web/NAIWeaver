@@ -1198,8 +1198,29 @@ class GenerationNotifier extends ChangeNotifier {
 
     try {
       final pipeline = NaiaPromptPipeline(_wildcardProcessor);
+      final processedCharacters = await Future.wait(
+        _state.characters.asMap().entries.map((entry) async {
+          final c = entry.value;
+          final characterRules = naiaConditionalRules
+              .split(RegExp(r'\r?\n'))
+              .where((line) => line.trimLeft().startsWith('char:${entry.key + 1} '))
+              .map((line) => line.trimLeft().substring('char:${entry.key + 1} '.length))
+              .join('\n');
+          return c.copyWith(
+            prompt: _tagService.resolveAliases(
+              await pipeline.process(c.prompt, rules: characterRules)),
+            uc: _tagService.resolveAliases(await _wildcardProcessor.process(c.uc)),
+          );
+        }),
+      );
       final processedPrompt = await pipeline.process(
-        promptController.text, rules: naiaConditionalRules);
+        promptController.text,
+        rules: naiaConditionalRules.split(RegExp(r'\r?\n'))
+            .where((line) => !RegExp(r'^\s*char:\d+\s').hasMatch(line))
+            .join('\n'),
+        characterPrompts: processedCharacters.map((c) => c.prompt).toList(),
+        characterEnabled: List<bool>.filled(processedCharacters.length, true),
+      );
       final naiaResolution = NaiaResolutionDirective.extract(processedPrompt);
       final resolvedPrompt = _tagService.resolveAliases(naiaResolution.prompt);
 
@@ -1248,21 +1269,7 @@ class GenerationNotifier extends ChangeNotifier {
           caps.vibeTransfer ? _vibeTransferNotifier?.buildPayload() : null;
 
       // Process wildcards in character prompts
-      final processedCharacters = await Future.wait(
-        _state.characters.asMap().entries.map((entry) async {
-          final c = entry.value;
-          final characterRules = naiaConditionalRules
-              .split(RegExp(r'\r?\n'))
-              .where((line) => line.trimLeft().startsWith('char:${entry.key + 1} '))
-              .map((line) => line.trimLeft().substring('char:${entry.key + 1} '.length))
-              .join('\n');
-          return c.copyWith(
-            prompt: _tagService.resolveAliases(
-              await pipeline.process(c.prompt, rules: characterRules)),
-            uc: _tagService.resolveAliases(await _wildcardProcessor.process(c.uc)),
-          );
-        }),
-      );
+
 
       final result = await _service.generateImage(
         prompt: finalPrompt,
