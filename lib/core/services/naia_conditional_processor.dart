@@ -5,6 +5,13 @@
 class NaiaConditionalProcessor {
   const NaiaConditionalProcessor();
 
+  bool matches(String condition, String prompt, {
+    List<String> characterPrompts = const [],
+    List<bool> characterEnabled = const [],
+  }) => _matches(condition, _splitTags(prompt),
+      characterPrompts: characterPrompts,
+      characterEnabled: characterEnabled);
+
   String apply(String prompt, String rules, {
     List<String> characterPrompts = const [],
     List<bool> characterEnabled = const [],
