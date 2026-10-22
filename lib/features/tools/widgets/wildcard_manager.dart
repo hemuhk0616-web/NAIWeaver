@@ -96,7 +96,7 @@ class _WildcardManagerState extends State<WildcardManager> {
 
   Widget _buildMobileEditorBar(WildcardNotifier notifier, VisionTokens t) {
     final fileName = notifier.state.selectedFile != null
-        ? p.basenameWithoutExtension(notifier.state.selectedFile!.path).toUpperCase()
+        ? notifier.wildcardKey(notifier.state.selectedFile!).toUpperCase()
         : '';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -207,7 +207,7 @@ class _WildcardManagerState extends State<WildcardManager> {
               itemBuilder: (context, index) {
                 final file = state.files[index];
                 final isSelected = state.selectedFile?.path == file.path;
-                final fileName = p.basenameWithoutExtension(file.path);
+                final fileName = notifier.wildcardKey(file);
 
                 final isFav = notifier.isFavorite(file);
 
