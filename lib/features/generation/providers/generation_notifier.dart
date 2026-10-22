@@ -1187,46 +1187,82 @@ class GenerationNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Resolves prompt fields locally without calling the image API.
-  Future<String> previewNaiaPrompt() async {
+  Future<({String prompt, String negative, List<NaiCharacter> characters, List<NaiInteraction> interactions, int? width, int? height})> _resolveNaiaGenerationInputs() async {
     final pipeline = NaiaPromptPipeline(_wildcardProcessor);
-    final characters = await Future.wait(
-      _state.characters.map((character) async => (
-        prompt: await _wildcardProcessor.process(character.prompt),
-        uc: await _wildcardProcessor.process(character.uc),
-      )),
+    var processedCharacters = await Future.wait(
+      _state.characters.asMap().entries.map((entry) async {
+        final c = entry.value;
+        final characterRules = naiaConditionalRules
+            .split(RegExp(r'\r?\n'))
+            .where((line) => line.trimLeft().startsWith('char:${entry.key + 1} '))
+            .map((line) => line.trimLeft().substring('char:${entry.key + 1} '.length))
+            .join('\n');
+        return c.copyWith(
+          prompt: _tagService.resolveAliases(
+            await pipeline.process(c.prompt, rules: characterRules)),
+          uc: _tagService.resolveAliases(await _wildcardProcessor.process(c.uc)),
+        );
+      }),
     );
-    final main = await _wildcardProcessor.process(promptController.text);
-    final negative = await _wildcardProcessor.process(negativePromptController.text);
-    final rules = await pipeline.expandActionValues(
+    final expandedMain = await _wildcardProcessor.process(promptController.text);
+    final expandedNegative = await _wildcardProcessor.process(negativePromptController.text);
+    final expandedRules = await pipeline.expandActionValues(
       naiaConditionalRules.split(RegExp(r'\r?\n'))
-          .where((line) => !RegExp(r'^\s*char:\d+\s').hasMatch(line))
-          .join('\n'),
+        .where((line) => !RegExp(r'^\s*char:\d+\s').hasMatch(line))
+        .join('\n'),
     );
-    final result = const NaiaOrderedRuleEngine().apply(
-      main, characters.map((c) => c.prompt).toList(), rules,
-      negative: negative,
-      characterUc: characters.map((c) => c.uc).toList(),
+    final ordered = const NaiaOrderedRuleEngine().apply(
+      expandedMain,
+      processedCharacters.map((c) => c.prompt).toList(),
+      expandedRules,
+      negative: expandedNegative,
+      characterUc: processedCharacters.map((c) => c.uc).toList(),
     );
-    final resolution = NaiaResolutionDirective.extract(result.main);
+    final processedPrompt = ordered.main;
+    final processedInteractions = const NaiaInteractionRemapper().remap(
+      _state.interactions, ordered.enabled);
+    processedCharacters = [
+      for (var i = 0; i < processedCharacters.length; i++)
+        if (ordered.enabled[i])
+          processedCharacters[i].copyWith(
+            prompt: ordered.characters[i], uc: ordered.characterUc[i]),
+    ];
+    final naiaResolution = NaiaResolutionDirective.extract(processedPrompt);
+    final resolvedPrompt = _tagService.resolveAliases(naiaResolution.prompt);
+
+    return (prompt: resolvedPrompt, negative: _tagService.resolveAliases(ordered.negative), characters: processedCharacters, interactions: processedInteractions, width: naiaResolution.width, height: naiaResolution.height);
+  }
+
+  /// Resolves the same NAIA inputs used by image generation.
+  Future<String> previewNaiaPrompt() async {
+    final inputs = await _resolveNaiaGenerationInputs();
+    final styleResult = resolveStyles(
+      isStyleEnabled: _state.isStyleEnabled,
+      activeStyleNames: _state.activeStyleNames,
+      styles: _state.styles,
+      furryMode: _state.furryMode,
+    );
     final buffer = StringBuffer()
       ..writeln('MAIN')
-      ..writeln(_tagService.resolveAliases(resolution.prompt))
+      ..writeln(inputs.prompt)
+      ..writeln()
+      ..writeln('STYLE PREFIX')
+      ..writeln(styleResult.prefix ?? '')
+      ..writeln()
+      ..writeln('STYLE SUFFIX')
+      ..writeln(styleResult.suffix ?? '')
       ..writeln()
       ..writeln('NEGATIVE')
-      ..writeln(_tagService.resolveAliases(result.negative));
-    if (resolution.width != null && resolution.height != null) {
-      buffer
-        ..writeln()
-        ..writeln('RESOLUTION: ${resolution.width}x${resolution.height}');
-    }
-    for (var i = 0; i < result.characters.length; i++) {
-      if (!result.enabled[i]) continue;
+      ..writeln([inputs.negative, if (styleResult.negative != null) styleResult.negative!].where((s) => s.isNotEmpty).join(', '))
+      ..writeln()
+      ..writeln('RESOLUTION');
+    buffer.writeln('${inputs.width ?? _state.width.toInt()} x ${inputs.height ?? _state.height.toInt()}');
+    for (var i = 0; i < inputs.characters.length; i++) {
       buffer
         ..writeln()
         ..writeln('CHARACTER ${i + 1}')
-        ..writeln(_tagService.resolveAliases(result.characters[i]))
-        ..writeln('UC: ${_tagService.resolveAliases(result.characterUc[i])}');
+        ..writeln(inputs.characters[i].prompt)
+        ..writeln('UC: ${inputs.characters[i].uc}');
     }
     return buffer.toString().trimRight();
   }
@@ -1243,48 +1279,10 @@ class GenerationNotifier extends ChangeNotifier {
     }
 
     try {
-      final pipeline = NaiaPromptPipeline(_wildcardProcessor);
-      var processedCharacters = await Future.wait(
-        _state.characters.asMap().entries.map((entry) async {
-          final c = entry.value;
-          final characterRules = naiaConditionalRules
-              .split(RegExp(r'\r?\n'))
-              .where((line) => line.trimLeft().startsWith('char:${entry.key + 1} '))
-              .map((line) => line.trimLeft().substring('char:${entry.key + 1} '.length))
-              .join('\n');
-          return c.copyWith(
-            prompt: _tagService.resolveAliases(
-              await pipeline.process(c.prompt, rules: characterRules)),
-            uc: _tagService.resolveAliases(await _wildcardProcessor.process(c.uc)),
-          );
-        }),
-      );
-      final expandedMain = await _wildcardProcessor.process(promptController.text);
-      final expandedNegative = await _wildcardProcessor.process(negativePromptController.text);
-      final expandedRules = await pipeline.expandActionValues(
-        naiaConditionalRules.split(RegExp(r'\r?\n'))
-          .where((line) => !RegExp(r'^\s*char:\d+\s').hasMatch(line))
-          .join('\n'),
-      );
-      final ordered = const NaiaOrderedRuleEngine().apply(
-        expandedMain,
-        processedCharacters.map((c) => c.prompt).toList(),
-        expandedRules,
-        negative: expandedNegative,
-        characterUc: processedCharacters.map((c) => c.uc).toList(),
-      );
-      final processedPrompt = ordered.main;
-      final processedInteractions = const NaiaInteractionRemapper().remap(
-        _state.interactions, ordered.enabled);
-      processedCharacters = [
-        for (var i = 0; i < processedCharacters.length; i++)
-          if (ordered.enabled[i])
-            processedCharacters[i].copyWith(
-              prompt: ordered.characters[i], uc: ordered.characterUc[i]),
-      ];
-      final naiaResolution = NaiaResolutionDirective.extract(processedPrompt);
-      final resolvedPrompt = _tagService.resolveAliases(naiaResolution.prompt);
-
+      final naiaInputs = await _resolveNaiaGenerationInputs();
+      final resolvedPrompt = naiaInputs.prompt;
+      final processedCharacters = naiaInputs.characters;
+      final processedInteractions = naiaInputs.interactions;
       String finalPrompt = resolvedPrompt;
       if (_galleryNotifier?.demoMode == true) {
         final demoPos = _prefs.demoPositivePrefix;
@@ -1312,7 +1310,7 @@ class GenerationNotifier extends ChangeNotifier {
       String? styleNegativeContent = styleResult.negative;
 
       String baseNegative = _tagService.resolveAliases(
-          ordered.negative);
+          naiaInputs.negative);
       if (_galleryNotifier?.demoMode == true) {
         final demoNeg = _prefs.demoNegativePrefix;
         if (demoNeg.isNotEmpty) {
@@ -1332,8 +1330,8 @@ class GenerationNotifier extends ChangeNotifier {
       final result = await _service.generateImage(
         prompt: finalPrompt,
         negativePrompt: fullNegativePrompt,
-        width: naiaResolution.width ?? _state.width.toInt(),
-        height: naiaResolution.height ?? _state.height.toInt(),
+        width: naiaInputs.width ?? _state.width.toInt(),
+        height: naiaInputs.height ?? _state.height.toInt(),
         scale: _state.scale,
         steps: _state.steps.toInt(),
         sampler: _state.sampler,
