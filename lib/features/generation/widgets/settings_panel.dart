@@ -491,21 +491,87 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Builder(builder: (context) {
             final diagnostics = const NaiaRuleValidator()
                 .validate(notifier.naiaConditionalRules);
+            final errors = diagnostics.where((d) => !d.warning).length;
+            final warnings = diagnostics.length - errors;
             if (diagnostics.isEmpty) {
-              return const Text('규칙 구조 검사: 오류 없음 (실행 검증은 별도 필요)');
+              return const Row(
+                children: [
+                  Icon(Icons.check_circle_outline, color: Colors.green, size: 18),
+                  SizedBox(width: 8),
+                  Expanded(child: Text('정적 규칙 검사 통과 · 실제 실행 결과는 미리보기로 확인하세요.')),
+                ],
+              );
             }
+            final statusColor = errors > 0 ? Colors.red : Colors.orange;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('규칙 검사: ${diagnostics.where((d) => !d.warning).length}개 오류 · ${diagnostics.where((d) => d.warning).length}개 경고',
-                    style: const TextStyle(color: Colors.orange)),
-                for (final diagnostic in diagnostics.take(8))
-                  Text('${diagnostic.line}행 ${diagnostic.warning ? '[경고]' : '[오류]'}: ${diagnostic.message}',
-                      style: const TextStyle(color: Colors.orange)),
+                Row(
+                  children: [
+                    Icon(errors > 0 ? Icons.error_outline : Icons.warning_amber_outlined,
+                        color: statusColor, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text('규칙 검사: 오류 $errors개 · 경고 $warnings개',
+                          style: TextStyle(color: statusColor,
+                              fontWeight: FontWeight.w600)),
+                    ),
+                    TextButton.icon(
+                      icon: const Icon(Icons.list_alt, size: 18),
+                      label: const Text('전체 보기'),
+                      onPressed: () => showDialog<void>(
+                        context: context,
+                        builder: (dialogContext) => AlertDialog(
+                          title: Text('규칙 진단 · ${diagnostics.length}건'),
+                          content: SizedBox(
+                            width: 520,
+                            child: ListView.separated(
+                              shrinkWrap: true,
+                              itemCount: diagnostics.length,
+                              separatorBuilder: (_, __) => const Divider(height: 12),
+                              itemBuilder: (context, index) {
+                                final d = diagnostics[index];
+                                return ListTile(
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  leading: Icon(
+                                    d.warning ? Icons.warning_amber_outlined
+                                        : Icons.error_outline,
+                                    color: d.warning ? Colors.orange : Colors.red,
+                                  ),
+                                  title: Text('${d.line}행 · ${d.warning ? "경고" : "오류"}'),
+                                  subtitle: SelectableText(d.message),
+                                );
+                              },
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(dialogContext),
+                              child: const Text('닫기'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                for (final diagnostic in diagnostics.take(3))
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      '${diagnostic.line}행 [${diagnostic.warning ? "경고" : "오류"}] ${diagnostic.message}',
+                      style: TextStyle(
+                        color: diagnostic.warning ? Colors.orange : Colors.red,
+                      ),
+                    ),
+                  ),
+                if (diagnostics.length > 3)
+                  Text('외 ${diagnostics.length - 3}건 · 전체 보기에서 확인하세요.'),
               ],
             );
           }),
