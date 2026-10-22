@@ -871,8 +871,8 @@ class _SimpleGeneratorAppState extends State<SimpleGeneratorApp> with SingleTick
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: context.t.surfaceHigh,
-      builder: (sheetContext) => FractionallySizedBox(
-        heightFactor: 0.88,
+      builder: (sheetContext) => SizedBox(
+        height: MediaQuery.sizeOf(sheetContext).height * 0.88,
         child: DefaultTabController(
           length: 4,
           child: Column(
