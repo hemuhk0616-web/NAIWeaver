@@ -27,6 +27,7 @@ import '../../../core/services/wildcard_processor.dart';
 import '../../../core/services/naia_prompt_pipeline.dart';
 import '../../../core/services/naia_resolution_directive.dart';
 import '../../../core/services/naia_character_actions.dart';
+import '../../../core/services/naia_interaction_remapper.dart';
 import '../../../core/services/presets.dart';
 import '../../../core/services/tag_service.dart';
 import '../../../core/utils/image_utils.dart';
@@ -1232,13 +1233,8 @@ class GenerationNotifier extends ChangeNotifier {
           characterEnabled: enabled,
         ),
       );
-      // Keep original indices until interactions are remapped safely.
-      if (characterResult.enabled.contains(false) &&
-          _state.interactions.isNotEmpty) {
-        throw StateError(
-          'char_set(disabled)는 캐릭터 상호작용이 설정된 경우 아직 지원되지 않습니다.',
-        );
-      }
+      final processedInteractions = const NaiaInteractionRemapper().remap(
+        _state.interactions, characterResult.enabled);
       processedCharacters = [
         for (var i = 0; i < processedCharacters.length; i++)
           if (characterResult.enabled[i])
@@ -1312,7 +1308,7 @@ class GenerationNotifier extends ChangeNotifier {
         promptPrefix: combinedPrefix,
         promptSuffix: combinedSuffix,
         characters: processedCharacters,
-        interactions: _state.interactions,
+        interactions: processedInteractions,
         useCoords: processedCharacters.isNotEmpty ? !_state.autoPositioning : false,
         directorRefImages: dirPayload?.images,
         directorRefDescriptions: dirPayload?.descriptions,
