@@ -384,11 +384,37 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
         }
       }
     }
+    if (sections.isNotEmpty) sections.add(SizedBox(height: sectionGap));
+    sections.add(_buildNaiaRules(notifier));
     sections.add(const SizedBox(height: 20));
 
     return ListView(
       padding: EdgeInsets.fromLTRB(hPad, 8, hPad, 40 + MediaQuery.of(context).padding.bottom + MediaQuery.of(context).viewInsets.bottom),
       children: sections,
+    );
+  }
+
+  Widget _buildNaiaRules(GenerationNotifier notifier) {
+    return ExpansionTile(
+      title: const Text('NAIA 조건부 프롬프트'),
+      subtitle: const Text('규칙은 기기에 자동 저장됩니다'),
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: TextFormField(
+            key: const ValueKey('naia_conditional_rules_editor'),
+            initialValue: notifier.naiaConditionalRules,
+            minLines: 3,
+            maxLines: 12,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: '(solo):main+=smile',
+              helperText: '현재 Main Prompt에만 적용됩니다.',
+            ),
+            onChanged: notifier.setNaiaConditionalRules,
+          ),
+        ),
+      ],
     );
   }
 
