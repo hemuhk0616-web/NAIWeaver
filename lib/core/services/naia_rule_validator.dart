@@ -20,7 +20,7 @@ class NaiaRuleValidator {
       var rule = original;
       // The generation pipeline routes char:N rules to the corresponding
       // character prompt before the ordered main rules are evaluated.
-      final scope = RegExp(r'^char:([1-9]\\d*)\\s+').firstMatch(rule);
+      final scope = RegExp(r'^char:([1-9]\d*)\s+').firstMatch(rule);
       if (scope != null) {
         rule = rule.substring(scope.end).trimLeft();
       }
