@@ -109,48 +109,25 @@ class WildcardProcessor {
   }
 
   String _selectWeighted(List<String> lines) {
-    int totalWeight = 0;
     final weights = <int>[];
     final values = <String>[];
-
+    var total = 0;
     for (final line in lines) {
       final trimmed = line.trim();
-      final match = RegExp(r'^(\d+(?:\.\d+)?)\s*:(?!=|:)\s*(.+)
-      if (match != null) {
-        final weight = (double.parse(match.group(1)!) * 1000).round();
-        weights.add(weight);
-        values.add(match.group(2)!.trim());
-        totalWeight += weight;
-      } else {
-        weights.add(1000);
-        values.add(trimmed);
-        totalWeight += 1000;
-      }
+      // NAIA uses a SINGLE colon for selection weight (100:tag).
+      // NovelAI's double-colon emphasis (1.5::tag::) must stay intact.
+      final match = RegExp(r'^(\d+(?:\.\d+)?)\s*:(?!:)\s*(.+)$').firstMatch(trimmed);
+      final weight = match == null
+          ? 1000
+          : (double.parse(match.group(1)!) * 1000).round();
+      if (weight <= 0) continue;
+      weights.add(weight);
+      values.add(match == null ? trimmed : match.group(2)!.trim());
+      total += weight;
     }
-
-    var roll = _random.nextInt(totalWeight);
-    for (int i = 0; i < weights.length; i++) {
-      roll -= weights[i];
-      if (roll < 0) return values[i];
-    }
-    return values.last;
-  }
-}
-).firstMatch(trimmed);
-      if (match != null) {
-        final weight = int.parse(match.group(1)!);
-        weights.add(weight);
-        values.add(match.group(2)!.trim());
-        totalWeight += weight;
-      } else {
-        weights.add(1);
-        values.add(trimmed);
-        totalWeight += 1;
-      }
-    }
-
-    var roll = _random.nextInt(totalWeight);
-    for (int i = 0; i < weights.length; i++) {
+    if (total == 0) return lines.first.trim();
+    var roll = _random.nextInt(total);
+    for (var i = 0; i < weights.length; i++) {
       roll -= weights[i];
       if (roll < 0) return values[i];
     }
