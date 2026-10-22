@@ -4,6 +4,20 @@ import 'package:naiweaver/core/services/naia_conditional_processor.dart';
 void main() {
   const engine = NaiaConditionalProcessor();
 
+  test('append operators use the action value, not the operator token', () {
+    expect(engine.apply('solo', '(solo):main+=smile'), 'solo, smile');
+    expect(engine.apply('solo', '(solo):prefix+=high quality'),
+        'high quality, solo');
+    expect(engine.apply('solo', '(solo):main+:happy'), 'solo, happy');
+    expect(engine.apply('solo, blue eyes', '(solo):solo+=pink hair'),
+        'solo, pink hair, blue eyes');
+  });
+
+  test('literal plus-colon in an append value does not change operator', () {
+    expect(engine.apply('solo, hat', '(solo):hat+=note+:value'),
+        'solo, hat, note+:value');
+  });
+
   test('NAIA append and insert-after', () {
     expect(engine.apply('solo', '(solo):main+=smile'), 'solo, smile');
     expect(engine.apply('solo, blue eyes', '(solo):solo+=pink hair'),
