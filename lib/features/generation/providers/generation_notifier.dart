@@ -24,6 +24,7 @@ import '../../../core/services/preferences_service.dart';
 import '../../../core/services/novel_ai_service.dart';
 import '../../../core/services/nai_text_service.dart';
 import '../../../core/services/wildcard_processor.dart';
+import '../../../core/services/naia_prompt_pipeline.dart';
 import '../../../core/services/presets.dart';
 import '../../../core/services/tag_service.dart';
 import '../../../core/utils/image_utils.dart';
@@ -1173,6 +1174,10 @@ class GenerationNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Conditional rules are kept separately from user-authored prompt text.
+  /// An empty rule set retains NAIWeaver's existing generation behavior.
+  String naiaConditionalRules = '';
+
   Future<void> generate() async {
     clearTagSuggestions();
 
@@ -1185,7 +1190,9 @@ class GenerationNotifier extends ChangeNotifier {
     }
 
     try {
-      final processedPrompt = await _wildcardProcessor.process(promptController.text);
+      final pipeline = NaiaPromptPipeline(_wildcardProcessor);
+      final processedPrompt = await pipeline.process(
+        promptController.text, rules: naiaConditionalRules);
       final resolvedPrompt = _tagService.resolveAliases(processedPrompt);
 
       String finalPrompt = resolvedPrompt;
