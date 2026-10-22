@@ -16,7 +16,9 @@ class NaiaCharacterActions {
     for (final line in rules.split(RegExp(r'\r?\n'))) {
       final parsed = _parseRule(line);
       if (parsed == null ||
-          !matches(parsed.condition, current, enabled)) continue;
+          !matches(parsed.condition, current, enabled)) {
+        continue;
+      }
       final index = parsed.index - 1;
       if (index < 0 || index >= current.length) continue;
       if (parsed.action == 'char_set') {
