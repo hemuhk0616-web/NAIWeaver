@@ -1249,10 +1249,19 @@ class GenerationNotifier extends ChangeNotifier {
 
       // Process wildcards in character prompts
       final processedCharacters = await Future.wait(
-        _state.characters.map((c) async => c.copyWith(
-          prompt: _tagService.resolveAliases(await _wildcardProcessor.process(c.prompt)),
-          uc: _tagService.resolveAliases(await _wildcardProcessor.process(c.uc)),
-        )),
+        _state.characters.asMap().entries.map((entry) async {
+          final c = entry.value;
+          final characterRules = naiaConditionalRules
+              .split(RegExp(r'\r?\n'))
+              .where((line) => line.trimLeft().startsWith('char:${entry.key + 1} '))
+              .map((line) => line.trimLeft().substring('char:${entry.key + 1} '.length))
+              .join('\n');
+          return c.copyWith(
+            prompt: _tagService.resolveAliases(
+              await pipeline.process(c.prompt, rules: characterRules)),
+            uc: _tagService.resolveAliases(await _wildcardProcessor.process(c.uc)),
+          );
+        }),
       );
 
       final result = await _service.generateImage(
