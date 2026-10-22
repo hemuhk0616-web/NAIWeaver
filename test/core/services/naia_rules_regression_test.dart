@@ -28,9 +28,9 @@ void main() {
       expect(validator.validate('(solo):char_replace(1,old)'), isNotEmpty);
     });
 
-    test('warns about ignored scoped line prefix', () {
-      final result = validator.validate('char:1 (solo):main+=smile');
-      expect(result.single.warning, isTrue);
+    test('accepts character-scoped rules handled by the generation pipeline', () {
+      expect(validator.validate('char:1 (solo):main+=smile'), isEmpty);
+      expect(validator.validate('char:2 (solo):main+=happy'), isEmpty);
     });
 
     test('detects empty logical operands', () {
