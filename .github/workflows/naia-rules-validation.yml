@@ -10,6 +10,8 @@ on:
       - 'test/core/services/naia_rules_regression_test.dart'
       - 'test/naia_*_test.dart'
       - 'lib/features/generation/providers/generation_notifier.dart'
+      - 'lib/features/generation/widgets/settings_panel.dart'
+      - 'lib/main.dart'
       - '.github/workflows/naia-rules-validation.yml'
   workflow_dispatch:
 
