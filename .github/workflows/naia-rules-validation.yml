@@ -7,6 +7,7 @@ on:
       - 'lib/core/services/naia_*.dart'
       - 'test/core/services/naia_rules_regression_test.dart'
       - 'test/naia_*_test.dart'
+      - 'lib/features/generation/providers/generation_notifier.dart'
       - '.github/workflows/naia-rules-validation.yml'
   workflow_dispatch:
 
