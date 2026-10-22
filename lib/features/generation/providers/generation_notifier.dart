@@ -1178,6 +1178,12 @@ class GenerationNotifier extends ChangeNotifier {
   /// An empty rule set retains NAIWeaver's existing generation behavior.
   String naiaConditionalRules = '';
 
+  void setNaiaConditionalRules(String rules) {
+    if (naiaConditionalRules == rules) return;
+    naiaConditionalRules = rules;
+    notifyListeners();
+  }
+
   Future<void> generate() async {
     clearTagSuggestions();
 
