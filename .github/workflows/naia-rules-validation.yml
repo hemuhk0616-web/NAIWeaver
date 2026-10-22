@@ -2,7 +2,7 @@ name: NAIA Rules Validation
 
 on:
   push:
-    branches: [master]
+    branches: [master, 'test/naia-v10-validation']
     paths:
       - 'lib/core/services/naia_*.dart'
       - 'test/core/services/naia_rules_regression_test.dart'
