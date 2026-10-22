@@ -2,7 +2,8 @@
 class NaiaRuleDiagnostic {
   final int line;
   final String message;
-  const NaiaRuleDiagnostic(this.line, this.message);
+  final bool warning;
+  const NaiaRuleDiagnostic(this.line, this.message, {this.warning = false});
 }
 
 class NaiaRuleValidator {
@@ -42,6 +43,20 @@ class NaiaRuleValidator {
       final action = rule.substring(closing + 2).trim();
       if (condition.isEmpty) {
         issues.add(NaiaRuleDiagnostic(i + 1, '조건이 비어 있습니다.'));
+      }
+      // These forms parse but the current engine does not execute them.
+      if (RegExp(r'^global_uc\s*(?:\+=|\+:|=)').hasMatch(action)) {
+        issues.add(NaiaRuleDiagnostic(i + 1,
+            'global_uc 동작은 현재 처리되지 않습니다.', warning: true));
+      }
+      final scoped = RegExp(r'^(?:char|uc):(\d+)\s*(?:\+=|\+:|=)').firstMatch(action);
+      if (scoped != null && int.tryParse(scoped.group(1)!) == 0) {
+        issues.add(NaiaRuleDiagnostic(i + 1,
+            '캐릭터 번호는 1부터 시작합니다.', warning: true));
+      }
+      if (scope != null && action.startsWith('char_')) {
+        issues.add(NaiaRuleDiagnostic(i + 1,
+            'char:N 범위와 char_set/char_replace 조합은 적용 결과를 확인하세요.', warning: true));
       }
       if (action.isEmpty) {
         issues.add(NaiaRuleDiagnostic(i + 1, '동작이 비어 있습니다.'));
