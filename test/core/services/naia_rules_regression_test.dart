@@ -95,6 +95,24 @@ void main() {
       expect(result.main, 'solo, disabled');
     });
 
+    test('disabled character state is visible to later rules', () {
+      final result = engine.apply('solo', <String>['blue hair'],
+          '(solo):char_set(1,disabled)\n'
+          '(char_on(1)):main+=wrong\n'
+          '(~char_on(1)):main+=correct');
+      expect(result.enabled, <bool>[false]);
+      expect(result.main, 'solo, correct');
+    });
+
+    test('re-enabling a character affects subsequent rules', () {
+      final result = engine.apply('solo', <String>['blue hair'],
+          '(solo):char_set(1,disabled)\n'
+          '(~char_on(1)):char_set(1,enabled)\n'
+          '(char_on(1)):main+=visible');
+      expect(result.enabled, <bool>[true]);
+      expect(result.main, 'solo, visible');
+    });
+
     test('character replacement is isolated to working copy', () {
       final source = <String>['blue hair'];
       final result = engine.apply('solo', source,
