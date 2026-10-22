@@ -19,9 +19,11 @@ class WildcardProcessor {
     String processedPrompt = prompt;
     bool hasChanged = true;
     int depth = 0;
-    const int maxDepth = 5;
+    const int maxDepth = 20;
+    final visited = <String>{};
 
     while (hasChanged && depth < maxDepth) {
+      if (!visited.add(processedPrompt)) break; // Stop cyclic wildcard references.
       hasChanged = false;
       final matches = RegExp(r'__([^\r\n]+?)__').allMatches(processedPrompt).toList();
 
