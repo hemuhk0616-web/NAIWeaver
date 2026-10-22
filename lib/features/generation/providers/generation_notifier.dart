@@ -1325,9 +1325,21 @@ class GenerationNotifier extends ChangeNotifier {
       styles: _state.styles,
       furryMode: _state.furryMode,
     );
+    // Mirror the demo prefixes applied by generate() after NAIA resolution.
+    final demoMode = _galleryNotifier?.demoMode == true;
+    final demoPositive = demoMode ? _prefs.demoPositivePrefix : '';
+    final demoNegative = demoMode ? _prefs.demoNegativePrefix : '';
+    final previewMain = demoPositive.isEmpty
+        ? inputs.prompt : '$demoPositive, ${inputs.prompt}';
+    final previewNegative = [
+      if (demoNegative.isNotEmpty) demoNegative,
+      if (inputs.negative.isNotEmpty) inputs.negative,
+      if (styleResult.negative != null && styleResult.negative!.isNotEmpty)
+        styleResult.negative!,
+    ].join(', ');
     final buffer = StringBuffer()
       ..writeln('MAIN')
-      ..writeln(inputs.prompt)
+      ..writeln(previewMain)
       ..writeln()
       ..writeln('STYLE PREFIX')
       ..writeln(styleResult.prefix ?? '')
@@ -1336,7 +1348,7 @@ class GenerationNotifier extends ChangeNotifier {
       ..writeln(styleResult.suffix ?? '')
       ..writeln()
       ..writeln('NEGATIVE')
-      ..writeln([inputs.negative, if (styleResult.negative != null) styleResult.negative!].where((s) => s.isNotEmpty).join(', '))
+      ..writeln(previewNegative)
       ..writeln()
       ..writeln('RESOLUTION');
     buffer.writeln('${inputs.width ?? _state.width.toInt()} x ${inputs.height ?? _state.height.toInt()}');
