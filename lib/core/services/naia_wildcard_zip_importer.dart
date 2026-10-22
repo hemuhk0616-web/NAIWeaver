@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:archive/archive.dart';
 import 'package:path/path.dart' as p;
 import 'wildcard_service.dart';
+import 'zip_unicode_entry_names.dart';
 
 /// Imports nested wildcard TXT files without overwriting existing files.
 /// Archive limits mitigate decompression bombs and unexpectedly large imports.
@@ -19,13 +21,19 @@ class NaiaWildcardZipImporter {
     if (await source.length() > maxZipBytes) {
       throw const FormatException('ZIP 파일이 32MB 제한을 초과했습니다.');
     }
-    final archive = ZipDecoder().decodeBytes(await source.readAsBytes());
+    final bytes = await source.readAsBytes();
+    final archive = ZipDecoder().decodeBytes(bytes);
+    final unicodeNames = zipUnicodeEntryNames(Uint8List.fromList(bytes));
     final root = p.normalize(p.absolute(service.wildcardDir));
     final planned = <String, ArchiveFile>{};
     var totalBytes = 0;
-    for (final entry in archive) {
+    for (var index = 0; index < archive.length; index++) {
+      final entry = archive[index];
       if (!entry.isFile) continue;
-      final name = entry.name.replaceAll('\\', '/');
+      final name = (index < unicodeNames.length
+              ? unicodeNames[index] ?? entry.name
+              : entry.name)
+          .replaceAll('\\', '/');
       if (!name.toLowerCase().endsWith('.txt')) continue;
       if (name.startsWith('/') || name.split('/').contains('..')) continue;
       final destination = p.normalize(p.join(root, name));
