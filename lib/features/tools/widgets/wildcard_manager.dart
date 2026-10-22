@@ -52,6 +52,40 @@ class _WildcardManagerState extends State<WildcardManager> {
     }
   }
 
+  Future<void> _previewWildcard() async {
+    final notifier = context.read<WildcardNotifier>();
+    final file = notifier.state.selectedFile;
+    if (file == null) return;
+    await notifier.flushPendingSave();
+    final name = notifier.wildcardKey(file);
+    final processor = WildcardProcessor(
+      wildcardDir: notifier.wildcardDir,
+      wildcardService: notifier.wildcardService,
+    );
+    String result;
+    try {
+      result = await processor.process('__$name__');
+    } catch (error) {
+      result = '미리보기 오류: $error';
+    }
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('와일드카드 확장 미리보기'),
+        content: SingleChildScrollView(
+          child: SelectableText('__$name__\n\n→ $result'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('닫기'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final notifier = context.watch<WildcardNotifier>();
@@ -348,6 +382,13 @@ class _WildcardManagerState extends State<WildcardManager> {
           color: t.surfaceMid,
           child: Row(
             children: [
+              IconButton(
+                icon: const Icon(Icons.preview_outlined, size: 18),
+                onPressed: _previewWildcard,
+                tooltip: '와일드카드 확장 결과 미리보기',
+                constraints: const BoxConstraints(),
+                padding: const EdgeInsets.all(4),
+              ),
               IconButton(
                 icon: Icon(Icons.verified_outlined, size: 16, color: t.textSecondary),
                 onPressed: notifier.validateCurrentFile,
