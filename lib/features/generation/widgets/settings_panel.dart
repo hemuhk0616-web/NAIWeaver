@@ -134,7 +134,7 @@ class AdvancedSettingsPanel extends StatelessWidget {
           expandedHeight: expandedH,
           headerHeight: headerH,
           mobile: mobile,
-          collapsedLabel: context.l.panelAdvancedSettings.toUpperCase(),
+          collapsedLabel: mobile ? '고급 설정' : context.l.panelAdvancedSettings.toUpperCase(),
           onToggle: notifier.toggleSettings,
           expandedContent: isExpanded
               ? ExpandedSettingsContent(
