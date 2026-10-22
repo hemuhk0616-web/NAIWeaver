@@ -29,7 +29,8 @@ class NaiaConditionalProcessor {
           characterPrompts: characterPrompts,
           characterEnabled: characterEnabled)) continue;
       final action = rule.substring(closing + 2).trim();
-      final append = RegExp(r'^(.+?)(?:\+=|\+:)(.*)      if (append != null) {
+      final append = RegExp(r'^(.+?)(?:\+=|\+:)(.*)$').firstMatch(action);
+      if (append != null) {
         final target = append.group(1)!.trim();
         final values = _splitTags(append.group(2)!);
         if (target == 'prefix') {
