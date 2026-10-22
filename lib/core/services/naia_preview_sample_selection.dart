@@ -8,7 +8,9 @@ int? naiaPreviewSampleOffset({
   required int sampleCount,
 }) {
   if (requestedSignature != currentSignature ||
-      requestedSignature != samplesSignature) return null;
+      requestedSignature != samplesSignature) {
+    return null;
+  }
   final firstVisible = sampleCount > 3 ? sampleCount - 3 : 0;
   final visibleCount = sampleCount - firstVisible;
   if (index < 0 || index >= visibleCount) return null;
