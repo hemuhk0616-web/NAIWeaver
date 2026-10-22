@@ -1189,17 +1189,30 @@ class GenerationNotifier extends ChangeNotifier {
 
   Future<({String prompt, String negative, List<NaiCharacter> characters, List<NaiInteraction> interactions, int? width, int? height})> _resolveNaiaGenerationInputs() async {
     final pipeline = NaiaPromptPipeline(_wildcardProcessor);
+    // Resolve all character wildcards before evaluating cross-character rules.
+    final expandedCharacterPrompts = await Future.wait(
+      _state.characters.map((c) async =>
+          _tagService.resolveAliases(await _wildcardProcessor.process(c.prompt))),
+    );
+    final initialCharacterEnabled =
+        List<bool>.filled(_state.characters.length, true);
     var processedCharacters = await Future.wait(
       _state.characters.asMap().entries.map((entry) async {
         final c = entry.value;
+        final scopedRule = RegExp('^char:${entry.key + 1}\\s+');
         final characterRules = naiaConditionalRules
             .split(RegExp(r'\r?\n'))
-            .where((line) => line.trimLeft().startsWith('char:${entry.key + 1} '))
-            .map((line) => line.trimLeft().substring('char:${entry.key + 1} '.length))
+            .map((line) => line.trimLeft())
+            .where((line) => scopedRule.hasMatch(line))
+            .map((line) => line.replaceFirst(scopedRule, ''))
             .join('\n');
         return c.copyWith(
-          prompt: _tagService.resolveAliases(
-            await pipeline.process(c.prompt, rules: characterRules)),
+          prompt: _tagService.resolveAliases(pipeline.conditions.apply(
+            expandedCharacterPrompts[entry.key],
+            await pipeline.expandActionValues(characterRules),
+            characterPrompts: expandedCharacterPrompts,
+            characterEnabled: initialCharacterEnabled,
+          )),
           uc: _tagService.resolveAliases(await _wildcardProcessor.process(c.uc)),
         );
       }),
