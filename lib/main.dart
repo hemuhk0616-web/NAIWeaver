@@ -873,47 +873,64 @@ class _SimpleGeneratorAppState extends State<SimpleGeneratorApp> with SingleTick
       backgroundColor: context.t.surfaceHigh,
       builder: (sheetContext) => FractionallySizedBox(
         heightFactor: 0.88,
-        child: Column(
-          children: [
-            ListTile(
-              title: const Text('생성 설정'),
-              trailing: IconButton(
-                tooltip: '닫기',
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(sheetContext),
+        child: DefaultTabController(
+          length: 4,
+          child: Column(
+            children: [
+              ListTile(
+                title: const Text('빠른 설정'),
+                trailing: IconButton(
+                  tooltip: '닫기',
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(sheetContext),
+                ),
               ),
-            ),
-            const Divider(height: 1),
-            Expanded(
-              child: ExpandedSettingsContent(
-                onManageStyles: () {
-                  Navigator.pop(sheetContext);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ToolsHubScreen(initialToolId: 'styles'),
-                    ),
-                  );
-                },
-                onEditStyle: (styleName) {
-                  Navigator.pop(sheetContext);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ToolsHubScreen(
-                        initialToolId: 'styles',
-                        initialStyleName: styleName,
+              const TabBar(
+                isScrollable: true,
+                tabs: [
+                  Tab(text: '프롬프트'),
+                  Tab(text: '캐릭터'),
+                  Tab(text: '생성 설정'),
+                  Tab(text: 'NAIA'),
+                ],
+              ),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    for (final section in const ['prompt', 'character', 'settings', 'naia'])
+                      ExpandedSettingsContent(
+                        mobileSection: section,
+                        onManageStyles: () {
+                          Navigator.pop(sheetContext);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ToolsHubScreen(initialToolId: 'styles'),
+                            ),
+                          );
+                        },
+                        onEditStyle: (styleName) {
+                          Navigator.pop(sheetContext);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ToolsHubScreen(
+                                initialToolId: 'styles',
+                                initialStyleName: styleName,
+                              ),
+                            ),
+                          );
+                        },
+                        onSavePreset: () {
+                          Navigator.pop(sheetContext);
+                          _showSavePresetDialog(context, context.read<GenerationNotifier>());
+                        },
                       ),
-                    ),
-                  );
-                },
-                onSavePreset: () {
-                  Navigator.pop(sheetContext);
-                  _showSavePresetDialog(context, context.read<GenerationNotifier>());
-                },
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
