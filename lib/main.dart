@@ -799,7 +799,7 @@ class _SimpleGeneratorAppState extends State<SimpleGeneratorApp> with SingleTick
                   );
                 },
                 child: Text(
-                  context.l.mainGallery.toUpperCase(),
+                  mobile ? '갤러리' : context.l.mainGallery.toUpperCase(),
                   style: TextStyle(
                     color: t.headerText,
                     fontSize: t.fontSize(mobile ? 11 : 8),
@@ -816,7 +816,7 @@ class _SimpleGeneratorAppState extends State<SimpleGeneratorApp> with SingleTick
                   );
                 },
                 child: Text(
-                  context.l.mainTools.toUpperCase(),
+                  mobile ? '도구' : context.l.mainTools.toUpperCase(),
                   style: TextStyle(
                     color: t.headerText,
                     fontSize: t.fontSize(mobile ? 11 : 8),
@@ -866,25 +866,19 @@ class _SimpleGeneratorAppState extends State<SimpleGeneratorApp> with SingleTick
   // Android-first shortcut: keep the image visible until the user explicitly
   // opens settings. Reuse existing controls/state rather than duplicating them.
   void _showMobileSettings(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: context.t.surfaceHigh,
-      builder: (sheetContext) => SizedBox(
-        height: MediaQuery.sizeOf(sheetContext).height * 0.88,
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: true,
+        builder: (sheetContext) => Scaffold(
+          appBar: AppBar(title: const Text('빠른 설정')),
+          body: SafeArea(
+            child: SizedBox(
+              height: MediaQuery.sizeOf(sheetContext).height - kToolbarHeight - MediaQuery.paddingOf(sheetContext).top,
         child: DefaultTabController(
           length: 4,
           child: Column(
             children: [
-              ListTile(
-                title: const Text('빠른 설정'),
-                trailing: IconButton(
-                  tooltip: '닫기',
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(sheetContext),
-                ),
-              ),
+
               const TabBar(
                 isScrollable: true,
                 tabs: [
@@ -930,6 +924,9 @@ class _SimpleGeneratorAppState extends State<SimpleGeneratorApp> with SingleTick
                 ),
               ),
             ],
+          ),
+        ),
+            ),
           ),
         ),
       ),
