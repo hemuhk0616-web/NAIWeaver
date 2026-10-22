@@ -1261,7 +1261,9 @@ class GenerationNotifier extends ChangeNotifier {
 
   void selectNaiaPreviewSample(int index) {
     if (index < 0 || index >= _naiaPreviewSamples.length) return;
-    _lockedNaiaPreview = _naiaPreviewSamples[index].inputs;
+    final offset = _naiaPreviewSamples.length - 3 + index;
+    if (offset < 0 || offset >= _naiaPreviewSamples.length) return;
+    _lockedNaiaPreview = _naiaPreviewSamples[offset].inputs;
     _lockedNaiaSignature = _naiaPreviewSignature();
     notifyListeners();
   }
