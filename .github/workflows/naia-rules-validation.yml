@@ -39,4 +39,4 @@ jobs:
         run: flutter analyze
 
       - name: Run NAIA service and regression tests
-        run: flutter test test/core/services/naia_rules_regression_test.dart test/naia_character_actions_test.dart test/naia_conditional_processor_test.dart test/naia_interaction_remapper_test.dart test/naia_ordered_rule_engine_test.dart test/naia_prompt_pipeline_test.dart test/naia_resolution_directive_test.dart test/naia_rule_validator_test.dart
+        run: flutter test test/core/services/naia_rules_regression_test.dart test/naia_character_actions_test.dart test/naia_conditional_processor_test.dart test/naia_interaction_remapper_test.dart test/naia_preview_sample_selection_test.dart test/naia_ordered_rule_engine_test.dart test/naia_prompt_pipeline_test.dart test/naia_resolution_directive_test.dart test/naia_rule_validator_test.dart
