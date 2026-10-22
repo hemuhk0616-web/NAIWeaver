@@ -13,6 +13,8 @@ int? naiaPreviewSampleOffset({
   }
   final firstVisible = sampleCount > 3 ? sampleCount - 3 : 0;
   final visibleCount = sampleCount - firstVisible;
-  if (index < 0 || index >= visibleCount) return null;
+  if (index < 0 || index >= visibleCount) {
+    return null;
+  }
   return firstVisible + index;
 }
