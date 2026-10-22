@@ -1463,7 +1463,7 @@ class GenerationNotifier extends ChangeNotifier {
               ? _state.activeStyleNames
               : <String>[];
       result.metadata['is_style_enabled'] = _state.isStyleEnabled;
-      result.metadata['original_negative_prompt'] = baseNegative;
+      result.metadata['original_negative_prompt'] = renderInputs.negative;
 
       final isDuplicate = _previousImageBytes != null &&
           listEquals(result.imageBytes, _previousImageBytes);
