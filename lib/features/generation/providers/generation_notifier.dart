@@ -1187,6 +1187,50 @@ class GenerationNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Resolves prompt fields locally without calling the image API.
+  Future<String> previewNaiaPrompt() async {
+    final pipeline = NaiaPromptPipeline(_wildcardProcessor);
+    final characters = await Future.wait(
+      _state.characters.map((character) async => (
+        prompt: await _wildcardProcessor.process(character.prompt),
+        uc: await _wildcardProcessor.process(character.uc),
+      )),
+    );
+    final main = await _wildcardProcessor.process(promptController.text);
+    final negative = await _wildcardProcessor.process(negativePromptController.text);
+    final rules = await pipeline.expandActionValues(
+      naiaConditionalRules.split(RegExp(r'\r?\n'))
+          .where((line) => !RegExp(r'^\s*char:\d+\s').hasMatch(line))
+          .join('\n'),
+    );
+    final result = const NaiaOrderedRuleEngine().apply(
+      main, characters.map((c) => c.prompt).toList(), rules,
+      negative: negative,
+      characterUc: characters.map((c) => c.uc).toList(),
+    );
+    final resolution = NaiaResolutionDirective.extract(result.main);
+    final buffer = StringBuffer()
+      ..writeln('MAIN')
+      ..writeln(_tagService.resolveAliases(resolution.prompt))
+      ..writeln()
+      ..writeln('NEGATIVE')
+      ..writeln(_tagService.resolveAliases(result.negative));
+    if (resolution.width != null && resolution.height != null) {
+      buffer
+        ..writeln()
+        ..writeln('RESOLUTION: ${resolution.width}x${resolution.height}');
+    }
+    for (var i = 0; i < result.characters.length; i++) {
+      if (!result.enabled[i]) continue;
+      buffer
+        ..writeln()
+        ..writeln('CHARACTER ${i + 1}')
+        ..writeln(_tagService.resolveAliases(result.characters[i]))
+        ..writeln('UC: ${_tagService.resolveAliases(result.characterUc[i])}');
+    }
+    return buffer.toString().trimRight();
+  }
+
   Future<void> generate() async {
     clearTagSuggestions();
 
