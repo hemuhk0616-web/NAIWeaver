@@ -25,12 +25,14 @@ void main() {
   test('Nested expansion, legacy weights and cycles', () async {
     final root = await Directory.systemTemp.createTemp('nai_wildcards_');
     try {
-      await File('${root.path}/first.txt').writeAsString('__second__\\n');
-      await File('${root.path}/second.txt').writeAsString('100::blue hair\\n');
-      await File('${root.path}/cycle.txt').writeAsString('__cycle__\\n');
+      await File('${root.path}/first.txt').writeAsString('__second__\n');
+      await File('${root.path}/second.txt').writeAsString('100:blue hair\n');
+      await File('${root.path}/cycle.txt').writeAsString('__cycle__\n');
       final processor = WildcardProcessor(wildcardDir: root.path);
       expect(await processor.process('__first__'), 'blue hair');
       expect(await processor.process('__cycle__'), '__cycle__');
+      await File('${root.path}/emphasis.txt').writeAsString('1.5::arched back::\n');
+      expect(await processor.process('__emphasis__'), '1.5::arched back::');
     } finally {
       await root.delete(recursive: true);
     }
