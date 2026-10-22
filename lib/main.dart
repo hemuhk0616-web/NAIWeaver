@@ -785,6 +785,12 @@ class _SimpleGeneratorAppState extends State<SimpleGeneratorApp> with SingleTick
                 constraints: const BoxConstraints(),
               ),
               const SizedBox(width: 8),
+              if (mobile)
+                IconButton(
+                  tooltip: '생성 설정 바로 열기',
+                  icon: Icon(Icons.tune, color: t.headerText, size: 22),
+                  onPressed: () => _showMobileSettings(context),
+                ),
               TextButton(
                 onPressed: () {
                   Navigator.push(
@@ -855,6 +861,62 @@ class _SimpleGeneratorAppState extends State<SimpleGeneratorApp> with SingleTick
               child: scaffold,
             )
           : scaffold;
+  }
+
+  // Android-first shortcut: keep the image visible until the user explicitly
+  // opens settings. Reuse existing controls/state rather than duplicating them.
+  void _showMobileSettings(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: context.t.surfaceHigh,
+      builder: (sheetContext) => FractionallySizedBox(
+        heightFactor: 0.88,
+        child: Column(
+          children: [
+            ListTile(
+              title: const Text('생성 설정'),
+              trailing: IconButton(
+                tooltip: '닫기',
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.pop(sheetContext),
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: ExpandedSettingsContent(
+                onManageStyles: () {
+                  Navigator.pop(sheetContext);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ToolsHubScreen(initialToolId: 'styles'),
+                    ),
+                  );
+                },
+                onEditStyle: (styleName) {
+                  Navigator.pop(sheetContext);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ToolsHubScreen(
+                        initialToolId: 'styles',
+                        initialStyleName: styleName,
+                      ),
+                    ),
+                  );
+                },
+                onSavePreset: () {
+                  Navigator.pop(sheetContext);
+                  _showSavePresetDialog(context, context.read<GenerationNotifier>());
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   // — Default body (classic bottom-sheet layout) —
