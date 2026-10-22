@@ -1241,6 +1241,13 @@ class GenerationNotifier extends ChangeNotifier {
     _state.interactions.map((item) => item.toJson().toString()).join('\u0003'),
     _state.width.toString(),
     _state.height.toString(),
+    _state.isStyleEnabled.toString(),
+    _state.activeStyleNames.join('\u0002'),
+    _state.styles.map((style) => style.toString()).join('\u0003'),
+    _state.furryMode.toString(),
+    (_galleryNotifier?.demoMode ?? false).toString(),
+    _prefs.demoPositivePrefix,
+    _prefs.demoNegativePrefix,
   ].join('\u0001');
 
   ({String prompt, String negative, List<NaiCharacter> characters, List<NaiInteraction> interactions, int? width, int? height})? _lockedNaiaPreview;
