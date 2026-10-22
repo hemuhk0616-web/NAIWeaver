@@ -1,77 +1,52 @@
-/// Applies NAIA's character actions to already-expanded character prompts.
-/// Indexes are 1-based, as in NAIA. No new wildcard rolls occur here.
+/// Applies character operations to expanded prompts without mutating saved slots.
 class NaiaCharacterActions {
   const NaiaCharacterActions();
 
-  /// Evaluate char_set rules in source order while retaining stable slot indices.
-  List<bool> applyEnabled(List<String> prompts, String rules, {
+  /// NAIA uses 1-based character indexes. Conditions see preceding changes.
+  ({List<String> prompts, List<bool> enabled}) apply(
+    List<String> prompts,
+    String rules, {
     required bool Function(String, List<String>, List<bool>) matches,
   }) {
+    final current = List<String>.from(prompts);
     final enabled = List<bool>.filled(prompts.length, true);
     for (final line in rules.split(RegExp(r'\r?\n'))) {
-      final match = RegExp(
-        r'^\s*\((.*?)\):char_set\(\s*(\d+)\s*,\s*(enabled|disabled)\s*\)\s*List<String> prompts, String rules,
-      {required bool Function(String) matches}) {
-    final output = List<String>.from(prompts);
-    for (final line in rules.split(RegExp(r'\r?\n'))) {
-      final rule = RegExp(r'^\s*\((.*?)\):char_replace\(\s*(\d+)\s*,\s*(.*?)\s*,\s*(.*?)\s*\)\s*$')
-          .firstMatch(line);
-      if (rule == null || !matches(rule.group(1)!)) continue;
-      final index = int.parse(rule.group(2)!) - 1;
-      if (index < 0 || index >= output.length) continue;
-      final oldTag = rule.group(3)!.trim();
-      final newTag = rule.group(4)!.trim();
-      final tags = output[index].split(',').map((s) => s.trim()).toList();
-      for (var i = 0; i < tags.length; i++) {
-        if (_stripWeight(tags[i]) == _stripWeight(oldTag)) {
-          tags[i] = newTag;
-        }
-      }
-      output[index] = tags.join(', ');
-    }
-    return output;
-  }
-
-  static String _stripWeight(String text) {
-    final match = RegExp(r'^[-+]?\d+(?:\.\d+)?::(.*?)\s*::$').firstMatch(text);
-    return match == null ? text.trim() : match.group(1)!.trim();
-  }
-}
-,
+      final set = RegExp(
+        r'^\s*\((.*?)\):char_set\(\s*(\d+)\s*,\s*(enabled|disabled)\s*\)\s*$',
         caseSensitive: false,
       ).firstMatch(line);
-      if (match == null || !matches(match.group(1)!, prompts, enabled)) continue;
-      final index = int.parse(match.group(2)!) - 1;
-      if (index < 0 || index >= enabled.length) continue;
-      enabled[index] = match.group(3)!.toLowerCase() == 'enabled';
+      final replace = RegExp(
+        r'^\s*\((.*?)\):char_replace\(\s*(\d+)\s*,\s*(.*?)\s*,\s*(.*?)\s*\)\s*$',
+      ).firstMatch(line);
+      final rule = set ?? replace;
+      if (rule == null || !matches(rule.group(1)!, current, enabled)) continue;
+      final index = int.parse(rule.group(2)!) - 1;
+      if (index < 0 || index >= current.length) continue;
+      if (set != null) {
+        enabled[index] = set.group(3)!.toLowerCase() == 'enabled';
+      } else {
+        final oldTag = _stripWeight(replace!.group(3)!);
+        final newTag = replace.group(4)!.trim();
+        current[index] = current[index].split(',').map((tag) {
+          return _stripWeight(tag) == oldTag ? newTag : tag.trim();
+        }).join(', ');
+      }
     }
-    return enabled;
+    return (prompts: current, enabled: enabled);
   }
 
-  List<String> applyReplace(List<String> prompts, String rules,
-      {required bool Function(String) matches}) {
-    final output = List<String>.from(prompts);
-    for (final line in rules.split(RegExp(r'\r?\n'))) {
-      final rule = RegExp(r'^\s*\((.*?)\):char_replace\(\s*(\d+)\s*,\s*(.*?)\s*,\s*(.*?)\s*\)\s*$')
-          .firstMatch(line);
-      if (rule == null || !matches(rule.group(1)!)) continue;
-      final index = int.parse(rule.group(2)!) - 1;
-      if (index < 0 || index >= output.length) continue;
-      final oldTag = rule.group(3)!.trim();
-      final newTag = rule.group(4)!.trim();
-      final tags = output[index].split(',').map((s) => s.trim()).toList();
-      for (var i = 0; i < tags.length; i++) {
-        if (_stripWeight(tags[i]) == _stripWeight(oldTag)) {
-          tags[i] = newTag;
-        }
-      }
-      output[index] = tags.join(', ');
-    }
-    return output;
-  }
+  List<bool> applyEnabled(List<String> prompts, String rules, {
+    required bool Function(String, List<String>, List<bool>) matches,
+  }) => apply(prompts, rules, matches: matches).enabled;
+
+  List<String> applyReplace(List<String> prompts, String rules, {
+    required bool Function(String) matches,
+  }) => apply(prompts, rules,
+      matches: (condition, current, enabled) => matches(condition)).prompts;
 
   static String _stripWeight(String text) {
-    final match = RegExp(r'^[-+]?\d+(?:\.\d+)?::(.*?)\s*::$').firstMatch(text);
-    return match == null ? text.trim() : match.group(1)!.trim();
+    final value = text.trim();
+    final match = RegExp(r'^[-+]?\d+(?:\.\d+)?::(.*?)\s*::$').firstMatch(value);
+    return match == null ? value : match.group(1)!.trim();
   }
 }
