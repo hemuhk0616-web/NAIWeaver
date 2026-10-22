@@ -268,6 +268,7 @@ class ExpandedSettingsContent extends StatefulWidget {
   final void Function(String styleName)? onEditStyle;
   final VoidCallback onSavePreset;
   final bool inSidebar;
+  final String? mobileSection;
 
   const ExpandedSettingsContent({
     super.key,
@@ -275,6 +276,7 @@ class ExpandedSettingsContent extends StatefulWidget {
     this.onEditStyle,
     required this.onSavePreset,
     this.inSidebar = false,
+    this.mobileSection,
   });
 
   @override
@@ -374,7 +376,23 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
     };
 
     final sections = <Widget>[];
-    for (final id in sectionOrder) {
+    final selectedSection = widget.mobileSection;
+    final visibleSections = selectedSection == null
+        ? sectionOrder
+        : sectionOrder.where((id) {
+            switch (selectedSection) {
+              case 'character':
+                return id == 'characters';
+              case 'prompt':
+                return id == 'negative_prompt' || id == 'styles';
+              case 'settings':
+                return id == 'model' || id == 'dimensions_seed' ||
+                    id == 'steps_scale' || id == 'sampler_post';
+              default:
+                return false;
+            }
+          }).toList();
+    for (final id in visibleSections) {
       final builder = builders[id];
       if (builder != null) {
         if (sections.isNotEmpty) sections.add(SizedBox(height: sectionGap));
@@ -386,8 +404,10 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
       }
     }
     if (sections.isNotEmpty) sections.add(SizedBox(height: sectionGap));
-    sections.add(_buildNaiaRules(notifier));
-    sections.add(const SizedBox(height: 20));
+    if (selectedSection == null || selectedSection == 'naia') {
+      sections.add(_buildNaiaRules(notifier));
+      sections.add(const SizedBox(height: 20));
+    }
 
     return ListView(
       padding: EdgeInsets.fromLTRB(hPad, 8, hPad, 40 + MediaQuery.of(context).padding.bottom + MediaQuery.of(context).viewInsets.bottom),
