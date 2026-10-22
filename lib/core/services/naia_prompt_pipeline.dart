@@ -18,7 +18,7 @@ class NaiaPromptPipeline {
   Future<String> _expandActionValues(String rules) async {
     final output = <String>[];
     for (final line in rules.split(RegExp(r'\r?\n'))) {
-      final match = RegExp(r'^(\(.*\):.*?(?:\+=|(?<![+])=))(.*)$').firstMatch(line);
+      final match = RegExp(r'^(\(.*\):.*?(?:\+=|\+:|(?<![+])=))(.*)$').firstMatch(line);
       if (match == null) {
         output.add(line);
       } else {
