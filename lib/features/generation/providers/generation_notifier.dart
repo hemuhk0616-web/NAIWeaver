@@ -1285,9 +1285,6 @@ class GenerationNotifier extends ChangeNotifier {
       final vibePayload =
           caps.vibeTransfer ? _vibeTransferNotifier?.buildPayload() : null;
 
-      // Process wildcards in character prompts
-
-
       final result = await _service.generateImage(
         prompt: finalPrompt,
         negativePrompt: fullNegativePrompt,
