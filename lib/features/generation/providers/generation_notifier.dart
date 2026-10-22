@@ -1292,12 +1292,14 @@ class GenerationNotifier extends ChangeNotifier {
       _lockedNaiaSignature == _naiaPreviewSignature();
 
   final List<({String preview, ({String prompt, String negative, List<NaiCharacter> characters, List<NaiInteraction> interactions, int? width, int? height}) inputs})> _naiaPreviewSamples = [];
+  String? _naiaSamplesSignature;
 
   bool selectNaiaPreviewSample(int index, String signature) {
     if (signature != _naiaPreviewSignature()) return false;
     // The preview dialog shows at most the latest three samples.
     final firstVisible = math.max(0, _naiaPreviewSamples.length - 3);
     final visibleCount = _naiaPreviewSamples.length - firstVisible;
+    if (_naiaSamplesSignature != signature) return false;
     if (index < 0 || index >= visibleCount) return false;
     final offset = firstVisible + index;
     if (offset < 0 || offset >= _naiaPreviewSamples.length) return false;
@@ -1362,6 +1364,10 @@ class GenerationNotifier extends ChangeNotifier {
     final preview = buffer.toString().trimRight();
     if (signature != _naiaPreviewSignature()) {
       throw StateError('미리보기 중 설정이 변경되었습니다. 다시 추첨해 주세요.');
+    }
+    if (_naiaSamplesSignature != signature) {
+      _naiaPreviewSamples.clear();
+      _naiaSamplesSignature = signature;
     }
     _naiaPreviewSamples.add((preview: preview, inputs: inputs));
     if (_naiaPreviewSamples.length > 10) _naiaPreviewSamples.removeAt(0);
