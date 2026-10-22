@@ -26,6 +26,7 @@ import '../../../core/services/nai_text_service.dart';
 import '../../../core/services/wildcard_processor.dart';
 import '../../../core/services/naia_prompt_pipeline.dart';
 import '../../../core/services/naia_resolution_directive.dart';
+import '../../../core/services/naia_character_actions.dart';
 import '../../../core/services/presets.dart';
 import '../../../core/services/tag_service.dart';
 import '../../../core/utils/image_utils.dart';
@@ -1198,7 +1199,7 @@ class GenerationNotifier extends ChangeNotifier {
 
     try {
       final pipeline = NaiaPromptPipeline(_wildcardProcessor);
-      final processedCharacters = await Future.wait(
+      var processedCharacters = await Future.wait(
         _state.characters.asMap().entries.map((entry) async {
           final c = entry.value;
           final characterRules = naiaConditionalRules
@@ -1221,6 +1222,20 @@ class GenerationNotifier extends ChangeNotifier {
         characterPrompts: processedCharacters.map((c) => c.prompt).toList(),
         characterEnabled: List<bool>.filled(processedCharacters.length, true),
       );
+      // Apply character replacements to expanded values, not source text.
+      final replacedPrompts = const NaiaCharacterActions().applyReplace(
+        processedCharacters.map((c) => c.prompt).toList(),
+        naiaConditionalRules,
+        matches: (condition) => pipeline.conditions.matches(
+          condition, processedPrompt,
+          characterPrompts: processedCharacters.map((c) => c.prompt).toList(),
+          characterEnabled: List<bool>.filled(processedCharacters.length, true),
+        ),
+      );
+      processedCharacters = [
+        for (var i = 0; i < processedCharacters.length; i++)
+          processedCharacters[i].copyWith(prompt: replacedPrompts[i]),
+      ];
       final naiaResolution = NaiaResolutionDirective.extract(processedPrompt);
       final resolvedPrompt = _tagService.resolveAliases(naiaResolution.prompt);
 
