@@ -14,6 +14,8 @@ class NaiaOrderedRuleEngine {
     const conditions = NaiaConditionalProcessor();
     const actions = NaiaCharacterActions();
     var currentMain = main;
+    final prefixTags = <String>[];
+    final postfixTags = <String>[];
     var currentNegative = negative;
     var currentCharacters = List<String>.from(characters);
     final currentUc = List<String>.from(characterUc);
@@ -65,6 +67,53 @@ class NaiaOrderedRuleEngine {
               .where((v) => v.isNotEmpty).join(', ');
           continue;
         }
+      }
+      final affix = RegExp(r'^(prefix|postfix)(\+=|\+:)(.*)r'^neg(\+=|\+:|=)(.*)$').firstMatch(action);
+      if (neg != null) {
+        final value = neg.group(2)!.trim();
+        currentNegative = neg.group(1) == '=' ? value :
+          [currentNegative, value].where((v) => v.isNotEmpty).join(', ');
+        continue;
+      }
+      final scoped = RegExp(r'^(char|uc):(\d+|\*)(\+=|\+:|=)(.*)$',
+          caseSensitive: false).firstMatch(action);
+      if (scoped != null) {
+        final kind = scoped.group(1)!.toLowerCase();
+        final rawIndex = scoped.group(2)!;
+        final operator = scoped.group(3)!;
+        final value = scoped.group(4)!.trim();
+        final target = kind == 'char' ? currentCharacters : currentUc;
+        final indexes = rawIndex == '*'
+            ? List<int>.generate(target.length, (i) => i)
+            : [int.parse(rawIndex) - 1];
+        for (final index in indexes) {
+          if (index < 0 || index >= target.length) continue;
+          target[index] = operator == '=' ? value :
+              [target[index], value].where((v) => v.isNotEmpty).join(', ');
+        }
+        continue;
+      }
+      currentMain = conditions.apply(currentMain, rule,
+        characterPrompts: currentCharacters, characterEnabled: enabled);
+    }
+    final composedMain = [...prefixTags, currentMain, ...postfixTags]
+        .where((v) => v.isNotEmpty).join(', ');
+    return (main: composedMain, negative: currentNegative,
+      characters: currentCharacters, characterUc: currentUc, enabled: enabled);
+  }
+}
+)
+          .firstMatch(action);
+      if (affix != null) {
+        final value = affix.group(3)!.trim();
+        if (value.isNotEmpty) {
+          if (affix.group(1) == 'prefix') {
+            prefixTags.add(value);
+          } else {
+            postfixTags.add(value);
+          }
+        }
+        continue;
       }
       final neg = RegExp(r'^neg(\+=|\+:|=)(.*)$').firstMatch(action);
       if (neg != null) {
