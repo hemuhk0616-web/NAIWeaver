@@ -6,6 +6,7 @@ on:
     paths:
       - 'lib/core/services/naia_*.dart'
       - 'test/core/services/naia_rules_regression_test.dart'
+      - 'test/naia_*_test.dart'
       - '.github/workflows/naia-rules-validation.yml'
   workflow_dispatch:
 
@@ -33,5 +34,5 @@ jobs:
       - name: Analyze NAIA rule engine and validator
         run: flutter analyze lib/core/services/naia_rule_validator.dart lib/core/services/naia_ordered_rule_engine.dart lib/core/services/naia_conditional_processor.dart lib/core/services/naia_character_actions.dart test/core/services/naia_rules_regression_test.dart
 
-      - name: Run NAIA regression tests
-        run: flutter test test/core/services/naia_rules_regression_test.dart
+      - name: Run NAIA service and regression tests
+        run: flutter test test/core/services/naia_rules_regression_test.dart test/naia_character_actions_test.dart test/naia_conditional_processor_test.dart test/naia_interaction_remapper_test.dart test/naia_ordered_rule_engine_test.dart test/naia_prompt_pipeline_test.dart test/naia_resolution_directive_test.dart test/naia_rule_validator_test.dart
