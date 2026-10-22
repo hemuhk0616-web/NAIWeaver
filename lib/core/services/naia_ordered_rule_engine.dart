@@ -26,7 +26,9 @@ class NaiaOrderedRuleEngine {
       final rule = line.trim();
       if (!rule.startsWith('(')) continue;
       final end = _matchingParen(rule);
-      if (end < 0 || end + 1 >= rule.length || rule[end + 1] != ':') continue;
+      if (end < 0 || end + 1 >= rule.length || rule[end + 1] != ':') {
+        continue;
+      }
       final condition = rule.substring(1, end);
       final action = rule.substring(end + 2).trim();
       if (!conditions.matches(condition, combined(),
