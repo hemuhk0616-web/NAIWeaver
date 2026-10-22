@@ -414,7 +414,7 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
                   for (var i = 0; i < 3; i++) {
                     previews.add(await notifier.previewNaiaPrompt());
                   }
-                  if (!context.mounted) return;
+                  if (!mounted) return;
                   var selected = 2;
                   await showDialog<void>(
                     context: context,
@@ -467,7 +467,7 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
                               final locked = notifier.selectNaiaPreviewSample(selected, signature);
                               if (!dialogContext.mounted) return;
                               Navigator.pop(dialogContext);
-                              if (!context.mounted) return;
+                              if (!mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(locked
                                     ? '선택한 추첨 결과가 생성 1회에 고정되었습니다.'
@@ -481,7 +481,7 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
                     ),
                   );
                 } catch (error) {
-                  if (!context.mounted) return;
+                  if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('미리보기 실패: $error')),
                   );
@@ -532,7 +532,7 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
                             child: ListView.separated(
                               shrinkWrap: true,
                               itemCount: diagnostics.length,
-                              separatorBuilder: (_, __) => const Divider(height: 12),
+                              separatorBuilder: (context, index) => const Divider(height: 12),
                               itemBuilder: (context, index) {
                                 final d = diagnostics[index];
                                 return ListTile(
