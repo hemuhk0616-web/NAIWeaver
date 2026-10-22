@@ -19,8 +19,12 @@ class NaiaConditionalProcessor {
     var tags = _splitTags(prompt);
     for (final line in rules.split(RegExp(r'\r?\n'))) {
       final rule = line.trim();
-      if (rule.isEmpty || rule.startsWith('#')) continue;
-      if (!rule.startsWith('(')) continue;
+      if (rule.isEmpty || rule.startsWith('#')) {
+        continue;
+      }
+      if (!rule.startsWith('(')) {
+        continue;
+      }
       final closing = _matchingParen(rule, 0);
       if (closing < 0 || closing + 1 >= rule.length ||
           rule[closing + 1] != ':') continue;
