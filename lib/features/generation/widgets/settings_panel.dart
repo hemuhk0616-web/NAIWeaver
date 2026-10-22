@@ -408,6 +408,7 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
               label: const Text('최종 프롬프트 미리보기'),
               onPressed: () async {
                 try {
+                  final signature = notifier.naiaPreviewSignature;
                   final previews = <String>[];
                   for (var i = 0; i < 3; i++) {
                     previews.add(await notifier.previewNaiaPrompt());
@@ -462,11 +463,14 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
                           ),
                           FilledButton(
                             onPressed: () async {
-                              notifier.selectNaiaPreviewSample(selected);
+                              final locked = notifier.selectNaiaPreviewSample(selected, signature);
                               if (!dialogContext.mounted) return;
                               Navigator.pop(dialogContext);
+                              if (!context.mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('선택한 추첨 결과가 생성 1회에 고정되었습니다.')),
+                                SnackBar(content: Text(locked
+                                    ? '선택한 추첨 결과가 생성 1회에 고정되었습니다.'
+                                    : '설정이 변경되어 고정할 수 없습니다. 다시 미리보기 해주세요.')),
                               );
                             },
                             child: const Text('생성용으로 고정'),
