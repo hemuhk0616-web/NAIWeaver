@@ -10,6 +10,21 @@ void main() {
         'solo, pink hair, blue eyes');
   });
 
+  test('nested boolean conditions respect parentheses', () {
+    expect(engine.apply('solo, hat', '((solo|1girl)&hat):main+=smile'),
+        'solo, hat, smile');
+    expect(engine.apply('solo', '(solo&(hat|glasses)):main+=smile'), 'solo');
+  });
+
+  test('char_in and char_on inspect expanded character context', () {
+    expect(engine.apply('solo', '(char_in(1, pink hair)&char_on(1)):main+=smile',
+        characterPrompts: ['pink hair, blue eyes'], characterEnabled: [true]),
+        'solo, smile');
+    expect(engine.apply('solo', '(~char_on(1)):main+=smile',
+        characterPrompts: ['pink hair'], characterEnabled: [false]),
+        'solo, smile');
+  });
+
   test('NAIA plus-colon appends to fixed targets', () {
     expect(engine.apply('solo', '(solo):main+:smile'), 'solo, smile');
     expect(engine.apply('solo', '(solo):postfix+:blush'), 'solo, blush');
