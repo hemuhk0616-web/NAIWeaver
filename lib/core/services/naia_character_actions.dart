@@ -62,15 +62,6 @@ class NaiaCharacterActions {
         index: index, arguments: args);
   }
 
-  List<bool> applyEnabled(List<String> prompts, String rules, {
-    required bool Function(String, List<String>, List<bool>) matches,
-  }) => apply(prompts, rules, matches: matches).enabled;
-
-  List<String> applyReplace(List<String> prompts, String rules, {
-    required bool Function(String) matches,
-  }) => apply(prompts, rules,
-      matches: (condition, current, enabled) => matches(condition)).prompts;
-
   static String _stripWeight(String text) {
     final value = text.trim();
     final match = RegExp(r'^[-+]?\d+(?:\.\d+)?::(.*?)\s*::$').firstMatch(value);
