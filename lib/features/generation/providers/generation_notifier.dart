@@ -1216,6 +1216,7 @@ class GenerationNotifier extends ChangeNotifier {
         }),
       );
       final expandedMain = await _wildcardProcessor.process(promptController.text);
+      final expandedNegative = await _wildcardProcessor.process(negativePromptController.text);
       final expandedRules = await pipeline.expandActionValues(
         naiaConditionalRules.split(RegExp(r'\r?\n'))
           .where((line) => !RegExp(r'^\s*char:\d+\s').hasMatch(line))
@@ -1225,6 +1226,8 @@ class GenerationNotifier extends ChangeNotifier {
         expandedMain,
         processedCharacters.map((c) => c.prompt).toList(),
         expandedRules,
+        negative: expandedNegative,
+        characterUc: processedCharacters.map((c) => c.uc).toList(),
       );
       final processedPrompt = ordered.main;
       final processedInteractions = const NaiaInteractionRemapper().remap(
@@ -1232,7 +1235,8 @@ class GenerationNotifier extends ChangeNotifier {
       processedCharacters = [
         for (var i = 0; i < processedCharacters.length; i++)
           if (ordered.enabled[i])
-            processedCharacters[i].copyWith(prompt: ordered.characters[i]),
+            processedCharacters[i].copyWith(
+              prompt: ordered.characters[i], uc: ordered.characterUc[i]),
       ];
       final naiaResolution = NaiaResolutionDirective.extract(processedPrompt);
       final resolvedPrompt = _tagService.resolveAliases(naiaResolution.prompt);
@@ -1264,7 +1268,7 @@ class GenerationNotifier extends ChangeNotifier {
       String? styleNegativeContent = styleResult.negative;
 
       String baseNegative = _tagService.resolveAliases(
-          await _wildcardProcessor.process(negativePromptController.text));
+          ordered.negative);
       if (_galleryNotifier?.demoMode == true) {
         final demoNeg = _prefs.demoNegativePrefix;
         if (demoNeg.isNotEmpty) {
