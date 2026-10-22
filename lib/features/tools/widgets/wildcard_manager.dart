@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
+import '../../../core/services/naia_wildcard_zip_importer.dart';
 import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
 import '../../../core/l10n/l10n_extensions.dart';
@@ -22,6 +24,31 @@ class WildcardManager extends StatefulWidget {
 
 class _WildcardManagerState extends State<WildcardManager> {
   bool _showingEditor = false;
+  bool _importingZip = false;
+
+  Future<void> _importZip() async {
+    if (_importingZip) return;
+    final notifier = context.read<WildcardNotifier>();
+    final picked = await FilePicker.platform.pickFiles(
+      type: FileType.custom, allowedExtensions: ['zip']);
+    if (picked == null || picked.files.single.path == null) return;
+    setState(() => _importingZip = true);
+    try {
+      await notifier.flushPendingSave();
+      final count = await NaiaWildcardZipImporter(notifier.wildcardService)
+          .importFile(picked.files.single.path!);
+      await notifier.refreshFiles();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('와일드카드 $count개 가져오기 완료')));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('ZIP 가져오기 실패: $e')));
+    } finally {
+      if (mounted) setState(() => _importingZip = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +144,14 @@ class _WildcardManagerState extends State<WildcardManager> {
               ],
             ),
           ),
+          IconButton(
+            icon: Icon(Icons.folder_zip_outlined, size: 20, color: t.textDisabled),
+            onPressed: _importingZip ? null : _importZip,
+            tooltip: 'ZIP 와일드카드 가져오기',
+            constraints: const BoxConstraints(),
+            padding: EdgeInsets.zero,
+          ),
+          const SizedBox(width: 12),
           IconButton(
             icon: Icon(Icons.help_outline, size: 18, color: t.textDisabled),
             onPressed: () => _showWildcardHelp(t),
