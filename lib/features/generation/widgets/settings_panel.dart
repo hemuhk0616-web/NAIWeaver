@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../../core/l10n/l10n_extensions.dart';
 import '../../../core/models/nai_model.dart';
 import '../../../core/services/preferences_service.dart';
+import '../../../core/services/naia_rule_validator.dart';
 import '../../../core/services/tag_service.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../core/utils/tag_suggestion_helper.dart';
@@ -490,6 +491,26 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
           ),
         ),
         Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Builder(builder: (context) {
+            final diagnostics = const NaiaRuleValidator()
+                .validate(notifier.naiaConditionalRules);
+            if (diagnostics.isEmpty) {
+              return const Text('규칙 구조 검사: 오류 없음 (실행 검증은 별도 필요)');
+            }
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('규칙 구조 검사: ${diagnostics.length}건 확인 필요',
+                    style: const TextStyle(color: Colors.orange)),
+                for (final diagnostic in diagnostics.take(8))
+                  Text('${diagnostic.line}행: ${diagnostic.message}',
+                      style: const TextStyle(color: Colors.orange)),
+              ],
+            );
+          }),
+        ),
+        Padding(
           padding: const EdgeInsets.all(12),
           child: TextFormField(
             key: const ValueKey('naia_conditional_rules_editor'),
@@ -499,7 +520,7 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               hintText: '(solo):main+=smile',
-              helperText: '현재 Main Prompt에만 적용됩니다.',
+              helperText: 'Main·캐릭터·UC 규칙을 입력할 수 있습니다.',
             ),
             onChanged: notifier.setNaiaConditionalRules,
           ),
