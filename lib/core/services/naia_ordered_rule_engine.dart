@@ -32,7 +32,9 @@ class NaiaOrderedRuleEngine {
       final condition = rule.substring(1, end);
       final action = rule.substring(end + 2).trim();
       if (!conditions.matches(condition, combined(),
-          characterPrompts: currentCharacters, characterEnabled: enabled)) continue;
+          characterPrompts: currentCharacters, characterEnabled: enabled)) {
+        continue;
+      }
 
       if (RegExp(r'^char_(set|replace)\(').hasMatch(action)) {
         final result = actions.apply(currentCharacters, rule,
