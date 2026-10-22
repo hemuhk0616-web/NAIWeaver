@@ -11,6 +11,10 @@ import 'preferences/security_preferences.dart';
 
 class PreferencesService {
   // — General key constants (remaining after domain split) —
+  static const String _keyNaiaConditionalRules = 'naia_conditional_rules';
+  String get naiaConditionalRules => _prefs.getString(_keyNaiaConditionalRules) ?? '';
+  Future<void> setNaiaConditionalRules(String value) => _prefs.setString(_keyNaiaConditionalRules, value);
+
   static const String _keyAutoSave = 'nai_auto_save';
   static const String _keyShowDirectorRefShelf = 'show_director_ref_shelf';
   static const String _keyShowVibeTransferShelf = 'show_vibe_transfer_shelf';
