@@ -123,8 +123,26 @@ class NaiaOrderedRuleEngine {
     return -1;
   }
 
-  static List<String> _split(String text) =>
-      text.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+  // Keep commas inside angle-bracket prompt constructs intact.
+  static List<String> _split(String text) {
+    final tags = <String>[];
+    final buffer = StringBuffer();
+    var angleDepth = 0;
+    for (final char in text.split('')) {
+      if (char == '<') angleDepth++;
+      if (char == '>' && angleDepth > 0) angleDepth--;
+      if (char == ',' && angleDepth == 0) {
+        final tag = buffer.toString().trim();
+        if (tag.isNotEmpty) tags.add(tag);
+        buffer.clear();
+      } else {
+        buffer.write(char);
+      }
+    }
+    final last = buffer.toString().trim();
+    if (last.isNotEmpty) tags.add(last);
+    return tags;
+  }
 
   static String _unweight(String value) {
     final match = RegExp(r'^[-+]?\d+(?:\.\d+)?::(.*?)\s*::$').firstMatch(value.trim());
