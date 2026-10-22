@@ -1257,6 +1257,15 @@ class GenerationNotifier extends ChangeNotifier {
       _lockedNaiaPreview != null &&
       _lockedNaiaSignature == _naiaPreviewSignature();
 
+  final List<({String preview, ({String prompt, String negative, List<NaiCharacter> characters, List<NaiInteraction> interactions, int? width, int? height}) inputs})> _naiaPreviewSamples = [];
+
+  void selectNaiaPreviewSample(int index) {
+    if (index < 0 || index >= _naiaPreviewSamples.length) return;
+    _lockedNaiaPreview = _naiaPreviewSamples[index].inputs;
+    _lockedNaiaSignature = _naiaPreviewSignature();
+    notifyListeners();
+  }
+
   void clearLockedNaiaPreview() {
     _lockedNaiaPreview = null;
     _lockedNaiaSignature = null;
@@ -1298,7 +1307,10 @@ class GenerationNotifier extends ChangeNotifier {
         ..writeln(inputs.characters[i].prompt)
         ..writeln('UC: ${inputs.characters[i].uc}');
     }
-    return buffer.toString().trimRight();
+    final preview = buffer.toString().trimRight();
+    _naiaPreviewSamples.add((preview: preview, inputs: inputs));
+    if (_naiaPreviewSamples.length > 10) _naiaPreviewSamples.removeAt(0);
+    return preview;
   }
 
   Future<void> generate() async {
