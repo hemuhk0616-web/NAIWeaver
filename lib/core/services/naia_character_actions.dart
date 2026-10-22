@@ -11,31 +11,16 @@ class NaiaCharacterActions {
     final current = List<String>.from(prompts);
     final enabled = List<bool>.filled(prompts.length, true);
     for (final line in rules.split(RegExp(r'\r?\n'))) {
-      final trimmed = line.trim();
-      if (!trimmed.startsWith('(')) continue;
-      var depth = 0;
-      var closing = -1;
-      for (var i = 0; i < trimmed.length; i++) {
-        if (trimmed[i] == '(') depth++;
-        if (trimmed[i] == ')') {
-          depth--;
-          if (depth == 0) { closing = i; break; }
-        }
-      }
-      if (closing < 0 || closing + 1 >= trimmed.length ||
-          trimmed[closing + 1] != ':') continue;
-      final condition = trimmed.substring(1, closing);
-      final action = trimmed.substring(closing + 2).trim();
       final parsed = _parseRule(line);
       if (parsed == null ||
           !matches(parsed.condition, current, enabled)) continue;
       final index = parsed.index - 1;
       if (index < 0 || index >= current.length) continue;
-      if (set != null) {
-        enabled[index] = set.group(2)!.toLowerCase() == 'enabled';
+      if (parsed.action == 'char_set') {
+        enabled[index] = parsed.arguments[1].toLowerCase() == 'enabled';
       } else {
-        final oldTag = _stripWeight(replace!.group(2)!);
-        final newTag = replace.group(3)!.trim();
+        final oldTag = _stripWeight(parsed.arguments[1]);
+        final newTag = parsed.arguments[2];
         current[index] = current[index].split(',').map((tag) {
           return _stripWeight(tag) == oldTag ? newTag : tag.trim();
         }).join(', ');
