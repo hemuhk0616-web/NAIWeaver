@@ -26,16 +26,10 @@ class NaiaCharacterActions {
           trimmed[closing + 1] != ':') continue;
       final condition = trimmed.substring(1, closing);
       final action = trimmed.substring(closing + 2).trim();
-      final set = RegExp(
-        r'^char_set\(\s*(\d+)\s*,\s*(enabled|disabled)\s*\)$',
-        caseSensitive: false,
-      ).firstMatch(action);
-      final replace = RegExp(
-        r'^char_replace\(\s*(\d+)\s*,\s*(.*?)\s*,\s*(.*?)\s*\)$',
-      ).firstMatch(action);
-      final rule = set ?? replace;
-      if (rule == null || !matches(condition, current, enabled)) continue;
-      final index = int.parse(rule.group(1)!) - 1;
+      final parsed = _parseRule(line);
+      if (parsed == null ||
+          !matches(parsed.condition, current, enabled)) continue;
+      final index = parsed.index - 1;
       if (index < 0 || index >= current.length) continue;
       if (set != null) {
         enabled[index] = set.group(2)!.toLowerCase() == 'enabled';
@@ -48,6 +42,39 @@ class NaiaCharacterActions {
       }
     }
     return (prompts: current, enabled: enabled);
+  }
+
+  static ({String condition, String action, int index, List<String> arguments})?
+      _parseRule(String line) {
+    final text = line.trim();
+    if (!text.startsWith('(')) return null;
+    var depth = 0;
+    var end = -1;
+    for (var i = 0; i < text.length; i++) {
+      if (text[i] == '(') depth++;
+      if (text[i] == ')') {
+        depth--;
+        if (depth == 0) { end = i; break; }
+      }
+    }
+    if (end < 0 || end + 1 >= text.length || text[end + 1] != ':') {
+      return null;
+    }
+    final actionText = text.substring(end + 2).trim();
+    final action = RegExp(r'^(char_set|char_replace)\((.*)\)$',
+        caseSensitive: false).firstMatch(actionText);
+    if (action == null) return null;
+    final args = action.group(2)!.split(',').map((s) => s.trim()).toList();
+    final kind = action.group(1)!.toLowerCase();
+    if (args.length != (kind == 'char_set' ? 2 : 3)) return null;
+    final index = int.tryParse(args[0]);
+    if (index == null || index < 1) return null;
+    if (kind == 'char_set' &&
+        !const {'enabled', 'disabled'}.contains(args[1].toLowerCase())) {
+      return null;
+    }
+    return (condition: text.substring(1, end), action: kind,
+        index: index, arguments: args);
   }
 
   List<bool> applyEnabled(List<String> prompts, String rules, {
