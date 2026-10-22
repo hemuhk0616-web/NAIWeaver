@@ -90,7 +90,7 @@ class NaiaOrderedRuleEngine {
         }
         continue;
       }
-      if (const {'prefix', 'main', 'postfix'}.contains(target)) continue;
+      // NAIA treats ordinary '=' as a tag replacement, even when the\n      // target text happens to be 'main', 'prefix', or 'postfix'.
       for (final segment in [prefix, mainTags, postfix]) {
         final replaced = <String>[];
         for (final tag in segment) {
