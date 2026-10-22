@@ -204,10 +204,14 @@ class WildcardService {
     if (kIsWeb) return false;
     final oldFile = File(p.join(wildcardDir, '$oldName.txt'));
     final newFile = File(p.join(wildcardDir, '$newName.txt'));
+    final root = p.normalize(p.absolute(wildcardDir));
+    if (!p.isWithin(root, p.normalize(oldFile.absolute.path)) ||
+        !p.isWithin(root, p.normalize(newFile.absolute.path))) return false;
     if (await newFile.exists()) return false;
     if (!await oldFile.exists()) return false;
 
     try {
+      await newFile.parent.create(recursive: true);
       await oldFile.rename(newFile.path);
     } catch (e) {
       debugPrint('Error renaming wildcard file: $e');
