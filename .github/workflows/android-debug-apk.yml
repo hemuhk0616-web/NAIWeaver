@@ -30,7 +30,10 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build unmodified Android debug APK
+      - name: Test wildcard compatibility
+        run: flutter test test/wildcard_unicode_nested_test.dart
+
+      - name: Build Android debug APK
         run: flutter build apk --debug
 
       - name: Upload APK
