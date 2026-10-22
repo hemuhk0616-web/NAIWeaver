@@ -51,6 +51,32 @@ void main() {
       expect(result.main, 'solo, smile');
     });
 
+    test('preserves commas inside angle-bracket prompt constructs', () {
+      final result = engine.apply(
+        'solo, <character:blue hair, golden eyes>, outdoors',
+        <String>[],
+        '(solo):main+=smile',
+      );
+      expect(result.main,
+          'solo, <character:blue hair, golden eyes>, outdoors, smile');
+    });
+
+    test('preserves commas inside LoRA angle-bracket constructs', () {
+      final result = engine.apply(
+        'solo, <lora:style,0.8>, blue hair', <String>[],
+        '(solo):main+=smile',
+      );
+      expect(result.main, 'solo, <lora:style,0.8>, blue hair, smile');
+    });
+
+    test('can match a complete angle-bracket construct', () {
+      final result = engine.apply(
+        '<lora:style,0.8>, solo', <String>[],
+        '(<lora:style,0.8>):main+=smile',
+      );
+      expect(result.main, '<lora:style,0.8>, solo, smile');
+    });
+
     test('does not append when condition fails', () {
       final result = engine.apply('solo', <String>[], '(duo):main+=smile');
       expect(result.main, 'solo');
