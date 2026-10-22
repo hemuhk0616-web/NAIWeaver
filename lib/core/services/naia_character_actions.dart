@@ -49,7 +49,7 @@ class NaiaCharacterActions {
     final action = RegExp(r'^(char_set|char_replace)\((.*)\)$',
         caseSensitive: false).firstMatch(actionText);
     if (action == null) return null;
-    final args = action.group(2)!.split(',').map((s) => s.trim()).toList();
+    final args = _splitArguments(action.group(2)!);
     final kind = action.group(1)!.toLowerCase();
     if (args.length != (kind == 'char_set' ? 2 : 3)) return null;
     final index = int.tryParse(args[0]);
@@ -65,6 +65,23 @@ class NaiaCharacterActions {
   List<bool> applyEnabled(List<String> prompts, String rules, {
     required bool Function(String, List<String>, List<bool>) matches,
   }) => apply(prompts, rules, matches: matches).enabled;
+
+  // Keep commas inside parenthesized tags intact.
+  static List<String> _splitArguments(String text) {
+    final result = <String>[];
+    var depth = 0;
+    var begin = 0;
+    for (var i = 0; i < text.length; i++) {
+      if (text[i] == '(') depth++;
+      if (text[i] == ')') depth--;
+      if (text[i] == ',' && depth == 0) {
+        result.add(text.substring(begin, i).trim());
+        begin = i + 1;
+      }
+    }
+    result.add(text.substring(begin).trim());
+    return result;
+  }
 
   static String _stripWeight(String text) {
     final value = text.trim();
