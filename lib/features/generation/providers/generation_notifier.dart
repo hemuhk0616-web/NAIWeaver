@@ -28,6 +28,7 @@ import '../../../core/services/naia_prompt_pipeline.dart';
 import '../../../core/services/naia_resolution_directive.dart';
 import '../../../core/services/naia_ordered_rule_engine.dart';
 import '../../../core/services/naia_interaction_remapper.dart';
+import '../../../core/services/naia_preview_sample_selection.dart';
 import '../../../core/services/presets.dart';
 import '../../../core/services/tag_service.dart';
 import '../../../core/utils/image_utils.dart';
@@ -1295,14 +1296,14 @@ class GenerationNotifier extends ChangeNotifier {
   String? _naiaSamplesSignature;
 
   bool selectNaiaPreviewSample(int index, String signature) {
-    if (signature != _naiaPreviewSignature()) return false;
-    // The preview dialog shows at most the latest three samples.
-    final firstVisible = math.max(0, _naiaPreviewSamples.length - 3);
-    final visibleCount = _naiaPreviewSamples.length - firstVisible;
-    if (_naiaSamplesSignature != signature) return false;
-    if (index < 0 || index >= visibleCount) return false;
-    final offset = firstVisible + index;
-    if (offset < 0 || offset >= _naiaPreviewSamples.length) return false;
+    final offset = naiaPreviewSampleOffset(
+      index: index,
+      requestedSignature: signature,
+      currentSignature: _naiaPreviewSignature(),
+      samplesSignature: _naiaSamplesSignature,
+      sampleCount: _naiaPreviewSamples.length,
+    );
+    if (offset == null) return false;
     _lockedNaiaPreview = _naiaPreviewSamples[offset].inputs;
     _lockedNaiaSignature = signature;
     notifyListeners();
