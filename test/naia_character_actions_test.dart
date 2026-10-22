@@ -32,4 +32,31 @@ void main() {
     );
     expect(result, [false, true]);
   });
+  test('char_replace changes what subsequent char_in conditions see', () {
+    final result = actions.apply(
+      ['blue hair', 'green eyes'],
+      '(solo):char_replace(1, blue hair, pink hair)\n'
+      '(char_in(1, pink hair)):char_set(2, disabled)',
+      matches: (condition, current, states) => conditions.matches(
+        condition, 'solo', characterPrompts: current,
+        characterEnabled: states,
+      ),
+    );
+    expect(result.prompts, ['pink hair', 'green eyes']);
+    expect(result.enabled, [true, false]);
+  });
+
+  test('a disabled character can be re-enabled by a later rule', () {
+    final result = actions.apply(
+      ['pink hair'],
+      '(solo):char_set(1, disabled)\n'
+      '(~char_on(1)):char_set(1, enabled)',
+      matches: (condition, current, states) => conditions.matches(
+        condition, 'solo', characterPrompts: current,
+        characterEnabled: states,
+      ),
+    );
+    expect(result.enabled, [true]);
+  });
+
 }
