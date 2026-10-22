@@ -32,4 +32,17 @@ void main() {
     expect(remapper.remap(interactions, [true, false]), isEmpty);
     expect(interactions.single.targetCharacterIndices, [1]);
   });
+  test('remaps multiple participants after filtering', () {
+    final item = NaiInteraction(
+      sourceCharacterIndices: [0, 2],
+      targetCharacterIndices: [3],
+      actionName: 'group',
+      type: InteractionType.sourceTarget,
+    );
+    final result = remapper.remap([item], [true, false, true, true]);
+    expect(result.single.sourceCharacterIndices, [0, 1]);
+    expect(result.single.targetCharacterIndices, [2]);
+    expect(item.sourceCharacterIndices, [0, 2]);
+  });
+
 }
