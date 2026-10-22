@@ -59,4 +59,16 @@ void main() {
     expect(result.enabled, [true]);
   });
 
+  test('nested predicates in character actions parse correctly', () {
+    final result = actions.apply(
+      ['pink hair', 'blue eyes'],
+      '((char_in(1, pink hair)&char_on(2))|hat):char_set(2, disabled)',
+      matches: (condition, current, states) => conditions.matches(
+        condition, 'solo', characterPrompts: current,
+        characterEnabled: states,
+      ),
+    );
+    expect(result.enabled, [true, false]);
+  });
+
 }
