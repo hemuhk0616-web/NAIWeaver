@@ -8,7 +8,7 @@
     <!-- In-app auto-update: launch the system package-installer for a downloaded APK. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <application
-        android:label="NAIWeaver"
+        android:label="NAIWeaver Dev"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:largeHeap="true"
