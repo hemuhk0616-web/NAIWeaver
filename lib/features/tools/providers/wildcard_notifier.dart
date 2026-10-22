@@ -116,12 +116,17 @@ class WildcardNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Wildcard settings are keyed by relative path, not filename alone.
+  /// This keeps e.g. outfit/common and pose/common independent.
+  String wildcardKey(File file) => p.withoutExtension(
+      p.relative(file.path, from: wildcardDir)).replaceAll('\\', '/');
+
   bool isFavorite(File file) {
-    return wildcardService.isFavorite(p.basenameWithoutExtension(file.path));
+    return wildcardService.isFavorite(wildcardKey(file));
   }
 
   Future<void> toggleFavorite(File file) async {
-    final name = p.basenameWithoutExtension(file.path);
+    final name = wildcardKey(file);
     await wildcardService.toggleFavorite(name);
     await refreshFiles();
   }
@@ -132,11 +137,11 @@ class WildcardNotifier extends ChangeNotifier {
   }
 
   WildcardMode getFileMode(File file) {
-    return wildcardService.getMode(p.basenameWithoutExtension(file.path));
+    return wildcardService.getMode(wildcardKey(file));
   }
 
   Future<void> setFileMode(File file, WildcardMode mode) async {
-    await wildcardService.setMode(p.basenameWithoutExtension(file.path), mode);
+    await wildcardService.setMode(wildcardKey(file), mode);
     notifyListeners();
   }
 
