@@ -21,7 +21,7 @@ class NaiaOrderedRuleEngine {
     for (final line in rules.split(RegExp(r'\r?\n'))) {
       final rule = line.trim();
       if (rule.isEmpty || rule.startsWith('#')) continue;
-      if (RegExp(r':char_(set|replace)\(').hasMatch(rule)) {
+      if (RegExp(r'^\(.*\):char_(set|replace)\(').hasMatch(rule)) {
         final result = actions.apply(currentCharacters, rule,
           initialEnabled: enabled,
           matches: (condition, prompts, states) => conditions.matches(
