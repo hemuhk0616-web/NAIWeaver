@@ -4,13 +4,12 @@ class NaiaCharacterActions {
   const NaiaCharacterActions();
 
   List<String> applyReplace(List<String> prompts, String rules,
-      {required bool Function(String, List<String>) matches}) {
+      {required bool Function(String) matches}) {
     final output = List<String>.from(prompts);
-    final mainTags = <String>[];
     for (final line in rules.split(RegExp(r'\r?\n'))) {
       final rule = RegExp(r'^\s*\((.*?)\):char_replace\(\s*(\d+)\s*,\s*(.*?)\s*,\s*(.*?)\s*\)\s*$')
           .firstMatch(line);
-      if (rule == null || !matches(rule.group(1)!, mainTags)) continue;
+      if (rule == null || !matches(rule.group(1)!)) continue;
       final index = int.parse(rule.group(2)!) - 1;
       if (index < 0 || index >= output.length) continue;
       final oldTag = rule.group(3)!.trim();
