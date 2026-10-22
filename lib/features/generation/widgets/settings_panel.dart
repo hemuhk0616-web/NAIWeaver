@@ -462,13 +462,11 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
                           ),
                           FilledButton(
                             onPressed: () async {
-                              if (selected != previews.length - 1) {
-                                await notifier.previewNaiaPrompt();
-                              }
+                              notifier.selectNaiaPreviewSample(selected);
                               if (!dialogContext.mounted) return;
                               Navigator.pop(dialogContext);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('마지막 추첨 결과가 생성 1회에 고정되었습니다.')),
+                                const SnackBar(content: Text('선택한 추첨 결과가 생성 1회에 고정되었습니다.')),
                               );
                             },
                             child: const Text('생성용으로 고정'),
