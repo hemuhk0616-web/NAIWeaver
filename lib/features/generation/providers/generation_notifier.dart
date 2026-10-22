@@ -29,6 +29,7 @@ import '../../../core/services/naia_resolution_directive.dart';
 import '../../../core/services/naia_ordered_rule_engine.dart';
 import '../../../core/services/naia_interaction_remapper.dart';
 import '../../../core/services/naia_preview_sample_selection.dart';
+import '../../../core/services/naia_preview_render_inputs.dart';
 import '../../../core/services/presets.dart';
 import '../../../core/services/tag_service.dart';
 import '../../../core/utils/image_utils.dart';
@@ -1328,21 +1329,17 @@ class GenerationNotifier extends ChangeNotifier {
       styles: _state.styles,
       furryMode: _state.furryMode,
     );
-    // Mirror the demo prefixes applied by generate() after NAIA resolution.
-    final demoMode = _galleryNotifier?.demoMode == true;
-    final demoPositive = demoMode ? _prefs.demoPositivePrefix : '';
-    final demoNegative = demoMode ? _prefs.demoNegativePrefix : '';
-    final previewMain = demoPositive.isEmpty
-        ? inputs.prompt : '$demoPositive, ${inputs.prompt}';
-    final previewNegative = [
-      if (demoNegative.isNotEmpty) demoNegative,
-      if (inputs.negative.isNotEmpty) inputs.negative,
-      if (styleResult.negative != null && styleResult.negative!.isNotEmpty)
-        styleResult.negative!,
-    ].join(', ');
+    final renderInputs = composeNaiaRenderInputs(
+      prompt: inputs.prompt,
+      negative: inputs.negative,
+      demoMode: _galleryNotifier?.demoMode == true,
+      demoPositivePrefix: _prefs.demoPositivePrefix,
+      demoNegativePrefix: _prefs.demoNegativePrefix,
+      styleNegative: styleResult.negative,
+    );
     final buffer = StringBuffer()
       ..writeln('MAIN')
-      ..writeln(previewMain)
+      ..writeln(renderInputs.prompt)
       ..writeln()
       ..writeln('STYLE PREFIX')
       ..writeln(styleResult.prefix ?? '')
@@ -1351,7 +1348,7 @@ class GenerationNotifier extends ChangeNotifier {
       ..writeln(styleResult.suffix ?? '')
       ..writeln()
       ..writeln('NEGATIVE')
-      ..writeln(previewNegative)
+      ..writeln(renderInputs.negative)
       ..writeln()
       ..writeln('RESOLUTION');
     buffer.writeln('${inputs.width ?? _state.width.toInt()} x ${inputs.height ?? _state.height.toInt()}');
@@ -1392,16 +1389,8 @@ class GenerationNotifier extends ChangeNotifier {
           : await _resolveNaiaGenerationInputs();
       _lockedNaiaPreview = null;
       _lockedNaiaSignature = null;
-      final resolvedPrompt = naiaInputs.prompt;
       final processedCharacters = naiaInputs.characters;
       final processedInteractions = naiaInputs.interactions;
-      String finalPrompt = resolvedPrompt;
-      if (_galleryNotifier?.demoMode == true) {
-        final demoPos = _prefs.demoPositivePrefix;
-        if (demoPos.isNotEmpty) {
-          finalPrompt = '$demoPos, $finalPrompt';
-        }
-      }
 
       int seed;
       if (_state.randomizeSeed) {
@@ -1417,19 +1406,16 @@ class GenerationNotifier extends ChangeNotifier {
         styles: _state.styles,
         furryMode: _state.furryMode,
       );
-      String? combinedPrefix = styleResult.prefix;
-      String? combinedSuffix = styleResult.suffix;
-      String? styleNegativeContent = styleResult.negative;
-
-      String baseNegative = _tagService.resolveAliases(
-          naiaInputs.negative);
-      if (_galleryNotifier?.demoMode == true) {
-        final demoNeg = _prefs.demoNegativePrefix;
-        if (demoNeg.isNotEmpty) {
-          baseNegative = baseNegative.isEmpty ? demoNeg : '$demoNeg, $baseNegative';
-        }
-      }
-      final fullNegativePrompt = styleNegativeContent != null ? "$baseNegative, $styleNegativeContent" : baseNegative;
+      final combinedPrefix = styleResult.prefix;
+      final combinedSuffix = styleResult.suffix;
+      final renderInputs = composeNaiaRenderInputs(
+        prompt: naiaInputs.prompt,
+        negative: _tagService.resolveAliases(naiaInputs.negative),
+        demoMode: _galleryNotifier?.demoMode == true,
+        demoPositivePrefix: _prefs.demoPositivePrefix,
+        demoNegativePrefix: _prefs.demoNegativePrefix,
+        styleNegative: styleResult.negative,
+      );
 
       // V5 (launch) has neither Character Reference nor Vibe Transfer; the
       // data is kept but not sent (the request builder drops it too).
@@ -1440,8 +1426,8 @@ class GenerationNotifier extends ChangeNotifier {
           caps.vibeTransfer ? _vibeTransferNotifier?.buildPayload() : null;
 
       final result = await _service.generateImage(
-        prompt: finalPrompt,
-        negativePrompt: fullNegativePrompt,
+        prompt: renderInputs.prompt,
+        negativePrompt: renderInputs.negative,
         width: naiaInputs.width ?? _state.width.toInt(),
         height: naiaInputs.height ?? _state.height.toInt(),
         scale: _state.scale,
