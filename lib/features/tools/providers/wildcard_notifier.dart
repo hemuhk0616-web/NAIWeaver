@@ -222,24 +222,31 @@ class WildcardNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> createFile(String name) async {
-    if (name.isEmpty) return;
-
-    final fileName = name.endsWith('.txt') ? name : '$name.txt';
-    final filePath = p.join(wildcardDir, fileName);
-    final file = File(filePath);
-
-    if (await file.exists()) {
-      debugPrint('File already exists');
-      return;
+  String? _safeWildcardName(String input) {
+    final normalized = input.trim().replaceAll('\\', '/');
+    final name = normalized.toLowerCase().endsWith('.txt')
+        ? normalized.substring(0, normalized.length - 4) : normalized;
+    final parts = name.split('/');
+    if (parts.isEmpty || parts.any((part) =>
+        part.isEmpty || part == '.' || part == '..' || part.contains(':'))) {
+      return null;
     }
+    return parts.join('/');
+  }
 
+  Future<void> createFile(String name) async {
+    final key = _safeWildcardName(name);
+    if (key == null) return;
+    final root = p.normalize(p.absolute(wildcardDir));
+    final destination = p.normalize(p.join(root, '$key.txt'));
+    if (!p.isWithin(root, destination) || await File(destination).exists()) return;
     try {
-      await file.writeAsString('');
+      await Directory(p.dirname(destination)).create(recursive: true);
+      await File(destination).writeAsString('');
       await wildcardService.refresh();
       await refreshFiles();
-      final newFile = _state.files.firstWhere((f) => p.basename(f.path) == fileName);
-      await selectFile(newFile);
+      final created = _state.files.where((f) => p.normalize(f.path) == destination);
+      if (created.isNotEmpty) await selectFile(created.first);
     } catch (e) {
       debugPrint('Error creating wildcard file: $e');
     }
@@ -247,6 +254,7 @@ class WildcardNotifier extends ChangeNotifier {
 
   Future<void> deleteFile(File file) async {
     try {
+      await flushPendingSave();
       if (_state.selectedFile?.path == file.path) {
         _state = _state.copyWith(selectedFile: null, content: '');
         editorController.text = '';
@@ -260,28 +268,22 @@ class WildcardNotifier extends ChangeNotifier {
   }
 
   Future<bool> renameFile(File file, String newName) async {
-    final oldName = p.basenameWithoutExtension(file.path);
-    final sanitized = newName.trim().replaceAll(' ', '.')
-        .replaceAll('/', '').replaceAll('\\', '').replaceAll('..', '');
-    if (sanitized.isEmpty || sanitized == oldName) return false;
-
-    final newPath = p.normalize(p.join(wildcardDir, '$sanitized.txt'));
-    if (!p.isWithin(wildcardDir, newPath)) return false;
-    if (await File(newPath).exists()) return false;
-
+    final oldName = wildcardKey(file);
+    final raw = newName.trim().replaceAll('\\', '/');
+    final folder = p.posix.dirname(oldName);
+    final requested = raw.contains('/')
+        ? raw : '${folder == '.' ? '' : '$folder/'}$raw';
+    final nextName = _safeWildcardName(requested);
+    if (nextName == null || nextName == oldName) return false;
     try {
+      await flushPendingSave();
       final wasSelected = _state.selectedFile?.path == file.path;
-      final success = await wildcardService.renameWildcard(oldName, sanitized);
+      final success = await wildcardService.renameWildcard(oldName, nextName);
       if (!success) return false;
-
       await refreshFiles();
-
-      if (wasSelected) {
-        final renamedFile = _state.files.firstWhere(
-          (f) => p.basenameWithoutExtension(f.path) == sanitized,
-          orElse: () => file,
-        );
-        await selectFile(renamedFile);
+      final renamed = _state.files.where((f) => wildcardKey(f) == nextName);
+      if (wasSelected && renamed.isNotEmpty) {
+        await selectFile(renamed.first);
       }
       return true;
     } catch (e) {
