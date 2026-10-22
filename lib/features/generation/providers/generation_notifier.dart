@@ -1222,21 +1222,8 @@ class GenerationNotifier extends ChangeNotifier {
         characterPrompts: processedCharacters.map((c) => c.prompt).toList(),
         characterEnabled: List<bool>.filled(processedCharacters.length, true),
       );
-      // Apply character replacements to expanded values, not source text.
-      final replacedPrompts = const NaiaCharacterActions().applyReplace(
-        processedCharacters.map((c) => c.prompt).toList(),
-        naiaConditionalRules,
-        matches: (condition) => pipeline.conditions.matches(
-          condition, processedPrompt,
-          characterPrompts: processedCharacters.map((c) => c.prompt).toList(),
-          characterEnabled: List<bool>.filled(processedCharacters.length, true),
-        ),
-      );
-      processedCharacters = [
-        for (var i = 0; i < processedCharacters.length; i++)
-          processedCharacters[i].copyWith(prompt: replacedPrompts[i]),
-      ];
-      final enabledSlots = const NaiaCharacterActions().applyEnabled(
+      // Run both character actions in source order against expanded prompts.
+      final characterResult = const NaiaCharacterActions().apply(
         processedCharacters.map((c) => c.prompt).toList(),
         naiaConditionalRules,
         matches: (condition, prompts, enabled) => pipeline.conditions.matches(
@@ -1245,16 +1232,17 @@ class GenerationNotifier extends ChangeNotifier {
           characterEnabled: enabled,
         ),
       );
-      // Interaction indices refer to original slots. Refuse an unsafe
-      // reindexing rather than silently sending incorrect interactions.
-      if (enabledSlots.contains(false) && _state.interactions.isNotEmpty) {
+      // Keep original indices until interactions are remapped safely.
+      if (characterResult.enabled.contains(false) &&
+          _state.interactions.isNotEmpty) {
         throw StateError(
           'char_set(disabled)는 캐릭터 상호작용이 설정된 경우 아직 지원되지 않습니다.',
         );
       }
       processedCharacters = [
         for (var i = 0; i < processedCharacters.length; i++)
-          if (enabledSlots[i]) processedCharacters[i],
+          if (characterResult.enabled[i])
+            processedCharacters[i].copyWith(prompt: characterResult.prompts[i]),
       ];
       final naiaResolution = NaiaResolutionDirective.extract(processedPrompt);
       final resolvedPrompt = _tagService.resolveAliases(naiaResolution.prompt);
