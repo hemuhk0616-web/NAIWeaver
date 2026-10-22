@@ -47,6 +47,25 @@ class NaiaOrderedRuleEngine {
       if (!conditions.matches(condition, currentMain,
           characterPrompts: currentCharacters, characterEnabled: enabled)) continue;
 
+      // NAIA accepts global_uc syntax but does not apply it to the payload.
+      if (RegExp(r'^global_uc(?:\+=|\+:|=)').hasMatch(action)) {
+        continue;
+      }
+      // NAIA's unknown-target +: appends its combined text to main.
+      final plusColon = action.indexOf('+:');
+      if (plusColon >= 0) {
+        final target = action.substring(0, plusColon).trim();
+        final recognized = const {'prefix', 'main', 'postfix', 'neg', 'global_uc'}
+            .contains(target) ||
+            RegExp(r'^(char|uc):(\d+|\*)$', caseSensitive: false)
+                .hasMatch(target);
+        if (!recognized) {
+          final value = action.replaceFirst('+:', '').trim();
+          currentMain = [currentMain, value]
+              .where((v) => v.isNotEmpty).join(', ');
+          continue;
+        }
+      }
       final neg = RegExp(r'^neg(\+=|\+:|=)(.*)$').firstMatch(action);
       if (neg != null) {
         final value = neg.group(2)!.trim();
