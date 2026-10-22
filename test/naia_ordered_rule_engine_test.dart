@@ -50,4 +50,16 @@ void main() {
     expect(characters, ['blue hair']);
     expect(uc, ['bad hands']);
   });
+  test('NAIA scoped char and UC targets accept star and 1-based index', () {
+    final result = engine.apply(
+      'solo', ['blue hair', 'pink hair'],
+      '(solo):char:1+=smile\n'
+      '(solo):uc:*+=bad hands\n'
+      '(char_in(1, smile)):char:2=green eyes',
+      characterUc: ['lowres', 'blurry'],
+    );
+    expect(result.characters, ['blue hair, smile', 'green eyes']);
+    expect(result.characterUc, ['lowres, bad hands', 'blurry, bad hands']);
+  });
+
 }
