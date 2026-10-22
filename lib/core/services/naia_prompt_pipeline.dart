@@ -15,13 +15,13 @@ class NaiaPromptPipeline {
   }) async {
     final expanded = await wildcards.process(prompt);
     if (rules.trim().isEmpty) return expanded;
-    final expandedRules = await _expandActionValues(rules);
+    final expandedRules = await expandActionValues(rules);
     return conditions.apply(expanded, expandedRules,
       characterPrompts: characterPrompts,
       characterEnabled: characterEnabled);
   }
 
-  Future<String> _expandActionValues(String rules) async {
+  Future<String> expandActionValues(String rules) async {
     final output = <String>[];
     for (final line in rules.split(RegExp(r'\r?\n'))) {
       final match = RegExp(r'^(\(.*\):.*?(?:\+=|\+:|(?<![+])=))(.*)$').firstMatch(line);
