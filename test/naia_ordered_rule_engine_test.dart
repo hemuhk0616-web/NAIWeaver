@@ -84,4 +84,14 @@ void main() {
     expect(result.negative, 'lowres');
   });
 
+  test('prefix and postfix stay outside later main additions', () {
+    final result = engine.apply(
+      'solo', [],
+      '(solo):postfix+=end tag\n'
+      '(solo):prefix+=start tag\n'
+      '(solo):main+=smile',
+    );
+    expect(result.main, 'start tag, solo, smile, end tag');
+  });
+
 }
