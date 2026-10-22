@@ -26,7 +26,7 @@ import '../../../core/services/nai_text_service.dart';
 import '../../../core/services/wildcard_processor.dart';
 import '../../../core/services/naia_prompt_pipeline.dart';
 import '../../../core/services/naia_resolution_directive.dart';
-import '../../../core/services/naia_character_actions.dart';
+import '../../../core/services/naia_ordered_rule_engine.dart';
 import '../../../core/services/naia_interaction_remapper.dart';
 import '../../../core/services/presets.dart';
 import '../../../core/services/tag_service.dart';
@@ -1215,30 +1215,24 @@ class GenerationNotifier extends ChangeNotifier {
           );
         }),
       );
-      final processedPrompt = await pipeline.process(
-        promptController.text,
-        rules: naiaConditionalRules.split(RegExp(r'\r?\n'))
-            .where((line) => !RegExp(r'^\s*char:\d+\s').hasMatch(line))
-            .join('\n'),
-        characterPrompts: processedCharacters.map((c) => c.prompt).toList(),
-        characterEnabled: List<bool>.filled(processedCharacters.length, true),
+      final expandedMain = await _wildcardProcessor.process(promptController.text);
+      final expandedRules = await pipeline.expandActionValues(
+        naiaConditionalRules.split(RegExp(r'\r?\n'))
+          .where((line) => !RegExp(r'^\s*char:\d+\s').hasMatch(line))
+          .join('\n'),
       );
-      // Run both character actions in source order against expanded prompts.
-      final characterResult = const NaiaCharacterActions().apply(
+      final ordered = const NaiaOrderedRuleEngine().apply(
+        expandedMain,
         processedCharacters.map((c) => c.prompt).toList(),
-        naiaConditionalRules,
-        matches: (condition, prompts, enabled) => pipeline.conditions.matches(
-          condition, processedPrompt,
-          characterPrompts: prompts,
-          characterEnabled: enabled,
-        ),
+        expandedRules,
       );
+      final processedPrompt = ordered.main;
       final processedInteractions = const NaiaInteractionRemapper().remap(
-        _state.interactions, characterResult.enabled);
+        _state.interactions, ordered.enabled);
       processedCharacters = [
         for (var i = 0; i < processedCharacters.length; i++)
-          if (characterResult.enabled[i])
-            processedCharacters[i].copyWith(prompt: characterResult.prompts[i]),
+          if (ordered.enabled[i])
+            processedCharacters[i].copyWith(prompt: ordered.characters[i]),
       ];
       final naiaResolution = NaiaResolutionDirective.extract(processedPrompt);
       final resolvedPrompt = _tagService.resolveAliases(naiaResolution.prompt);
