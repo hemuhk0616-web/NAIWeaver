@@ -27,11 +27,15 @@ class NaiaConditionalProcessor {
       }
       final closing = _matchingParen(rule, 0);
       if (closing < 0 || closing + 1 >= rule.length ||
-          rule[closing + 1] != ':') continue;
+          rule[closing + 1] != ':') {
+        continue;
+      }
       final condition = rule.substring(1, closing);
       if (!_matches(condition, tags,
           characterPrompts: characterPrompts,
-          characterEnabled: characterEnabled)) continue;
+          characterEnabled: characterEnabled)) {
+        continue;
+      }
       final action = rule.substring(closing + 2).trim();
       final append = RegExp(r'^(.+?)(?:\+=|\+:)(.*)$').firstMatch(action);
       if (append != null) {
