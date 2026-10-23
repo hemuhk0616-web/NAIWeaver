@@ -41,7 +41,9 @@ class AppBackupService {
       final relative = p.relative(file.path, from: paths.baseDir)
           .replaceAll('\\', '/');
       if (!safeFile(relative) || !await file.exists() ||
-          await file.length() > 8 * 1024 * 1024) return;
+          await file.length() > 8 * 1024 * 1024) {
+        return;
+      }
       files[relative] = base64Encode(await file.readAsBytes());
     }
     for (final name in names) {
