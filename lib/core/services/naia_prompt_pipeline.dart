@@ -39,7 +39,11 @@ class NaiaPromptPipeline {
     }).join(', ');
   }
 
-  /// Expand only a matched action; unmatched rules must not consume rolls.\n  Future<String> expandMatchedActionValue(String value) async =>\n      _chooseAlternatives(await wildcards.process(value));\n\n  Future<String> expandActionValues(String rules) async {
+  /// Expand only a matched action; unmatched rules must not consume rolls.
+  Future<String> expandMatchedActionValue(String value) async =>
+      _chooseAlternatives(await wildcards.process(value));
+
+  Future<String> expandActionValues(String rules) async {
     final output = <String>[];
     for (final line in rules.split(RegExp(r'\r?\n'))) {
       final trimmed = line.trimLeft();
