@@ -219,4 +219,29 @@ void main() {
     expect(result.enabled, [true, false]);
   });
 
+  test('source order: character mutation affects later conditions', () async {
+    final result = await engine.applyAsync(
+      'solo', ['blue hair'],
+      '(solo):char:1+=smile\\n'
+      '(char_in(1, smile)):main+=happy\\n'
+      '(happy):char_replace(1, blue hair, pink hair)',
+      characterEnabled: [true],
+      expandAction: (value) async => value,
+    );
+    expect(result.main, 'solo, happy');
+    expect(result.characters, ['blue hair, smile']);
+  });
+
+  test('disabled character state is visible to following rules', () async {
+    final result = await engine.applyAsync(
+      'solo', ['blue hair'],
+      '(solo):char_set(1, disabled)\\n'
+      '(~char_on(1)):main+=solo focus',
+      characterEnabled: [true],
+      expandAction: (value) async => value,
+    );
+    expect(result.enabled, [false]);
+    expect(result.main, 'solo, solo focus');
+  });
+
 }
