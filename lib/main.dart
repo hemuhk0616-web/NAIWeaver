@@ -1396,7 +1396,11 @@ class _SimpleGeneratorAppState extends State<SimpleGeneratorApp> with SingleTick
                               ),
                             ),
                           );
-                          countController.dispose();
+                          // The dialog's route can still be unmounting after showDialog
+                          // completes. Dispose its text controller after that frame.
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            countController.dispose();
+                          });
                           if (count != null && context.mounted) {
                             notifier.startAutoLoop(count: count == 0 ? null : count);
                           }
