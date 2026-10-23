@@ -90,12 +90,14 @@ class NaiCharacter {
   final String name;
   final String prompt;
   final String uc;
+  final bool enabled;
   final NaiCoordinate center;
 
   NaiCharacter({
     this.name = '',
     required this.prompt,
     required this.uc,
+    this.enabled = true,
     required this.center,
   });
 
@@ -103,6 +105,7 @@ class NaiCharacter {
         name: json['name'] as String? ?? '',
         prompt: json['prompt'],
         uc: json['uc'],
+        enabled: json['enabled'] as bool? ?? true,
         center: NaiCoordinate.fromJson(json['center']),
       );
 
@@ -110,6 +113,7 @@ class NaiCharacter {
         'name': name,
         'prompt': prompt,
         'uc': uc,
+        'enabled': enabled,
         'center': center.toJson(),
       };
 
@@ -117,12 +121,14 @@ class NaiCharacter {
     String? name,
     String? prompt,
     String? uc,
+    bool? enabled,
     NaiCoordinate? center,
   }) {
     return NaiCharacter(
       name: name ?? this.name,
       prompt: prompt ?? this.prompt,
       uc: uc ?? this.uc,
+      enabled: enabled ?? this.enabled,
       center: center ?? this.center,
     );
   }
