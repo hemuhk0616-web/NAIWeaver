@@ -118,6 +118,7 @@ class NaiaOrderedRuleEngine {
     String main, List<String> characters, String rules, {
     String negative = '',
     List<String> characterUc = const [],
+    List<bool> characterEnabled = const [],
     required Future<String> Function(String) expandAction,
   }) async {
     const conditions = NaiaConditionalProcessor();
@@ -128,7 +129,8 @@ class NaiaOrderedRuleEngine {
     var currentNegative = negative;
     var currentCharacters = List<String>.from(characters);
     final uc = List<String>.from(characterUc);
-    var enabled = List<bool>.filled(characters.length, true);
+    var enabled = List<bool>.generate(characters.length,
+      (i) => i < characterEnabled.length ? characterEnabled[i] : true);
 
     String combined() => [...prefix, ...mainTags, ...postfix].join(', ');
     for (final line in rules.split(RegExp(r'\r?\n'))) {
