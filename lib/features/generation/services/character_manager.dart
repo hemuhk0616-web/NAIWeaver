@@ -87,7 +87,9 @@ class CharacterManager {
     int to,
   ) {
     if (from < 0 || from >= characters.length ||
-        to < 0 || to >= characters.length) return null;
+        to < 0 || to >= characters.length) {
+      return null;
+    }
     if (from == to) {
       return (characters: List<NaiCharacter>.of(characters),
           interactions: List<NaiInteraction>.of(interactions));
