@@ -777,6 +777,40 @@ class _SimpleGeneratorAppState extends State<SimpleGeneratorApp> with SingleTick
                     ),
                   );
                 }),
+              if (mobile)
+                PopupMenuButton<String>(
+                  tooltip: '더보기',
+                  icon: Icon(Icons.more_vert, color: t.headerText, size: 24),
+                  onSelected: (action) {
+                    switch (action) {
+                      case 'help':
+                        showHelpDialog(context);
+                        break;
+                      case 'settings':
+                        _showMobileSettings(context);
+                        break;
+                      case 'gallery':
+                        Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => const GalleryScreen()));
+                        break;
+                      case 'tools':
+                        Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => const ToolsHubScreen()));
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => const [
+                    PopupMenuItem(value: 'settings',
+                      child: ListTile(leading: Icon(Icons.tune), title: Text('생성 설정'))),
+                    PopupMenuItem(value: 'gallery',
+                      child: ListTile(leading: Icon(Icons.photo_library_outlined), title: Text('갤러리'))),
+                    PopupMenuItem(value: 'tools',
+                      child: ListTile(leading: Icon(Icons.build_outlined), title: Text('도구'))),
+                    PopupMenuItem(value: 'help',
+                      child: ListTile(leading: Icon(Icons.help_outline), title: Text('도움말'))),
+                  ],
+                )
+              else ...[
               IconButton(
                 onPressed: () => showHelpDialog(context),
                 icon: Icon(Icons.help_outline, color: t.headerText, size: mobile ? 20 : 16),
@@ -825,9 +859,7 @@ class _SimpleGeneratorAppState extends State<SimpleGeneratorApp> with SingleTick
                   ),
                 ),
               ),
-              // Mobile: keep TOOLS off the screen edge, roughly in line with
-              // the content margin below it.
-              if (mobile) const SizedBox(width: 6),
+              ],
             ],
           ),
           body: SafeArea(
