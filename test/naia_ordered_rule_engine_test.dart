@@ -147,7 +147,7 @@ void main() {
       '(sex&~!group sex):sex+=pose result,',
       '(masturbation):masturbation+=solo pose,',
       '(*white background, simple background):simple background+=outfit result,',
-    ].join('\\n');
+    ].join('\n');
     final solo = engine.apply('1girl, nsfw, masturbation', [], rules);
     expect(solo.main, contains('solo'));
     expect(solo.main, contains('uncensored'));
