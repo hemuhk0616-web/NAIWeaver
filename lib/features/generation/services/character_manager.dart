@@ -78,6 +78,41 @@ class CharacterManager {
     return (characters: updatedChars, interactions: updatedInteractions);
   }
 
+  /// Move a character and remap all interaction participant indices.
+  ({List<NaiCharacter> characters, List<NaiInteraction> interactions})?
+      moveCharacter(
+    List<NaiCharacter> characters,
+    List<NaiInteraction> interactions,
+    int from,
+    int to,
+  ) {
+    if (from < 0 || from >= characters.length ||
+        to < 0 || to >= characters.length) return null;
+    if (from == to) {
+      return (characters: List<NaiCharacter>.of(characters),
+          interactions: List<NaiInteraction>.of(interactions));
+    }
+    final reordered = List<NaiCharacter>.of(characters);
+    final moving = reordered.removeAt(from);
+    reordered.insert(to, moving);
+    final oldToNew = <int, int>{
+      for (var newIndex = 0; newIndex < reordered.length; newIndex++)
+        (newIndex == to
+          ? from
+          : from < to
+              ? (newIndex < from ? newIndex : newIndex <= to ? newIndex + 1 : newIndex)
+              : (newIndex < to ? newIndex : newIndex < from ? newIndex - 1 : newIndex))
+        : newIndex,
+    };
+    final mapped = interactions.map((interaction) => interaction.copyWith(
+      sourceCharacterIndices: interaction.sourceCharacterIndices
+          .map((index) => oldToNew[index] ?? index).toList(),
+      targetCharacterIndices: interaction.targetCharacterIndices
+          .map((index) => oldToNew[index] ?? index).toList(),
+    )).toList();
+    return (characters: reordered, interactions: mapped);
+  }
+
   /// Update or add an interaction. Returns updated interactions list.
   List<NaiInteraction> updateInteraction(
     List<NaiInteraction> current,
