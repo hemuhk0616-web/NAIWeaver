@@ -22,6 +22,7 @@ class LocaleNotifier extends ChangeNotifier {
     // On web, URL param overrides build default
     if (kIsWeb) {
       final lang = Uri.base.queryParameters['lang'];
+      if (lang == 'ko') return const Locale('ko');
       if (lang == 'ja') return const Locale('ja');
       if (lang == 'en') return const Locale('en');
       if (lang == 'zh') return const Locale('zh');
