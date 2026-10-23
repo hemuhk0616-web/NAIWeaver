@@ -762,7 +762,7 @@
       }
     }
   },
-  "packSavedRefsSection": "SAVED REFERENCES ({selected}/{total})",
+  "packSavedRefsSection": "저장된 참조 이미지({selected}/{total})",
   "@packSavedRefsSection": {
     "placeholders": {
       "selected": {
@@ -773,7 +773,7 @@
       }
     }
   },
-  "packSavedVibesSection": "SAVED VIBES ({selected}/{total})",
+  "packSavedVibesSection": "저장된 바이브({selected}/{total})",
   "@packSavedVibesSection": {
     "placeholders": {
       "selected": {
@@ -784,7 +784,7 @@
       }
     }
   },
-  "packCharacterPresetsSection": "CHARACTER PRESETS ({selected}/{total})",
+  "packCharacterPresetsSection": "캐릭터 프리셋({selected}/{total})",
   "@packCharacterPresetsSection": {
     "placeholders": {
       "selected": {
@@ -795,7 +795,7 @@
       }
     }
   },
-  "packThemesSection": "THEMES ({selected}/{total})",
+  "packThemesSection": "테마({selected}/{total})",
   "@packThemesSection": {
     "placeholders": {
       "selected": {
@@ -806,7 +806,7 @@
       }
     }
   },
-  "packAlbumsSection": "ALBUMS ({selected}/{total})",
+  "packAlbumsSection": "앨범({selected}/{total})",
   "@packAlbumsSection": {
     "placeholders": {
       "selected": {
@@ -817,11 +817,11 @@
       }
     }
   },
-  "packSettingsSection": "APP & JUKEBOX SETTINGS",
-  "packSettingsItem": "App & jukebox settings",
-  "packImportRestartHint": "Imported. Restart the app to fully apply settings and themes.",
+  "packSettingsSection": "앱 및 주크박스 설정",
+  "packSettingsItem": "앱 및 주크박스 설정",
+  "packImportRestartHint": "가져오기 완료. 설정과 테마를 완전히 적용하려면 앱을 다시 시작하세요.",
   "packExportSuccess": "팩을 내보냈습니다",
-  "packExportFailed": "Export failed: {error}",
+  "packExportFailed": "내보내기 실패: {error}",
   "@packExportFailed": {
     "placeholders": {
       "error": {
@@ -830,7 +830,7 @@
     }
   },
   "packImportDialogTitle2": "팩 가져오기",
-  "packImportCount": "IMPORT ({count})",
+  "packImportCount": "가져오기({count})",
   "@packImportCount": {
     "placeholders": {
       "count": {
@@ -839,7 +839,7 @@
     }
   },
   "packImportSuccess": "팩을 가져왔습니다",
-  "packImportFailed": "Import failed: {error}",
+  "packImportFailed": "가져오기 실패: {error}",
   "@packImportFailed": {
     "placeholders": {
       "error": {
@@ -849,7 +849,7 @@
   },
   "packExportGalleryTitle": "갤러리 내보내기",
   "packAlbums": "앨범",
-  "packUnsortedCount": "UNSORTED ({count})",
+  "packUnsortedCount": "미분류({count})",
   "@packUnsortedCount": {
     "placeholders": {
       "count": {
@@ -860,7 +860,7 @@
   "packOptions": "옵션",
   "packStripMetadata": "메타데이터 제거",
   "packFavoritesOnly": "즐겨찾기만",
-  "packExportCount": "EXPORT ({count})",
+  "packExportCount": "내보내기({count})",
   "@packExportCount": {
     "placeholders": {
       "count": {
@@ -870,7 +870,7 @@
   },
   "packSaveDialogTitle": "NAIWeaver 팩 저장",
   "packExportGalleryZipDialog": "갤러리 ZIP 내보내기",
-  "packExportedToZip": "Exported {count} images to ZIP",
+  "packExportedToZip": "이미지 {count}장을 ZIP으로 내보냈습니다",
   "@packExportedToZip": {
     "placeholders": {
       "count": {
@@ -881,7 +881,7 @@
   "themeSelectToEdit": "편집할 테마 선택",
   "themeList": "테마",
   "themeNew": "새 테마",
-  "themeSave": "SAVE",
+  "themeSave": "저장",
   "themeReset": "초기화",
   "themePreview": "미리보기",
   "themeColors": "색상",
@@ -900,18 +900,18 @@
   "themeColorAccentEdit": "편집 강조색",
   "themeColorAccentSuccess": "성공 강조색",
   "themeColorAccentDanger": "위험 강조색",
-  "themeColorLogo": "Logo",
+  "themeColorLogo": "로고",
   "themeColorCascade": "캐스케이드",
   "themeReferences": "참조 이미지",
   "themeColorVibeTransfer": "바이브 전송",
   "themeColorRefCharacter": "캐릭터 참조",
   "themeColorRefStyle": "스타일 참조",
-  "themeColorRefCharStyle": "Ref Char+Style",
+  "themeColorRefCharStyle": "참조 캐릭터+스타일",
   "themeColorFavorite": "즐겨찾기",
   "themeColorCharacter": "캐릭터",
   "themeColorPositive": "긍정",
   "themeColorNegative": "부정",
-  "themeFont": "FONT",
+  "themeFont": "글꼴",
   "themeTextScale": "텍스트 배율",
   "themeHeaderScale": "헤더 배율",
   "themeTitleScale": "제목 배율",
@@ -921,7 +921,7 @@
   "themePromptInput": "프롬프트 입력",
   "themeFontSize": "글자 크기",
   "themeHeightLabel": "높이",
-  "themeLines": "{count} lines",
+  "themeLines": "{count}줄",
   "@themeLines": {
     "placeholders": {
       "count": {
@@ -935,7 +935,7 @@
   "themePanelLayout": "패널 배치",
   "themePanelLayoutDesc": "드래그하여 고급 설정 섹션 순서 변경",
   "themeDeleteTitle": "테마 삭제",
-  "themeDeleteConfirm": "ARE YOU SURE YOU WANT TO DELETE ''{name}''?",
+  "themeDeleteConfirm": "\"{name}\" 테마를 정말 삭제할까요?",
   "@themeDeleteConfirm": {
     "placeholders": {
       "name": {
@@ -946,7 +946,7 @@
   "themeNewTitle": "새 테마",
   "themeCustomTheme": "사용자 지정 테마",
   "themeThemeName": "테마 이름",
-  "themeCreateFailed": "Failed to create theme: {error}",
+  "themeCreateFailed": "테마 생성 실패: {error}",
   "@themeCreateFailed": {
     "placeholders": {
       "error": {
@@ -955,31 +955,31 @@
     }
   },
   "themeSectionModel": "모델",
-  "themeSectionDimSeed": "DIMENSIONS + SEED",
-  "themeSectionStepsScale": "STEPS + SCALE",
-  "themeSectionSamplerPost": "SAMPLER + POST-PROCESSING",
+  "themeSectionDimSeed": "크기 및 시드",
+  "themeSectionStepsScale": "스텝 및 스케일",
+  "themeSectionSamplerPost": "샘플러 및 후처리",
   "themeSectionStyles": "스타일",
   "themeSectionNegPrompt": "부정 프롬프트",
   "themeSectionPresets": "프리셋",
   "themeSectionSaveAlbum": "앨범에 저장",
   "themePreviewHeader": "헤더 텍스트",
   "themePreviewSecondary": "보조 텍스트 내용",
-  "themePreviewHint": "Hint / tertiary text",
+  "themePreviewHint": "힌트 / 보조 안내문",
   "themePreviewGenerate": "생성",
-  "themePreviewEdit": "EDIT",
+  "themePreviewEdit": "편집",
   "cascadeEditorLabel": "캐스케이드 편집기",
   "cascadeSavedToLibrary": "캐스케이드를 라이브러리에 저장했습니다",
   "cascadeNoBeatSelected": "선택한 비트가 없습니다",
-  "cascadeScenePrompt": "SCENE / ACTION",
-  "cascadeSceneSubLabel": "what's happening + framing",
-  "cascadeSceneHint": "what's happening: e.g. 2girls, hugging, wide shot, from above",
+  "cascadeScenePrompt": "장면 / 동작",
+  "cascadeSceneSubLabel": "동작과 화면 구도",
+  "cascadeSceneHint": "장면 설명: 예) 2girls, hugging, wide shot, from above",
   "cascadeEnvironmentPrompt": "환경 프롬프트",
-  "cascadeEnvSubLabel": "where it takes place",
-  "cascadeEnvHint": "where: e.g. forest, night, indoors, cinematic lighting",
+  "cascadeEnvSubLabel": "장면이 펼쳐지는 장소",
+  "cascadeEnvHint": "배경 설명: 예) forest, night, indoors, cinematic lighting",
   "cascadeApplyToAll": "전체 적용",
   "cascadeSceneApplied": "모든 비트에 장면을 적용했습니다",
   "cascadeCharacterSlots": "캐릭터 슬롯",
-  "cascadeCharacterSlotN": "CHARACTER SLOT {n}",
+  "cascadeCharacterSlotN": "캐릭터 슬롯 {n}",
   "@cascadeCharacterSlotN": {
     "placeholders": {
       "n": {
@@ -990,11 +990,11 @@
   "cascadePosition": "위치",
   "cascadeAiPosition": "AI 위치",
   "cascadePositivePrompt": "긍정 프롬프트",
-  "cascadeCharHint": "Character tags, appearance, state...",
+  "cascadeCharHint": "캐릭터 태그, 외형, 상태...",
   "cascadeNegativePrompt": "부정 프롬프트",
-  "cascadeAvoidHint": "Avoid tags...",
+  "cascadeAvoidHint": "제외할 태그...",
   "cascadeLinkAction": "동작 연결",
-  "cascadeCastMemberN": "CHARACTER {n}",
+  "cascadeCastMemberN": "캐릭터 {n}",
   "@cascadeCastMemberN": {
     "placeholders": {
       "n": {
@@ -1007,12 +1007,12 @@
   "cascadeRemoveCharacter": "캐릭터 제거",
   "cascadePlacementManual": "수동",
   "cascadePlacementAi": "AI",
-  "cascadeNoCharactersInBeat": "No characters in this beat. Add one to place or prompt them.",
+  "cascadeNoCharactersInBeat": "이 비트에 캐릭터가 없습니다. 캐릭터를 추가해 배치하거나 프롬프트를 입력하세요.",
   "interactionEditorTitle": "상호작용 편집기",
   "interactionActionLabel": "동작",
-  "interactionActionHint": "ENTER ACTION (e.g., hugging)",
+  "interactionActionHint": "동작 입력(예: hugging)",
   "interactionDirectionLabel": "방향",
-  "interactionWithLabel": "WITH",
+  "interactionWithLabel": "상대",
   "interactionNeedPartner": "상호작용을 설정하려면 캐릭터를 하나 더 추가하세요",
   "interactionSave": "상호작용 저장",
   "cascadeBeatSettings": "비트 설정",
@@ -1023,7 +1023,7 @@
   "cascadeStyles": "스타일",
   "cascadeNoStyles": "사용 가능한 스타일이 없습니다",
   "cascadeLibrary": "캐스케이드 라이브러리",
-  "cascadeSequencesSaved": "{count} SEQUENCES SAVED",
+  "cascadeSequencesSaved": "저장된 시퀀스 {count}개",
   "@cascadeSequencesSaved": {
     "placeholders": {
       "count": {
@@ -1033,7 +1033,7 @@
   },
   "cascadeNew": "새 캐스케이드",
   "cascadeNoCascades": "캐스케이드를 찾지 못했습니다",
-  "cascadeBeatsAndSlots": "{beats} BEATS • {slots} CHARACTER SLOTS",
+  "cascadeBeatsAndSlots": "비트 {beats}개 · 캐릭터 슬롯 {slots}개",
   "@cascadeBeatsAndSlots": {
     "placeholders": {
       "beats": {
@@ -1047,9 +1047,9 @@
   "cascadeCreateNew": "새 캐스케이드 만들기",
   "cascadeName": "캐스케이드 이름",
   "cascadeCharSlotsLabel": "캐릭터 슬롯",
-  "cascadeAutoPosition": "AUTO POSITION (LET AI DECIDE)",
-  "cascadeDeleteTitle": "DELETE CASCADE?",
-  "cascadeDeleteConfirm": "Are you sure you want to delete \"{name}\"?",
+  "cascadeAutoPosition": "자동 배치(AI가 결정)",
+  "cascadeDeleteTitle": "캐스케이드를 삭제할까요?",
+  "cascadeDeleteConfirm": "\"{name}\"을(를) 정말 삭제할까요?",
   "@cascadeDeleteConfirm": {
     "placeholders": {
       "name": {
@@ -1059,7 +1059,7 @@
   },
   "cascadeSelect": "캐스케이드 선택",
   "cascadeNoSaved": "저장된 캐스케이드가 없습니다",
-  "cascadeCharactersAndBeats": "{chars} CHARACTERS • {beats} BEATS",
+  "cascadeCharactersAndBeats": "캐릭터 {chars}명 · 비트 {beats}개",
   "@cascadeCharactersAndBeats": {
     "placeholders": {
       "chars": {
@@ -1070,7 +1070,7 @@
       }
     }
   },
-  "cascadeCharTags": "CHAR {n} TAGS",
+  "cascadeCharTags": "캐릭터 {n} 태그",
   "@cascadeCharTags": {
     "placeholders": {
       "n": {
@@ -1078,18 +1078,18 @@
       }
     }
   },
-  "cascadeGlobalScene": "GLOBAL SCENE (tags for every beat)",
-  "cascadeGlobalStyle": "GLOBAL STYLE / INJECTION",
-  "cascadeCaptionHint": "Narrate this beat... (shown over the preview)",
-  "cascadeCaptionToggle": "Show / hide captions",
+  "cascadeGlobalScene": "공통 장면(모든 비트에 적용할 태그)",
+  "cascadeGlobalStyle": "공통 스타일 / 삽입 태그",
+  "cascadeCaptionHint": "이 비트의 설명 입력...(미리보기 위에 표시)",
+  "cascadeCaptionToggle": "설명 표시 / 숨기기",
   "cascadeExportTooltip": "캡션과 함께 내보내기",
-  "cascadeExportBeat": "Export this beat (caption burned in)",
-  "cascadeExportStripVertical": "Storyboard strip — vertical",
-  "cascadeExportStripHorizontal": "Storyboard strip — horizontal",
+  "cascadeExportBeat": "현재 비트 내보내기(설명 포함)",
+  "cascadeExportStripVertical": "스토리보드 이어붙이기 — 세로",
+  "cascadeExportStripHorizontal": "스토리보드 이어붙이기 — 가로",
   "cascadeExportSaved": "내보내기 완료",
   "cascadeExportFailed": "내보내기에 실패했습니다",
   "cascadeStripDownscaled": "메모리 제한에 맞게 스토리보드 크기를 줄였습니다",
-  "cascadeRegenerateBeat": "REGENERATE BEAT {n}",
+  "cascadeRegenerateBeat": "비트 {n} 다시 생성",
   "@cascadeRegenerateBeat": {
     "placeholders": {
       "n": {
@@ -1097,7 +1097,7 @@
       }
     }
   },
-  "cascadeGenerateBeat": "GENERATE BEAT {n}",
+  "cascadeGenerateBeat": "비트 {n} 생성",
   "@cascadeGenerateBeat": {
     "placeholders": {
       "n": {
@@ -1106,11 +1106,11 @@
     }
   },
   "cascadeSkipToNext": "다음으로 건너뛰기",
-  "cascadeBeatRenderError": "Couldn't build this beat. Check character appearances are set.",
-  "cascadeStartCasting": "Cast",
+  "cascadeBeatRenderError": "비트를 구성하지 못했습니다. 캐릭터 외형이 설정됐는지 확인하세요.",
+  "cascadeStartCasting": "캐릭터 배정",
   "cascadeBackToLibrary": "라이브러리",
   "cascadeUnsavedTitle": "저장하지 않은 변경 사항",
-  "cascadeUnsavedMessage": "You have unsaved changes to this cascade. Discard them?",
+  "cascadeUnsavedMessage": "캐스케이드에 저장하지 않은 변경 사항이 있습니다. 버릴까요?",
   "cascadeDiscard": "버리기",
   "cascadeExitCascade": "캐스케이드 종료",
   "img2imgResult": "결과",
@@ -1121,9 +1121,9 @@
   "img2imgTitle": "IMG2IMG",
   "img2imgEditorLabel": "편집기",
   "img2imgBackToPicker": "이미지 선택으로 돌아가기",
-  "img2imgGenerating": "GENERATING...",
+  "img2imgGenerating": "생성 중...",
   "img2imgGenerate": "생성",
-  "img2imgGenerationFailed": "Generation failed: {error}",
+  "img2imgGenerationFailed": "생성 실패: {error}",
   "@img2imgGenerationFailed": {
     "placeholders": {
       "error": {
@@ -1131,17 +1131,17 @@
       }
     }
   },
-  "img2imgSettings": "IMG2IMG SETTINGS",
+  "img2imgSettings": "이미지 투 이미지 설정",
   "img2imgPrompt": "프롬프트",
-  "img2imgPromptHint": "Describe what to generate...",
+  "img2imgPromptHint": "생성할 이미지 설명...",
   "img2imgNegative": "부정",
-  "img2imgNegativeHint": "Undesired content...",
+  "img2imgNegativeHint": "원하지 않는 요소...",
   "img2imgStrength": "강도",
   "img2imgNoise": "노이즈",
   "img2imgMaskBlur": "마스크 흐림",
   "img2imgColorCorrect": "색상 보정",
   "img2imgSourceInfo": "원본",
-  "img2imgMaskStrokes": "MASK: {count} strokes",
+  "img2imgMaskStrokes": "마스크: {count}획",
   "@img2imgMaskStrokes": {
     "placeholders": {
       "count": {
@@ -1149,9 +1149,9 @@
       }
     }
   },
-  "img2imgNoMask": "NO MASK (full img2img)",
+  "img2imgNoMask": "마스크 없음(이미지 전체 처리)",
   "img2imgImportPrompt": "프롬프트 가져오기",
-  "img2imgImportPromptDesc": "Auto-fill prompt from source image metadata",
+  "img2imgImportPromptDesc": "원본 이미지의 메타데이터에서 프롬프트 자동 입력",
   "img2imgUploadFromDevice": "기기에서 불러오기",
   "img2imgUploadFromDeviceDesc": "사진 또는 파일에서 이미지 선택",
   "img2imgBlankCanvas": "빈 캔버스",
@@ -1161,9 +1161,9 @@
   "slideshowPlayAll": "전체 재생",
   "slideshowConfigs": "설정 목록",
   "slideshowNewConfig": "새 설정",
-  "slideshowNoConfigs": "NO SLIDESHOW CONFIGS YET.\nTAP + TO CREATE ONE.",
+  "slideshowNoConfigs": "슬라이드쇼 설정이 없습니다.\n+를 눌러 새로 만드세요.",
   "slideshowSelectOrCreate": "슬라이드쇼 설정 선택 또는 만들기",
-  "slideshowNameLabel": "NAME",
+  "slideshowNameLabel": "이름",
   "slideshowSourceLabel": "원본",
   "slideshowTransition": "전환 효과",
   "slideshowTransitionDuration": "전환 시간",
@@ -1175,20 +1175,20 @@
   "slideshowManualZoom": "수동 확대",
   "slideshowPlayback": "재생",
   "slideshowShuffle": "무작위 재생",
-  "slideshowLoop": "LOOP",
+  "slideshowLoop": "반복",
   "slideshowDefault": "기본값",
   "slideshowUseAsDefault": "기본 슬라이드쇼로 사용",
   "slideshowPlay": "슬라이드쇼 재생",
-  "slideshowTransFade": "FADE",
+  "slideshowTransFade": "페이드",
   "slideshowTransSlideL": "왼쪽으로 밀기",
   "slideshowTransSlideR": "오른쪽으로 밀기",
   "slideshowTransSlideUp": "위로 밀기",
-  "slideshowTransZoom": "ZOOM",
-  "slideshowTransXZoom": "X-ZOOM",
+  "slideshowTransZoom": "확대",
+  "slideshowTransXZoom": "가로 확대",
   "slideshowSourceAllImages": "전체 이미지",
   "slideshowSourceAlbum": "앨범",
   "slideshowSourceFavorites": "즐겨찾기",
-  "slideshowSourceCustom": "{count} CUSTOM",
+  "slideshowSourceCustom": "사용자 지정 {count}개",
   "@slideshowSourceCustom": {
     "placeholders": {
       "count": {
@@ -1197,7 +1197,7 @@
     }
   },
   "slideshowDeleteConfig": "설정 삭제",
-  "slideshowDeleteConfirm": "DELETE ''{name}''?",
+  "slideshowDeleteConfirm": "\"{name}\"을(를) 삭제할까요?",
   "@slideshowDeleteConfirm": {
     "placeholders": {
       "name": {
@@ -1207,7 +1207,7 @@
   },
   "slideshowImageSource": "이미지 출처",
   "slideshowAllImages": "전체 이미지",
-  "slideshowImageCount": "{count} images",
+  "slideshowImageCount": "이미지 {count}장",
   "@slideshowImageCount": {
     "placeholders": {
       "count": {
@@ -1218,7 +1218,7 @@
   "slideshowFavoritesLabel": "즐겨찾기",
   "slideshowAlbumLabel": "앨범",
   "slideshowCustomSelection": "직접 선택",
-  "slideshowSelectedCount": "{count} selected",
+  "slideshowSelectedCount": "{count}개 선택됨",
   "@slideshowSelectedCount": {
     "placeholders": {
       "count": {
@@ -1228,7 +1228,7 @@
   },
   "slideshowNoAlbums": "생성된 앨범이 없습니다",
   "slideshowSelectAlbum": "앨범 선택",
-  "slideshowCustomCount": "{selected} / {total} SELECTED",
+  "slideshowCustomCount": "{selected}/{total}개 선택됨",
   "@slideshowCustomCount": {
     "placeholders": {
       "selected": {
@@ -1243,7 +1243,7 @@
   "slideshowSelectAll": "전체 선택",
   "slideshowNoImages": "표시할 이미지가 없습니다",
   "slideshowGoBack": "돌아가기",
-  "demoImagesSelected": "{count} IMAGES SELECTED",
+  "demoImagesSelected": "이미지 {count}장 선택됨",
   "@demoImagesSelected": {
     "placeholders": {
       "count": {
@@ -1251,11 +1251,11 @@
       }
     }
   },
-  "demoAll": "ALL",
+  "demoAll": "전체",
   "demoClear": "지우기",
   "demoNoImages": "갤러리에 이미지가 없습니다",
   "cascadeBeatTimeline": "비트 타임라인",
-  "cascadeBeatsCount": "{count} BEATS",
+  "cascadeBeatsCount": "비트 {count}개",
   "@cascadeBeatsCount": {
     "placeholders": {
       "count": {
@@ -1263,7 +1263,7 @@
       }
     }
   },
-  "cascadeBeatN": "BEAT {n}",
+  "cascadeBeatN": "비트 {n}",
   "@cascadeBeatN": {
     "placeholders": {
       "n": {
@@ -1275,7 +1275,7 @@
   "cascadeRemoveBeat": "비트 삭제",
   "settingsCheckForUpdates": "업데이트 확인",
   "settingsUpdateAvailable": "업데이트가 있습니다",
-  "settingsUpdateAvailableDesc": "A new version ({version}) is available.",
+  "settingsUpdateAvailableDesc": "새 버전({version})을 사용할 수 있습니다.",
   "@settingsUpdateAvailableDesc": {
     "placeholders": {
       "version": {
@@ -1284,9 +1284,9 @@
     }
   },
   "settingsUpdateDownload": "다운로드",
-  "settingsUpToDate": "You're up to date!",
+  "settingsUpToDate": "최신 버전입니다!",
   "settingsUpdateCheckFailed": "업데이트 확인 실패",
-  "settingsUpdateDownloading": "Downloading update…",
+  "settingsUpdateDownloading": "업데이트 다운로드 중…",
   "settingsUpdateProgress": "{received} / {total}",
   "@settingsUpdateProgress": {
     "placeholders": {
@@ -1298,13 +1298,13 @@
       }
     }
   },
-  "settingsUpdateInstalling": "Starting installer…",
-  "settingsUpdateRestartPrompt": "NAIWeaver will close to apply the update, then reopen automatically.",
+  "settingsUpdateInstalling": "설치 프로그램 실행 중…",
+  "settingsUpdateRestartPrompt": "업데이트를 적용하기 위해 NAIWeaver를 종료한 뒤 자동으로 다시 엽니다.",
   "settingsUpdateDownloadFailed": "다운로드 실패",
   "settingsUpdateInstallFailed": "설치 프로그램을 시작할 수 없습니다",
   "settingsUpdateSkipVersion": "이 버전 건너뛰기",
   "settingsUpdateOpenInBrowser": "브라우저에서 열기",
-  "settingsUpdateApply": "Update & Restart",
+  "settingsUpdateApply": "업데이트 후 재시작",
   "mainAnlas": "Anlas",
   "settingsAnlasTracker": "Anlas 잔액 표시",
   "settingsAnlasTrackerDesc": "상단 바에 Anlas 잔액 표시",
@@ -1314,16 +1314,16 @@
   "canvasErase": "지우개",
   "canvasSize": "크기",
   "canvasOpacity": "불투명도",
-  "canvasUndo": "Undo",
-  "canvasRedo": "Redo",
+  "canvasUndo": "실행 취소",
+  "canvasRedo": "다시 실행",
   "canvasClear": "모든 획 지우기",
   "canvasFlatten": "레이어 병합",
-  "canvasFlattenSend": "FLATTEN & SEND",
-  "canvasBack": "Back to img2img",
-  "canvasDiscardTitle": "DISCARD CHANGES?",
-  "canvasDiscardMessage": "You have unsaved paint strokes. Discard them?",
+  "canvasFlattenSend": "레이어 합치기 및 전송",
+  "canvasBack": "이미지 투 이미지로 돌아가기",
+  "canvasDiscardTitle": "변경 사항을 버릴까요?",
+  "canvasDiscardMessage": "저장하지 않은 브러시 획이 있습니다. 버릴까요?",
   "canvasDiscard": "버리기",
-  "canvasFlattenFailed": "Flatten failed: {error}",
+  "canvasFlattenFailed": "레이어 합치기 실패: {error}",
   "@canvasFlattenFailed": {
     "placeholders": {
       "error": {
@@ -1331,11 +1331,11 @@
       }
     }
   },
-  "canvasFlattening": "FLATTENING...",
-  "canvasRestoreSession": "A previous canvas session was found. Restore it?",
+  "canvasFlattening": "레이어 합치는 중...",
+  "canvasRestoreSession": "이전 캔버스 작업을 찾았습니다. 복원할까요?",
   "canvasRestore": "복원",
-  "canvasAutoSave": "Canvas Auto-Save",
-  "canvasAutoSaveDesc": "Auto-save canvas editing sessions for crash recovery",
+  "canvasAutoSave": "캔버스 자동 저장",
+  "canvasAutoSaveDesc": "오류 발생 시 복구할 수 있도록 캔버스 편집 작업 자동 저장",
   "canvasColor": "색상",
   "canvasLayers": "레이어",
   "canvasLayerAdd": "레이어 추가",
@@ -1346,7 +1346,7 @@
   "canvasLayerHidden": "숨김",
   "canvasLayerOpacity": "불투명도",
   "canvasLayerBlendMode": "혼합",
-  "canvasLayerDeleteConfirm": "Delete this layer? Strokes will be lost.",
+  "canvasLayerDeleteConfirm": "이 레이어를 삭제할까요? 그린 내용이 사라집니다.",
   "canvasLayerDefault": "Layer {number}",
   "@canvasLayerDefault": {
     "placeholders": {
