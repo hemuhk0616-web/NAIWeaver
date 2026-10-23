@@ -104,6 +104,9 @@ class NaiaConditionalProcessor {
       }
       final ors = _splitTopLevel(value, '|');
       if (ors.length > 1) return ors.any(evaluate);
+      // NAIA rule examples also use commas to separate alternative tags.
+      final commaAlternatives = _splitTopLevel(value, ',');
+      if (commaAlternatives.length > 1) return commaAlternatives.any(evaluate);
       final ands = _splitTopLevel(value, '&');
       if (ands.length > 1) return ands.every(evaluate);
 
