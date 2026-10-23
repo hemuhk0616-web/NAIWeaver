@@ -879,15 +879,6 @@ class _SimpleGeneratorAppState extends State<SimpleGeneratorApp> with SingleTick
           child: Column(
             children: [
 
-              const TabBar(
-                isScrollable: true,
-                tabs: [
-                  Tab(text: '프롬프트'),
-                  Tab(text: '캐릭터'),
-                  Tab(text: '생성 설정'),
-                  Tab(text: 'NAIA'),
-                ],
-              ),
               Expanded(
                 child: TabBarView(
                   children: [
@@ -921,6 +912,21 @@ class _SimpleGeneratorAppState extends State<SimpleGeneratorApp> with SingleTick
                         },
                       ),
                   ],
+                ),
+              ),
+              // Keep primary navigation within thumb reach on Android.
+              Material(
+                child: SafeArea(
+                  top: false,
+                  child: TabBar(
+                    isScrollable: true,
+                    tabs: const [
+                      Tab(text: '프롬프트'),
+                      Tab(text: '캐릭터'),
+                      Tab(text: '생성 설정'),
+                      Tab(text: 'NAIA'),
+                    ],
+                  ),
                 ),
               ),
             ],
