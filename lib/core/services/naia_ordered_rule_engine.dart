@@ -145,7 +145,9 @@ class NaiaOrderedRuleEngine {
       }
 
       if (RegExp(r'^char_(set|replace)\(').hasMatch(action)) {
-        final expandedRule = await expandAction(rule);
+        final expandedRule = action.startsWith('char_replace(') && action.endsWith(')')
+            ? '${rule.substring(0, end + 2)}${action.substring(0, action.lastIndexOf(',') + 1)} ${await expandAction(action.substring(action.lastIndexOf(',') + 1, action.length - 1).trim())})'
+            : rule;
         final result = actions.apply(currentCharacters, expandedRule,
           initialEnabled: enabled,
           matches: (c, prompts, states) => conditions.matches(c, combined(),
@@ -181,7 +183,7 @@ class NaiaOrderedRuleEngine {
       }
       if (operator == '+:' &&
           !const {'prefix', 'main', 'postfix'}.contains(target)) {
-        mainTags.addAll(_split(action.replaceFirst('+:', '')));
+        mainTags.addAll(_split('$target${values.join(', ')}'));
         continue;
       }
       if (operator != '=') {
