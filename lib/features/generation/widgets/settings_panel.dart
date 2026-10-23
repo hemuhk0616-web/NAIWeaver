@@ -534,6 +534,17 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
           ),
         ),
         Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: () => _applyUpdate7Preset(notifier),
+              icon: const Icon(Icons.auto_awesome),
+              label: const Text('업데이트7 프리셋 적용'),
+            ),
+          ),
+        ),
+        Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Align(
             alignment: Alignment.centerRight,
