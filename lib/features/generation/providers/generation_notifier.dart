@@ -1079,6 +1079,53 @@ class GenerationNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  Map<String, Map<String, dynamic>> get naiaCharacterSetPresets =>
+      _prefs.naiaCharacterSetPresets;
+
+  Future<void> saveNaiaCharacterSetPreset(String name) async {
+    final normalized = name.trim();
+    if (normalized.isEmpty) throw ArgumentError('Preset name cannot be empty');
+    await _prefs.saveNaiaCharacterSetPreset(normalized, {
+      'characters': _state.characters.map((c) => c.toJson()).toList(),
+      'interactions': _state.interactions.map((i) => i.toJson()).toList(),
+      'autoPositioning': _state.autoPositioning,
+    });
+    notifyListeners();
+  }
+
+  Future<void> deleteNaiaCharacterSetPreset(String name) async {
+    await _prefs.deleteNaiaCharacterSetPreset(name);
+    notifyListeners();
+  }
+
+  bool applyNaiaCharacterSetPreset(String name) {
+    final preset = naiaCharacterSetPresets[name];
+    if (preset == null) return false;
+    try {
+      final characters = (preset['characters'] as List)
+          .map((e) => NaiCharacter.fromJson(Map<String, dynamic>.from(e as Map)))
+          .toList();
+      if (characters.length > _state.model.maxCharacters) return false;
+      final interactions = (preset['interactions'] as List)
+          .map((e) => NaiInteraction.fromJson(Map<String, dynamic>.from(e as Map)))
+          .toList();
+      final validIndices = interactions.every((i) =>
+          [...i.sourceCharacterIndices, ...i.targetCharacterIndices]
+              .every((index) => index >= 0 && index < characters.length));
+      if (!validIndices) return false;
+      _state = _state.copyWith(
+        characters: characters,
+        interactions: interactions,
+        autoPositioning: preset['autoPositioning'] as bool? ?? true,
+      );
+      clearLockedNaiaPreview();
+      notifyListeners();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   // — Character Presets —
 
   void loadCharacterPresets() {
