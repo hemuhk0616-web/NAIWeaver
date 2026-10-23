@@ -287,6 +287,7 @@ class ExpandedSettingsContent extends StatefulWidget {
 }
 
 class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
+  int _naiaPresetRevision = 0;
   final _negativePromptKey = GlobalKey();
   final _negativePromptFocus = FocusNode();
   bool _stylesExpanded = false;
@@ -510,7 +511,7 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
     if (accepted != true || !mounted) return;
     notifier.promptController.text = NaiaUpdate7Preset.leadingPrompt;
     notifier.setNaiaConditionalRules(NaiaUpdate7Preset.rules);
-    setState(() {});
+    setState(() => _naiaPresetRevision++);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('업데이트7 프리셋을 적용했습니다. 미리보기로 결과를 확인하세요.')),
     );
@@ -711,7 +712,7 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
         Padding(
           padding: const EdgeInsets.all(12),
           child: TextFormField(
-            key: const ValueKey('naia_conditional_rules_editor'),
+            key: ValueKey('naia_conditional_rules_editor_$_naiaPresetRevision'),
             initialValue: notifier.naiaConditionalRules,
             minLines: 3,
             maxLines: 12,
