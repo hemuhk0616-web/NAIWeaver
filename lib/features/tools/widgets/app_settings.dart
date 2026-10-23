@@ -1780,10 +1780,6 @@ class _AppSettingsState extends State<AppSettings> {
               child: Text('ENGLISH'),
             ),
             DropdownMenuItem(
-              value: Locale('ko'),
-              child: Text('한국어'),
-            ),
-            DropdownMenuItem(
               value: Locale('ja'),
               child: Text('日本語'),
             ),
