@@ -269,4 +269,31 @@ void main() {
     expect(result.enabled, [false]);
   });
 
+  test('scoped rule before global mutation must not see future tag', () async {
+    final result = await engine.applyAsync(
+      'solo', ['blue hair'],
+      'char:1 (smile):main+=too early\\n'
+      '(solo):char:1+=smile',
+      characterEnabled: [true],
+      expandAction: (value) async => value,
+    );
+    expect(result.characters, ['blue hair, smile']);
+    expect(result.main, 'solo');
+  });
+
+  test('scoped rule matched action expands wildcard once', () async {
+    final expanded = <String>[];
+    final result = await engine.applyAsync(
+      'solo', ['blue hair'],
+      'char:1 (blue hair):main+=__expression__',
+      characterEnabled: [true],
+      expandAction: (value) async {
+        expanded.add(value);
+        return value.replaceAll('__expression__', 'smile');
+      },
+    );
+    expect(expanded, ['__expression__']);
+    expect(result.characters, ['blue hair, smile']);
+  });
+
 }
