@@ -24,7 +24,7 @@ class NaiaOrderedRuleEngine {
     String combined() => [...prefix, ...mainTags, ...postfix].join(', ');
     for (final line in rules.split(RegExp(r'\r?\n'))) {
       final rule = line.trim();
-      final scopedLine = RegExp(r'^char:(\d+)\s+(\(.*)).firstMatch(rule);
+      final scopedLine = RegExp(r'^char:(\d+)\s+(\(.*)$').firstMatch(rule);
       if (scopedLine != null) {
         final index = int.parse(scopedLine.group(1)!) - 1;
         if (index >= 0 && index < currentCharacters.length && enabled[index]) {
@@ -412,7 +412,7 @@ class NaiaOrderedRuleEngine {
     String combined() => [...prefix, ...mainTags, ...postfix].join(', ');
     for (final line in rules.split(RegExp(r'\r?\n'))) {
       final rule = line.trim();
-      final scopedLine = RegExp(r'^char:(\d+)\s+(\(.*)).firstMatch(rule);
+      final scopedLine = RegExp(r'^char:(\d+)\s+(\(.*)$').firstMatch(rule);
       if (scopedLine != null) {
         final index = int.parse(scopedLine.group(1)!) - 1;
         if (index >= 0 && index < currentCharacters.length && enabled[index]) {
