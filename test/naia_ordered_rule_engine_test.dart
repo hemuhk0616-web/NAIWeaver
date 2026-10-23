@@ -222,8 +222,8 @@ void main() {
   test('source order: character mutation affects later conditions', () async {
     final result = await engine.applyAsync(
       'solo', ['blue hair'],
-      '(solo):char:1+=smile\\n'
-      '(char_in(1, smile)):main+=happy\\n'
+      '(solo):char:1+=smile\n'
+      '(char_in(1, smile)):main+=happy\n'
       '(happy):char_replace(1, blue hair, pink hair)',
       characterEnabled: [true],
       expandAction: (value) async => value,
@@ -235,7 +235,7 @@ void main() {
   test('disabled character state is visible to following rules', () async {
     final result = await engine.applyAsync(
       'solo', ['blue hair'],
-      '(solo):char_set(1, disabled)\\n'
+      '(solo):char_set(1, disabled)\n'
       '(~char_on(1)):main+=solo focus',
       characterEnabled: [true],
       expandAction: (value) async => value,
@@ -247,8 +247,8 @@ void main() {
   test('scoped character rules follow global changes in source order', () async {
     final result = await engine.applyAsync(
       'solo', ['blue hair'],
-      '(solo):char:1+=smile\\n'
-      'char:1 (smile):main+=happy\\n'
+      '(solo):char:1+=smile\n'
+      'char:1 (smile):main+=happy\n'
       '(char_in(1, happy)):main+=finished',
       characterEnabled: [true],
       expandAction: (value) async => value,
@@ -260,7 +260,7 @@ void main() {
   test('scoped character rules do not run on disabled slots', () async {
     final result = await engine.applyAsync(
       'solo', ['blue hair'],
-      '(solo):char_set(1, disabled)\\n'
+      '(solo):char_set(1, disabled)\n'
       'char:1 (blue hair):main+=wrong',
       characterEnabled: [true],
       expandAction: (value) async => value,
@@ -272,7 +272,7 @@ void main() {
   test('scoped rule before global mutation must not see future tag', () async {
     final result = await engine.applyAsync(
       'solo', ['blue hair'],
-      'char:1 (smile):main+=too early\\n'
+      'char:1 (smile):main+=too early\n'
       '(solo):char:1+=smile',
       characterEnabled: [true],
       expandAction: (value) async => value,
