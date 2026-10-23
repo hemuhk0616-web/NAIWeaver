@@ -21,6 +21,7 @@ class NaiaPromptPipeline {
     if (rules.trim().isEmpty) return expanded;
     final result = await const NaiaOrderedRuleEngine().applyAsync(
       expanded, characterPrompts, rules,
+      characterEnabled: characterEnabled,
       expandAction: expandMatchedActionValue,
     );
     return result.main;
