@@ -179,7 +179,7 @@ void main() {
     final expanded = <String>[];
     final result = await engine.applyAsync(
       'solo', ['blue hair'],
-      '(solo):char_replace(1, blue hair, __new_hair__)\\n'
+      '(solo):char_replace(1, blue hair, __new_hair__)\n'
       '(char_in(1, pink hair)):main+=smile',
       expandAction: (value) async {
         expanded.add(value);
@@ -195,7 +195,7 @@ void main() {
     final expanded = <String>[];
     final result = await engine.applyAsync(
       'solo', ['blue hair'],
-      '(forest):char_replace(1, blue hair, __unused__)\\n'
+      '(forest):char_replace(1, blue hair, __unused__)\n'
       '(solo):char_set(1, disabled)',
       expandAction: (value) async {
         expanded.add(value);
@@ -210,7 +210,7 @@ void main() {
   test('async rules honor initially disabled character slots', () async {
     final result = await engine.applyAsync(
       'solo', ['blue hair', 'green eyes'],
-      '(char_on(2)):main+=wrong\\n'
+      '(char_on(2)):main+=wrong\n'
       '(~char_on(2)):main+=correct',
       characterEnabled: [true, false],
       expandAction: (value) async => value,
