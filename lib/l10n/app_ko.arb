@@ -577,7 +577,7 @@
   "presetInteractions": "상호작용",
   "presetReferences": "참조 이미지",
   "presetNoRefs": "이 프리셋에 저장된 참조 이미지가 없습니다",
-  "presetProcessing": "PROCESSING...",
+  "presetProcessing": "처리 중...",
   "presetAddReference": "참조 이미지 추가",
   "presetDeleteTitle": "프리셋 삭제",
   "presetDeleteConfirm": "ARE YOU SURE YOU WANT TO DELETE ''{name}''?",
@@ -1550,7 +1550,7 @@
   "jukeboxCategoryAll": "ALL",
   "jukeboxCategoryClassical": "클래식",
   "jukeboxCategoryAnime": "애니메이션",
-  "jukeboxCategoryGame": "GAME",
+  "jukeboxCategoryGame": "게임",
   "jukeboxCategoryJazz": "JAZZ",
   "jukeboxCategoryAmbient": "앰비언트",
   "jukeboxCategoryHoliday": "휴일",
@@ -1576,9 +1576,9 @@
   "mlDiscard": "버리기",
   "mlAddPoint": "ADD",
   "mlRemovePoint": "제거",
-  "mlTierFast": "FAST",
+  "mlTierFast": "빠름",
   "mlTierBalanced": "균형",
-  "mlTierBalancedShort": "BAL",
+  "mlTierBalancedShort": "균형",
   "mlTierQuality": "고품질",
   "mlRemovingBg": "배경 제거 중",
   "mlUpscalingImages": "이미지 업스케일 중",
@@ -1588,9 +1588,9 @@
   "mlMayBeSlow": "느릴 수 있음",
   "mlNotRecommended": "권장하지 않음",
   "mlNotAvailableOnPlatform": "이 플랫폼에서 사용할 수 없음",
-  "mlLowRamWarning": "LOW RAM — MAY CRASH",
-  "mlBgRemovedAndSaved": "BG REMOVED & SAVED",
-  "mlBgRemovedCount": "BG REMOVED: {completed}/{total} IMAGES",
+  "mlLowRamWarning": "메모리 부족 — 앱이 종료될 수 있음",
+  "mlBgRemovedAndSaved": "배경 제거 후 저장 완료",
+  "mlBgRemovedCount": "배경 제거: {completed}/{total}장",
   "@mlBgRemovedCount": {
     "placeholders": {
       "completed": {
@@ -1601,7 +1601,7 @@
       }
     }
   },
-  "mlUpscaledCount": "UPSCALED: {completed}/{total} IMAGES",
+  "mlUpscaledCount": "업스케일: {completed}/{total}장",
   "@mlUpscaledCount": {
     "placeholders": {
       "completed": {
@@ -1612,7 +1612,7 @@
       }
     }
   },
-  "mlBgRemovedSavedAs": "BG REMOVED: SAVED AS {name}",
+  "mlBgRemovedSavedAs": "배경 제거 완료: {name}(으)로 저장",
   "@mlBgRemovedSavedAs": {
     "placeholders": {
       "name": {
@@ -1623,30 +1623,30 @@
   "toolsDirectorTools": "디렉터 도구",
   "toolsEnhance": "향상",
   "directorToolsTitle": "디렉터 도구",
-  "directorToolsDesc": "Server-side image manipulation: remove backgrounds, extract line art, colorize, and more",
+  "directorToolsDesc": "서버에서 이미지의 배경 제거, 선화 추출, 채색 등을 처리합니다",
   "directorToolsUseCurrent": "최근 생성 이미지 사용",
   "directorToolsUseCurrentDesc": "마지막 생성 이미지를 원본으로 사용",
   "directorToolsSelectTool": "도구 선택",
   "directorToolsProcess": "처리",
-  "directorToolsProcessing": "PROCESSING...",
-  "directorToolsDefry": "DEFRY (TOOL STRENGTH)",
-  "directorToolsMood": "MOOD",
+  "directorToolsProcessing": "처리 중...",
+  "directorToolsDefry": "디프라이(도구 강도)",
+  "directorToolsMood": "분위기",
   "directorToolsPrompt": "프롬프트",
-  "directorToolsPromptHint": "Optional prompt for colorize/emotion...",
+  "directorToolsPromptHint": "채색·감정 표현용 추가 프롬프트(선택)...",
   "directorToolsSaved": "결과를 갤러리에 저장했습니다",
   "enhanceTitle": "이미지 향상",
-  "enhanceDesc": "Re-process an image with img2img enhancement",
+  "enhanceDesc": "이미지를 img2img로 다시 처리하여 품질 향상",
   "enhanceUseCurrent": "최근 생성 이미지 사용",
   "enhanceUseCurrentDesc": "마지막 생성 이미지를 원본으로 사용",
   "enhanceProcess": "이미지 향상",
-  "enhanceProcessing": "ENHANCING...",
+  "enhanceProcessing": "이미지 향상 중...",
   "enhancePrompt": "프롬프트",
   "enhanceNegative": "부정",
   "enhanceStrength": "강도",
   "enhanceNoise": "노이즈",
   "enhanceMaxChip": "MAX ✨",
-  "enhanceMaxTooltip": "NovelAI Enhance Max: keeps the source size in the request and returns the image scaled to ~3.1 MP",
-  "enhanceEstimatedCost": "~{anlas} ANLAS (EST.)",
+  "enhanceMaxTooltip": "NovelAI Enhance Max: 요청 시 원본 크기를 유지하고 약 310만 화소로 확대된 이미지를 반환합니다",
+  "enhanceEstimatedCost": "예상 비용: Anlas 약 {anlas}",
   "@enhanceEstimatedCost": {
     "placeholders": {
       "anlas": {
@@ -1658,8 +1658,8 @@
   "settingsSeedControl": "시드 조작 표시",
   "settingsSeedControlDesc": "생성 화면에 시드 값과 무작위 설정 표시",
   "settingsShowTooltips": "도움말 표시",
-  "settingsShowTooltipsDesc": "Display helpful tooltips when hovering or long-pressing buttons",
-  "commonMenu": "Menu",
+  "settingsShowTooltipsDesc": "버튼을 길게 누르거나 가리키면 도움말 표시",
+  "commonMenu": "메뉴",
   "presetDuplicate": "복제",
   "presetLoad": "프리셋 불러오기",
   "settingsStylesToggle": "스타일 전환",
@@ -1670,9 +1670,9 @@
   "sidebarCollapse": "접기",
   "sidebarExpand": "펼치기",
   "naiUpscale": "NAI 업스케일",
-  "naiUpscaling": "UPSCALING VIA API...",
+  "naiUpscaling": "API로 업스케일 중...",
   "naiUpscaleFailed": "API 업스케일 실패",
-  "naiUpscaledCount": "API UPSCALED: {completed}/{total} IMAGES",
+  "naiUpscaledCount": "API 업스케일: {completed}/{total}장",
   "@naiUpscaledCount": {
     "placeholders": {
       "completed": {
@@ -1698,17 +1698,17 @@
   "settingsDirectorToolsButtonDesc": "이미지 뷰어에 디렉터 도구 버튼 표시",
   "settingsExportButton": "기기로 내보내기 버튼",
   "settingsExportButtonDesc": "사진 갤러리에 직접 저장하는 내보내기 버튼 표시",
-  "settingsAutoExport": "Auto-Export to Device",
+  "settingsAutoExport": "기기로 자동 내보내기",
   "settingsAutoExportDesc": "생성 이미지를 기기 사진 갤러리에 자동 저장",
   "settingsExportAlbum": "내보낼 앨범 이름",
-  "settingsExportAlbumDesc": "Device folder/album where exported images are saved",
+  "settingsExportAlbumDesc": "내보낸 이미지가 저장되는 기기 폴더/앨범",
   "settingsExportFolder": "내보내기 폴더",
-  "settingsExportFolderDesc": "Choose a custom folder for exports (SD card, etc). Overrides album name when set.",
-  "settingsExportFolderDefault": "Default (device gallery)",
+  "settingsExportFolderDesc": "내보내기 폴더를 직접 선택합니다(SD 카드 등). 설정하면 앨범 이름보다 우선 적용됩니다.",
+  "settingsExportFolderDefault": "기본값(기기 갤러리)",
   "settingsUpscaleBackend": "업스케일 처리 방식",
   "settingsUpscaleBackendDesc": "업스케일에 로컬 ML 모델 또는 NovelAI API 사용",
-  "settingsUpscaleBackendMl": "ML (Local)",
-  "settingsUpscaleBackendNovelai": "NovelAI (API)",
+  "settingsUpscaleBackendMl": "ML(로컬)",
+  "settingsUpscaleBackendNovelai": "NovelAI(API)",
   "quickActionEnhance": "향상",
   "quickActionDirectorTools": "디렉터 도구",
   "themeColorBgRemoval": "배경 제거",
@@ -1716,10 +1716,10 @@
   "jukeboxSynthUnavailable": "신시사이저를 사용할 수 없습니다",
   "jukeboxImport": "가져오기",
   "jukeboxKeyboard": "키보드",
-  "jukeboxGame": "GAME",
-  "jukeboxEnd": "END",
+  "jukeboxGame": "게임",
+  "jukeboxEnd": "종료",
   "jukeboxTempo": "템포",
-  "jukeboxKeyboardHint": "KEYS: A-L  SHARPS: W,E,T,Y,U,O,P  OCTAVE: Z/X",
+  "jukeboxKeyboardHint": "건반: A~L  검은건반: W,E,T,Y,U,O,P  옥타브: Z/X",
   "jukeboxGameResults": "결과",
   "jukeboxGameScore": "점수",
   "jukeboxGameMaxCombo": "최대 콤보",
@@ -1729,7 +1729,7 @@
   "jukeboxGameGood": "좋음",
   "jukeboxGameMiss": "미스",
   "jukeboxHighScores": "최고 기록",
-  "jukeboxQueueCount": "QUEUE ({count})",
+  "jukeboxQueueCount": "대기열({count})",
   "@jukeboxQueueCount": {
     "placeholders": {
       "count": {
@@ -1746,13 +1746,13 @@
   "jukeboxKeyboardTooltip": "키보드",
   "jukeboxGameMode": "게임 모드",
   "jukeboxNoSongs": "곡이 없습니다",
-  "jukeboxRecommendedBadge": "REC",
-  "jukeboxAnalyzing": "ANALYZING...",
+  "jukeboxRecommendedBadge": "추천",
+  "jukeboxAnalyzing": "분석 중...",
   "jukeboxNoScoresYet": "아직 기록이 없습니다",
   "jukeboxSelectInstrument": "악기 선택",
   "jukeboxWatch": "보기",
   "jukeboxPlayGame": "게임 시작",
-  "jukeboxChannelLabel": "CH {channel}",
+  "jukeboxChannelLabel": "채널 {channel}",
   "@jukeboxChannelLabel": {
     "placeholders": {
       "channel": {
@@ -1760,7 +1760,7 @@
       }
     }
   },
-  "jukeboxCombo": "{count} COMBO",
+  "jukeboxCombo": "{count}콤보",
   "@jukeboxCombo": {
     "placeholders": {
       "count": {
@@ -1802,7 +1802,7 @@
   "jukeboxKaraokeBadge": "KAR",
   "jukeboxDeleteCustomSongTooltip": "사용자 추가 곡 삭제",
   "jukeboxDeleteSong": "곡 삭제",
-  "jukeboxDeleteSongConfirm": "Delete {title}? This will remove the file from disk.",
+  "jukeboxDeleteSongConfirm": "{title} 곡을 삭제할까요? 기기에서도 파일이 삭제됩니다.",
   "@jukeboxDeleteSongConfirm": {
     "placeholders": {
       "title": {
@@ -1820,7 +1820,7 @@
   "jukeboxVizDensity": "밀도",
   "jukeboxFontSize": "크기",
   "jukeboxResetToDefaults": "기본값으로 초기화",
-  "jukeboxRepeatMode": "REPEAT: {mode}",
+  "jukeboxRepeatMode": "반복: {mode}",
   "@jukeboxRepeatMode": {
     "placeholders": {
       "mode": {
@@ -1828,7 +1828,7 @@
       }
     }
   },
-  "jukeboxShuffleStatus": "SHUFFLE: {status}",
+  "jukeboxShuffleStatus": "무작위 재생: {status}",
   "@jukeboxShuffleStatus": {
     "placeholders": {
       "status": {
@@ -1837,7 +1837,7 @@
     }
   },
   "galleryBadgeNaiUpscale": "NAI 업스케일",
-  "galleryBadgeDirectorTool": "DIRECTOR: {tool}",
+  "galleryBadgeDirectorTool": "디렉터: {tool}",
   "@galleryBadgeDirectorTool": {
     "placeholders": {
       "tool": {
@@ -1849,7 +1849,7 @@
   "galleryBadgeBgRemoved": "배경 제거됨",
   "galleryBadgeUpscaled": "업스케일됨",
   "galleryBgRemovalFailed": "배경 제거 실패",
-  "naiUpscaleTooLarge": "Image too large for NAI upscale ({width}x{height} exceeds 2048px limit per side)",
+  "naiUpscaleTooLarge": "NAI 업스케일에 이미지가 너무 큽니다({width}×{height}, 한 변 최대 2048px)",
   "@naiUpscaleTooLarge": {
     "placeholders": {
       "width": {
@@ -1878,7 +1878,7 @@
   "img2imgOutputRes": "출력 해상도",
   "img2imgResetRes": "원본 크기로 초기화",
   "img2imgChangeRes": "변경",
-  "duplicateImageWarning": "Image identical to last generation — try a different seed or check your vibes/references",
+  "duplicateImageWarning": "직전 생성 이미지와 동일합니다. 다른 시드를 사용하거나 바이브·참조 이미지를 확인하세요.",
   "duplicateImageRandomize": "무작위",
   "settingsCredits": "제작진",
   "settingsSpecialThanks": "특별 감사",
@@ -1929,11 +1929,11 @@
   "textGenReasoning": "추론",
   "tagSourcesOpen": "태그 목록",
   "tagSourcesTitle": "태그 목록",
-  "tagSourcesDesc": "Import Danbooru / e621-style .csv or .json tag lists. Each list is kept separately, can be switched off, and is merged into autocomplete in the order shown (drag to reorder). The bundled list always wins name collisions.",
+  "tagSourcesDesc": "Danbooru/e621 형식의 CSV 또는 JSON 태그 목록을 가져옵니다. 각 목록은 별도로 보관되며 활성화 여부를 선택할 수 있습니다. 표시된 순서대로 자동완성에 병합됩니다(드래그하여 순서 변경). 같은 이름의 태그는 기본 제공 목록이 우선합니다.",
   "tagSourcesImport": "목록 가져오기",
   "tagSourcesEmpty": "아직 가져온 태그 목록이 없습니다.",
   "tagSourcesBundled": "기본 제공 Danbooru 목록(항상 활성화)",
-  "tagSourcesTagCount": "{count} tags",
+  "tagSourcesTagCount": "태그 {count}개",
   "@tagSourcesTagCount": {
     "placeholders": {
       "count": {
@@ -1945,7 +1945,7 @@
   "tagSourcesRename": "이름 변경",
   "tagSourcesRenameTitle": "목록 이름 변경",
   "tagSourcesExport": "내보내기",
-  "tagSourcesExported": "Exported {name}",
+  "tagSourcesExported": "{name} 내보내기 완료",
   "@tagSourcesExported": {
     "placeholders": {
       "name": {
@@ -1954,7 +1954,7 @@
     }
   },
   "tagSourcesDelete": "삭제",
-  "tagSourcesDeleteConfirm": "Remove \"{name}\" ({count} tags) from autocomplete? Favourites you set on its tags are kept in case you import it again.",
+  "tagSourcesDeleteConfirm": "자동완성에서 \"{name}\"(태그 {count}개)을 제거할까요? 해당 태그의 즐겨찾기는 다시 가져올 때를 위해 유지됩니다.",
   "@tagSourcesDeleteConfirm": {
     "placeholders": {
       "name": {
@@ -1967,7 +1967,7 @@
   },
   "tagImportTitle": "태그 목록 가져오기",
   "tagImportName": "목록 이름",
-  "tagImportRows": "{count} rows",
+  "tagImportRows": "{count}행",
   "@tagImportRows": {
     "placeholders": {
       "count": {
@@ -1989,14 +1989,14 @@
   "tagImportColAliases": "별칭",
   "tagImportColNone": "— 없음 —",
   "tagImportProfile": "카테고리 번호 체계",
-  "tagImportProfileDanbooru": "Danbooru (0 general · 1 artist · 3 copyright · 4 character · 5 meta)",
-  "tagImportProfileE621": "e621 (5 species · 7 meta · 8 lore)",
-  "tagImportProfileE621Merged": "Merged Danbooru + e621 (e621 block at 7–15)",
+  "tagImportProfileDanbooru": "Danbooru(0 일반 · 1 작가 · 3 작품 · 4 캐릭터 · 5 메타)",
+  "tagImportProfileE621": "e621(5 종족 · 7 메타 · 8 설정)",
+  "tagImportProfileE621Merged": "Danbooru + e621 병합(e621 범위 7~15)",
   "tagImportProfileCustom": "사용자 지정 매핑",
   "tagImportCustomMapHint": "파일에서 찾은 각 카테고리 값을 매핑하세요:",
   "tagImportSkipValue": "행 건너뛰기",
   "tagImportMinCount": "최소 게시물 수",
-  "tagImportWillImport": "{selected} of {total} tags pass the threshold",
+  "tagImportWillImport": "태그 {total}개 중 {selected}개가 기준을 충족합니다",
   "@tagImportWillImport": {
     "placeholders": {
       "selected": {
@@ -2011,7 +2011,7 @@
   "tagImportSpaces": "밑줄 → 공백(NovelAI 방식)",
   "tagImportAliases": "별칭 가져오기",
   "tagImportPreview": "미리보기",
-  "tagImportReplaceExisting": "A list named \"{name}\" already exists and will be replaced.",
+  "tagImportReplaceExisting": "\"{name}\" 목록이 이미 있습니다. 기존 목록을 덮어씁니다.",
   "@tagImportReplaceExisting": {
     "placeholders": {
       "name": {
@@ -2020,7 +2020,7 @@
     }
   },
   "tagImportButton": "가져오기",
-  "tagImportDone": "Imported {imported} tags into \"{name}\"",
+  "tagImportDone": "\"{name}\" 목록에 태그 {imported}개를 가져왔습니다",
   "@tagImportDone": {
     "placeholders": {
       "imported": {
@@ -2031,7 +2031,7 @@
       }
     }
   },
-  "tagImportSkippedSummary": "skipped {below} below count, {category} by category, {invalid} invalid, {duplicate} duplicates",
+  "tagImportSkippedSummary": "게시물 수 미달 {below}개, 카테고리 제외 {category}개, 유효하지 않음 {invalid}개, 중복 {duplicate}개 건너뜀",
   "@tagImportSkippedSummary": {
     "placeholders": {
       "below": {
@@ -2048,7 +2048,7 @@
       }
     }
   },
-  "tagImportFailed": "Could not read tag list: {error}",
+  "tagImportFailed": "태그 목록을 읽지 못했습니다: {error}",
   "@tagImportFailed": {
     "placeholders": {
       "error": {
@@ -2057,7 +2057,7 @@
     }
   },
   "tagImportEmpty": "이 파일에서 태그를 찾지 못했습니다.",
-  "packTagSourcesSection": "TAG LISTS ({selected}/{total})",
+  "packTagSourcesSection": "태그 목록({selected}/{total})",
   "@packTagSourcesSection": {
     "placeholders": {
       "selected": {
