@@ -1316,9 +1316,9 @@ class GenerationNotifier extends ChangeNotifier {
             .map((line) => line.replaceFirst(scopedRule, ''))
             .join('\n');
         return c.copyWith(
-          prompt: _tagService.resolveAliases(pipeline.conditions.apply(
+          prompt: _tagService.resolveAliases(await pipeline.process(
             expandedCharacterPrompts[entry.key],
-            await pipeline.expandActionValues(characterRules),
+            rules: characterRules,
             characterPrompts: expandedCharacterPrompts,
             characterEnabled: initialCharacterEnabled,
           )),
@@ -1339,6 +1339,7 @@ class GenerationNotifier extends ChangeNotifier {
       orderedRules,
       negative: expandedNegative,
       characterUc: processedCharacters.map((c) => c.uc).toList(),
+      characterEnabled: initialCharacterEnabled,
       expandAction: pipeline.expandMatchedActionValue,
     );
     final processedPrompt = ordered.main;
