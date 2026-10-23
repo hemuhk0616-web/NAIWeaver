@@ -138,4 +138,25 @@ void main() {
     expect(result.main, 'hat, solo, smile');
   });
 
+  test('real rule definitions respond to expanded wildcard categories', () {
+    final rules = [
+      '(masturbation):1girl+=solo,',
+      '(sex|paizuri|fellatio|fingering|handjob|cunnilingus|masturbation):nsfw+=uncensored,',
+      '(~masturbation&~!group sex&~!etc):1girl+=1boy,',
+      '(*group sex):1girl+=multiple boys,',
+      '(sex&~!group sex):sex+=pose result,',
+      '(masturbation):masturbation+=solo pose,',
+      '(*white background, simple background):simple background+=outfit result,',
+    ].join('\\n');
+    final solo = engine.apply('1girl, nsfw, masturbation', [], rules);
+    expect(solo.main, contains('solo'));
+    expect(solo.main, contains('uncensored'));
+    expect(solo.main, contains('solo pose'));
+    expect(solo.main, isNot(contains('1boy')));
+    final paired = engine.apply('1girl, nsfw, sex, simple background', [], rules);
+    expect(paired.main, contains('1boy'));
+    expect(paired.main, contains('pose result'));
+    expect(paired.main, contains('outfit result'));
+  });
+
 }
