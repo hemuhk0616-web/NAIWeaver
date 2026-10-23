@@ -55,7 +55,8 @@ class QuickActionOverlay extends StatelessWidget {
     final double saveTop = nextTop;
     if (showSave) nextTop += step;
 
-    final bool showExport = prefs.showExportButton && !kIsWeb;
+    // Android: export is a primary action, regardless of the optional desktop shelf toggle.
+    final bool showExport = (mobile || prefs.showExportButton) && !kIsWeb;
     final double exportTop = nextTop;
     if (showExport) nextTop += step;
 
@@ -125,7 +126,7 @@ class QuickActionOverlay extends StatelessWidget {
             child: _ActionButton(
               onTap: () => notifier.exportToDevice(context),
               icon: Icons.download,
-              label: l.mainExport,
+              label: mobile ? '기기에 저장' : l.mainExport,
               color: t.accent,
               mobile: mobile,
             ),
