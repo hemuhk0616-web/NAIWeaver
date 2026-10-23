@@ -1308,20 +1308,8 @@ class GenerationNotifier extends ChangeNotifier {
     var processedCharacters = await Future.wait(
       _state.characters.asMap().entries.map((entry) async {
         final c = entry.value;
-        final scopedRule = RegExp('^char:${entry.key + 1}\\s+');
-        final characterRules = naiaConditionalRules
-            .split(RegExp(r'\r?\n'))
-            .map((line) => line.trimLeft())
-            .where((line) => scopedRule.hasMatch(line))
-            .map((line) => line.replaceFirst(scopedRule, ''))
-            .join('\n');
         return c.copyWith(
-          prompt: _tagService.resolveAliases(await pipeline.process(
-            expandedCharacterPrompts[entry.key],
-            rules: characterRules,
-            characterPrompts: expandedCharacterPrompts,
-            characterEnabled: initialCharacterEnabled,
-          )),
+          prompt: expandedCharacterPrompts[entry.key],
           uc: _tagService.resolveAliases(await _wildcardProcessor.process(c.uc)),
         );
       }),
@@ -1330,13 +1318,10 @@ class GenerationNotifier extends ChangeNotifier {
       [naiaLeadingPrompt, promptController.text, naiaTrailingPrompt]
           .where((part) => part.trim().isNotEmpty).join(', '));
     final expandedNegative = await _wildcardProcessor.process(negativePromptController.text);
-    final orderedRules = naiaConditionalRules.split(RegExp(r'\r?\n'))
-        .where((line) => !RegExp(r'^\s*char:\d+\s').hasMatch(line))
-        .join('\n');
     final ordered = await const NaiaOrderedRuleEngine().applyAsync(
       expandedMain,
       processedCharacters.map((c) => c.prompt).toList(),
-      orderedRules,
+      naiaConditionalRules,
       negative: expandedNegative,
       characterUc: processedCharacters.map((c) => c.uc).toList(),
       characterEnabled: initialCharacterEnabled,
