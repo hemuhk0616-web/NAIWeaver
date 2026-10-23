@@ -1330,17 +1330,16 @@ class GenerationNotifier extends ChangeNotifier {
       [naiaLeadingPrompt, promptController.text, naiaTrailingPrompt]
           .where((part) => part.trim().isNotEmpty).join(', '));
     final expandedNegative = await _wildcardProcessor.process(negativePromptController.text);
-    final expandedRules = await pipeline.expandActionValues(
-      naiaConditionalRules.split(RegExp(r'\r?\n'))
+    final orderedRules = naiaConditionalRules.split(RegExp(r'\r?\n'))
         .where((line) => !RegExp(r'^\s*char:\d+\s').hasMatch(line))
-        .join('\n'),
-    );
-    final ordered = const NaiaOrderedRuleEngine().apply(
+        .join('\n');
+    final ordered = await const NaiaOrderedRuleEngine().applyAsync(
       expandedMain,
       processedCharacters.map((c) => c.prompt).toList(),
-      expandedRules,
+      orderedRules,
       negative: expandedNegative,
       characterUc: processedCharacters.map((c) => c.uc).toList(),
+      expandAction: pipeline.expandMatchedActionValue,
     );
     final processedPrompt = ordered.main;
     final processedInteractions = const NaiaInteractionRemapper().remap(
