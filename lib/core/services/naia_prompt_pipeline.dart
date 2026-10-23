@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'naia_conditional_processor.dart';
 import 'wildcard_processor.dart';
 
@@ -6,6 +8,7 @@ class NaiaPromptPipeline {
   NaiaPromptPipeline(this.wildcards);
 
   final WildcardProcessor wildcards;
+  final Random _random = Random();
   final NaiaConditionalProcessor conditions = const NaiaConditionalProcessor();
 
   Future<String> process(String prompt, {
@@ -23,6 +26,19 @@ class NaiaPromptPipeline {
 
   /// Expand only assigned action values. Conditions and function arguments
   /// must remain intact so a wildcard cannot silently rewrite rule syntax.
+  // NAIA action alternatives are selected independently for each comma tag.
+  // Resolve after wildcard expansion so nested wildcard results can contain ^.
+  String _chooseAlternatives(String value) {
+    return value.split(',').map((part) {
+      final choices = part.split('^');
+      if (choices.length == 1) return part;
+      final valid = choices.map((item) => item.trim())
+          .where((item) => item.isNotEmpty).toList();
+      if (valid.isEmpty) return part;
+      return valid[_random.nextInt(valid.length)];
+    }).join(', ');
+  }
+
   Future<String> expandActionValues(String rules) async {
     final output = <String>[];
     for (final line in rules.split(RegExp(r'\r?\n'))) {
@@ -59,7 +75,8 @@ class NaiaPromptPipeline {
       }
       final valueStart = actionStart + assignment.start +
           assignment.group(0)!.length - assignment.group(3)!.length;
-      final value = await wildcards.process(line.substring(valueStart));
+      final expandedValue = await wildcards.process(line.substring(valueStart));
+      final value = _chooseAlternatives(expandedValue);
       output.add('${line.substring(0, valueStart)}$value');
     }
     return output.join('\n');
