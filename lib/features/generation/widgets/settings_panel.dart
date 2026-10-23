@@ -528,26 +528,27 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
           icon: const Icon(Icons.save_outlined, size: 16),
           label: const Text('프리셋 저장'),
           onPressed: () async {
-            final controller = TextEditingController();
+            // Avoid disposing a TextField controller while its dialog route
+            // is still being removed from the widget tree.
+            var enteredName = '';
             final name = await showDialog<String>(
               context: context,
               builder: (ctx) => AlertDialog(
                 title: Text(leading ? '선행 프리셋 저장' : '후행 프리셋 저장'),
                 content: TextField(
-                  controller: controller,
+                  onChanged: (value) => enteredName = value,
                   autofocus: true,
                   decoration: const InputDecoration(labelText: '프리셋 이름'),
                 ),
                 actions: [
                   TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('취소')),
                   FilledButton(
-                    onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+                    onPressed: () => Navigator.pop(ctx, enteredName.trim()),
                     child: const Text('저장'),
                   ),
                 ],
               ),
             );
-            controller.dispose();
             if (name == null || name.isEmpty || !mounted) return;
             if (presets.containsKey(name)) {
               final replace = await showDialog<bool>(
