@@ -157,11 +157,14 @@ class NaiaConditionalProcessor {
   static List<String> _splitTopLevel(String value, String separator) {
     final parts = <String>[];
     var depth = 0;
+    var angleDepth = 0;
     var begin = 0;
     for (var i = 0; i < value.length; i++) {
-      if (value[i] == '(') depth++;
-      if (value[i] == ')') depth--;
-      if (value[i] == separator && depth == 0) {
+      if (value[i] == '<') angleDepth++;
+      if (value[i] == '>' && angleDepth > 0) angleDepth--;
+      if (angleDepth == 0 && value[i] == '(') depth++;
+      if (angleDepth == 0 && value[i] == ')') depth--;
+      if (value[i] == separator && depth == 0 && angleDepth == 0) {
         parts.add(value.substring(begin, i).trim());
         begin = i + 1;
       }
