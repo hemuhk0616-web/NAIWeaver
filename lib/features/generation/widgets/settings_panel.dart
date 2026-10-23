@@ -517,6 +517,84 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
     );
   }
 
+  Widget _naiaPresetControls(GenerationNotifier notifier, bool leading) {
+    final presets = leading ? notifier.naiaLeadingPresets : notifier.naiaTrailingPresets;
+    return Wrap(
+      spacing: 8,
+      runSpacing: 4,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        OutlinedButton.icon(
+          icon: const Icon(Icons.save_outlined, size: 16),
+          label: const Text('프리셋 저장'),
+          onPressed: () async {
+            final controller = TextEditingController();
+            final name = await showDialog<String>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: Text(leading ? '선행 프리셋 저장' : '후행 프리셋 저장'),
+                content: TextField(
+                  controller: controller,
+                  autofocus: true,
+                  decoration: const InputDecoration(labelText: '프리셋 이름'),
+                ),
+                actions: [
+                  TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('취소')),
+                  FilledButton(
+                    onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+                    child: const Text('저장'),
+                  ),
+                ],
+              ),
+            );
+            controller.dispose();
+            if (name == null || name.isEmpty || !mounted) return;
+            if (presets.containsKey(name)) {
+              final replace = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('기존 프리셋 덮어쓰기'),
+                  content: Text('“$name” 프리셋을 덮어쓸까요?'),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
+                    FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('덮어쓰기')),
+                  ],
+                ),
+              );
+              if (replace != true) return;
+            }
+            await notifier.saveNaiaPromptPreset(leading, name);
+            if (mounted) setState(() {});
+          },
+        ),
+        for (final name in presets.keys)
+          InputChip(
+            label: Text(name),
+            onPressed: () {
+              notifier.applyNaiaPromptPreset(leading, name);
+              setState(() => _naiaPresetRevision++);
+            },
+            onDeleted: () async {
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('프리셋 삭제'),
+                  content: Text('“$name” 프리셋을 삭제할까요?'),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
+                    FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('삭제')),
+                  ],
+                ),
+              );
+              if (confirmed != true) return;
+              await notifier.deleteNaiaPromptPreset(leading, name);
+              if (mounted) setState(() {});
+            },
+          ),
+      ],
+    );
+  }
+
   Widget _buildNaiaRules(GenerationNotifier notifier) {
     return ExpansionTile(
       title: const Text('NAIA 조건부 프롬프트'),
@@ -528,7 +606,7 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
-                key: const ValueKey('naia_leading_prompt'),
+                key: ValueKey('naia_leading_prompt_$_naiaPresetRevision'),
                 initialValue: notifier.naiaLeadingPrompt,
                 maxLines: 3,
                 decoration: const InputDecoration(
@@ -538,9 +616,10 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
                 ),
                 onChanged: notifier.setNaiaLeadingPrompt,
               ),
+              _naiaPresetControls(notifier, true),
               const SizedBox(height: 12),
               TextFormField(
-                key: const ValueKey('naia_trailing_prompt'),
+                key: ValueKey('naia_trailing_prompt_$_naiaPresetRevision'),
                 initialValue: notifier.naiaTrailingPrompt,
                 maxLines: 3,
                 decoration: const InputDecoration(
@@ -550,6 +629,7 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
                 ),
                 onChanged: notifier.setNaiaTrailingPrompt,
               ),
+              _naiaPresetControls(notifier, false),
             ],
           ),
         ),
