@@ -652,12 +652,12 @@
   "refPreciseReferences": "정밀 참조",
   "refVibeTransfer": "바이브 전송",
   "refDialogCancel": "취소",
-  "refDialogSave": "SAVE",
-  "refNameHint": "NAME",
+  "refDialogSave": "저장",
+  "refNameHint": "이름",
   "refClearAll": "모두 지우기",
   "refSavedSection": "저장됨",
   "refSaveReference": "참조 이미지 저장",
-  "refReferenceCount": "{count} REFERENCES",
+  "refReferenceCount": "참조 이미지 {count}개",
   "@refReferenceCount": {
     "placeholders": {
       "count": {
@@ -666,20 +666,20 @@
     }
   },
   "refNoReferencesAdded": "추가된 참조 이미지가 없습니다",
-  "refEmptyDescription": "Upload reference images to maintain character\nappearance or artistic style across generations.",
+  "refEmptyDescription": "참조 이미지를 추가하면 생성할 때 캐릭터 외형이나\n그림체를 일관되게 유지하는 데 도움이 됩니다.",
   "refAddReference": "참조 이미지 추가",
   "refEditorTitle": "참조 이미지 편집기",
   "refTypeLabel": "참조 유형",
   "refStrength": "강도",
   "refFidelity": "충실도",
-  "refStrengthShort": "STR",
-  "refFidelityShort": "FID",
+  "refStrengthShort": "강도",
+  "refFidelityShort": "충실도",
   "refTypeCharacter": "캐릭터",
   "refTypeStyle": "스타일",
-  "refTypeCharAndStyle": "CHAR & STYLE",
+  "refTypeCharAndStyle": "캐릭터 및 스타일",
   "refSaveVibe": "바이브 저장",
   "refVibeTransfers": "바이브 전송",
-  "refVibeCount": "{count} VIBES",
+  "refVibeCount": "바이브 {count}개",
   "@refVibeCount": {
     "placeholders": {
       "count": {
@@ -688,14 +688,14 @@
     }
   },
   "refNoVibesAdded": "추가된 바이브가 없습니다",
-  "refVibeEmptyDescription": "Upload reference images to transfer artistic\nstyle and mood to your generations.",
+  "refVibeEmptyDescription": "참조 이미지를 추가해 생성 이미지에\n그림체와 분위기를 반영하세요.",
   "refAddVibe": "바이브 추가",
-  "refVibeLabel": "VIBE",
+  "refVibeLabel": "바이브",
   "refVibeEditorTitle": "바이브 편집기",
   "refInfoExtracted": "정보 추출 완료",
-  "refInfoExtractedShort": "INF",
+  "refInfoExtractedShort": "추출",
   "refApiKeyMissing": "API 키가 없거나 올바르지 않습니다",
-  "refVibeEncodeFailed": "Failed to encode vibe: {error}",
+  "refVibeEncodeFailed": "바이브 인코딩 실패: {error}",
   "@refVibeEncodeFailed": {
     "placeholders": {
       "error": {
@@ -708,17 +708,17 @@
   "refBrowseFiles": "파일 찾아보기",
   "refNoSavedRefs": "저장된 참조 이미지가 없습니다",
   "packTitle": "NAIWeaver 팩",
-  "packDesc": "Export and import presets, styles, and wildcards as .vpack files.",
+  "packDesc": "프리셋, 스타일, 와일드카드를 .vpack 파일로 내보내거나 가져옵니다.",
   "packExportLabel": "팩 내보내기",
-  "packExportDesc": "Bundle presets, styles, and wildcards",
+  "packExportDesc": "프리셋, 스타일, 와일드카드를 하나로 묶기",
   "packImportLabel": "팩 가져오기",
-  "packImportDesc": "Load a .vpack file",
+  "packImportDesc": ".vpack 파일 불러오기",
   "packGalleryExport": "갤러리 내보내기",
-  "packGalleryExportDesc": "Export gallery images as a ZIP file, organized by album folders.",
+  "packGalleryExportDesc": "갤러리 이미지를 앨범별 폴더로 정리한 ZIP 파일로 내보냅니다.",
   "packExportGalleryZip": "갤러리를 ZIP으로 내보내기",
   "packExportGalleryZipDesc": "앨범 폴더 구조 유지",
   "packImportDialogTitle": "NAIWeaver 팩 가져오기",
-  "packFailedRead": "Failed to read pack: {error}",
+  "packFailedRead": "팩을 읽지 못했습니다: {error}",
   "@packFailedRead": {
     "placeholders": {
       "error": {
@@ -728,8 +728,8 @@
   },
   "packExportDialogTitle": "팩 내보내기",
   "packName": "팩 이름",
-  "packDescriptionOptional": "DESCRIPTION (OPTIONAL)",
-  "packPresetsSection": "PRESETS ({selected}/{total})",
+  "packDescriptionOptional": "설명(선택 사항)",
+  "packPresetsSection": "프리셋({selected}/{total})",
   "@packPresetsSection": {
     "placeholders": {
       "selected": {
@@ -740,7 +740,7 @@
       }
     }
   },
-  "packStylesSection": "STYLES ({selected}/{total})",
+  "packStylesSection": "스타일({selected}/{total})",
   "@packStylesSection": {
     "placeholders": {
       "selected": {
@@ -751,7 +751,7 @@
       }
     }
   },
-  "packWildcardsSection": "WILDCARDS ({selected}/{total})",
+  "packWildcardsSection": "와일드카드({selected}/{total})",
   "@packWildcardsSection": {
     "placeholders": {
       "selected": {
@@ -1347,7 +1347,7 @@
   "canvasLayerOpacity": "불투명도",
   "canvasLayerBlendMode": "혼합",
   "canvasLayerDeleteConfirm": "이 레이어를 삭제할까요? 그린 내용이 사라집니다.",
-  "canvasLayerDefault": "Layer {number}",
+  "canvasLayerDefault": "레이어 {number}",
   "@canvasLayerDefault": {
     "placeholders": {
       "number": {
@@ -1356,21 +1356,21 @@
     }
   },
   "canvasLayerClear": "레이어 지우기",
-  "canvasLayerClearConfirm": "Clear all strokes on this layer?",
-  "canvasLine": "LINE",
-  "canvasRectangle": "RECT",
+  "canvasLayerClearConfirm": "이 레이어의 모든 획을 지울까요?",
+  "canvasLine": "직선",
+  "canvasRectangle": "사각형",
   "canvasCircle": "원",
-  "canvasEyedropper": "PICK",
-  "canvasTransform": "MOVE",
+  "canvasEyedropper": "색상 추출",
+  "canvasTransform": "이동",
   "canvasImportImage": "이미지 가져오기",
   "canvasHelp": "캔버스 도움말",
   "canvasSmooth": "부드럽게",
-  "canvasFill": "FILL",
-  "canvasText": "TEXT",
-  "canvasTextHint": "Enter text...",
+  "canvasFill": "채우기",
+  "canvasText": "텍스트",
+  "canvasTextHint": "텍스트 입력...",
   "canvasTextSize": "크기",
   "canvasTextPlace": "배치",
-  "canvasTextFont": "FONT",
+  "canvasTextFont": "글꼴",
   "canvasTextSpacing": "간격",
   "canvasTextDefault": "기본값",
   "canvasBlendNormal": "일반",
@@ -1380,17 +1380,17 @@
   "settingsOutputFolder": "출력 폴더",
   "settingsOutputFolderDesc": "생성된 이미지를 저장할 위치 선택",
   "settingsFilenamePattern": "파일 이름 패턴",
-  "settingsFilenamePatternDesc": "Custom name for saved images. Tokens: <prompt>, <seed>, <album:fallback>, <year>, <month>, <day>, <hours>, <minutes>, <seconds>, <date>, <time>, <digits:0000>. Leave empty for the NAI-style default.",
+  "settingsFilenamePatternDesc": "저장 이미지의 파일 이름을 지정합니다. 사용 가능한 토큰: <prompt>, <seed>, <album:fallback>, <year>, <month>, <day>, <hours>, <minutes>, <seconds>, <date>, <time>, <digits:0000>. 비워 두면 NAI 기본 형식을 사용합니다.",
   "settingsSavePathPattern": "저장 하위 폴더 패턴",
-  "settingsSavePathPatternDesc": "Auto-create subfolders under the output folder (and under a custom export folder, including an SD card), e.g. <year>/<month>/<day>. Same tokens. Leave empty for none. The device-gallery album export stays flat.",
+  "settingsSavePathPatternDesc": "출력 폴더(또는 SD 카드를 포함한 사용자 지정 내보내기 폴더)에 하위 폴더를 자동으로 만듭니다. 예: <year>/<month>/<day>. 파일 이름과 같은 토큰을 사용합니다. 비워 두면 하위 폴더를 만들지 않습니다. 기기 갤러리의 앨범 내보내기에는 하위 폴더가 적용되지 않습니다.",
   "settingsPatternPreview": "미리보기",
-  "settingsOutputFolderDefault": "Default (App Storage)",
+  "settingsOutputFolderDefault": "기본값(앱 저장 공간)",
   "settingsOutputFolderBrowse": "찾아보기",
   "settingsOutputFolderClear": "지우기",
   "settingsUseSdCard": "SD 카드 사용",
   "settingsSdDialogTitle": "출력 위치를 SD 카드로 이동",
-  "settingsSdUninstallWarning": "Images on the SD card live in the app's own folder (Android/data). Android DELETES that folder when the app is uninstalled — on this device and on the card. Export anything precious somewhere else first.",
-  "settingsSdExistingInfo": "{count} existing files ({size}) can be moved to the SD card.",
+  "settingsSdUninstallWarning": "SD 카드의 이미지는 앱 전용 폴더(Android/data)에 저장됩니다. 앱을 삭제하면 기기와 SD 카드의 해당 폴더도 Android에서 삭제합니다. 중요한 파일은 먼저 다른 곳으로 내보내세요.",
+  "settingsSdExistingInfo": "기존 파일 {count}개({size})를 SD 카드로 이동할 수 있습니다.",
   "@settingsSdExistingInfo": {
     "placeholders": {
       "count": {
@@ -1404,7 +1404,7 @@
   "settingsSdMoveButton": "기존 파일 이동",
   "settingsSdFreshButton": "새로 시작",
   "settingsSdAlready": "출력 폴더가 이미 SD 카드에 있습니다",
-  "settingsSdNotEnoughSpace": "Not enough space on the SD card: needs {needed}, {available} available",
+  "settingsSdNotEnoughSpace": "SD 카드 공간이 부족합니다. 필요: {needed}, 사용 가능: {available}",
   "@settingsSdNotEnoughSpace": {
     "placeholders": {
       "needed": {
@@ -1415,8 +1415,8 @@
       }
     }
   },
-  "settingsSdMoving": "Moving files to the SD card… keep the app open.",
-  "settingsSdMoveDone": "{count} files moved to the SD card",
+  "settingsSdMoving": "SD 카드로 파일 이동 중… 앱을 종료하지 마세요.",
+  "settingsSdMoveDone": "파일 {count}개를 SD 카드로 이동했습니다.",
   "@settingsSdMoveDone": {
     "placeholders": {
       "count": {
@@ -1424,7 +1424,7 @@
       }
     }
   },
-  "settingsSdMoveFailed": "{count} files could not be moved — tap USE SD CARD to retry",
+  "settingsSdMoveFailed": "파일 {count}개를 이동하지 못했습니다. 'SD 카드 사용'을 눌러 다시 시도하세요.",
   "@settingsSdMoveFailed": {
     "placeholders": {
       "count": {
@@ -1432,7 +1432,7 @@
       }
     }
   },
-  "settingsSdMovePaused": "Move paused — {count} files remain. Tap USE SD CARD to resume.",
+  "settingsSdMovePaused": "이동이 일시 중지됐습니다. 파일 {count}개가 남았습니다. 'SD 카드 사용'을 눌러 재개하세요.",
   "@settingsSdMovePaused": {
     "placeholders": {
       "count": {
@@ -1441,7 +1441,7 @@
     }
   },
   "settingsSdResumeTitle": "SD 카드로 이동 재개",
-  "settingsSdResumeBody": "{count} files from a previous move are still waiting. Resume now?",
+  "settingsSdResumeBody": "이전 이동 작업에서 파일 {count}개가 남아 있습니다. 지금 재개할까요?",
   "@settingsSdResumeBody": {
     "placeholders": {
       "count": {
@@ -1450,31 +1450,31 @@
     }
   },
   "settingsSdResume": "재개",
-  "resCustomEntry": "Custom...",
+  "resCustomEntry": "사용자 지정...",
   "resCustomDialogTitle": "사용자 지정 해상도",
   "resCustomWidth": "너비",
   "resCustomHeight": "높이",
-  "resCustomName": "Name (optional)",
+  "resCustomName": "이름(선택 사항)",
   "resCustomUseOnce": "한 번 사용",
-  "resCustomSaveAndUse": "Save & Use",
-  "resCustomMustBeMultiple": "Must be a multiple of 64",
-  "resCustomOutOfRange": "Must be between 64 and 2048",
+  "resCustomSaveAndUse": "저장 후 사용",
+  "resCustomMustBeMultiple": "64의 배수여야 합니다",
+  "resCustomOutOfRange": "64~2048 사이여야 합니다",
   "themeSectionCharacters": "캐릭터",
   "charEditorTitle": "캐릭터",
   "charEditorExpanded": "확장",
   "charEditorCompact": "간략",
-  "charEditorAutoPosition": "AUTO",
+  "charEditorAutoPosition": "자동",
   "charEditorUsingCompactShelf": "프롬프트 아래 간략 목록 사용 중",
   "charEditorCharacterName": "캐릭터 이름",
-  "charEditorPromptHint": "Character tags, appearance...",
-  "charEditorUcHint": "Undesired tags...",
+  "charEditorPromptHint": "캐릭터 태그, 외형...",
+  "charEditorUcHint": "제외할 태그...",
   "charEditorShowUc": "UC",
-  "charEditorShowPosition": "POS",
+  "charEditorShowPosition": "위치",
   "charEditorShowPresets": "프리셋",
   "charEditorAiDecidesPosition": "AI가 위치 결정",
   "charEditorAddCharacter": "캐릭터 추가",
-  "charEditorCharacterLimitReached": "Character limit reached (6)",
-  "charEditorDeleteConfirm": "Delete \"{name}\"?",
+  "charEditorCharacterLimitReached": "캐릭터 최대 수(6명)에 도달했습니다",
+  "charEditorDeleteConfirm": "\"{name}\" 캐릭터를 삭제할까요?",
   "@charEditorDeleteConfirm": {
     "placeholders": {
       "name": {
@@ -1519,7 +1519,7 @@
   "charEditorNoPresets": "저장된 캐릭터 프리셋이 없습니다",
   "charEditorSelectSource": "동작을 수행하는 캐릭터",
   "charEditorSelectTarget": "동작을 받는 캐릭터",
-  "charEditorCharacterN": "Character {n}",
+  "charEditorCharacterN": "캐릭터 {n}",
   "@charEditorCharacterN": {
     "placeholders": {
       "n": {
@@ -1529,7 +1529,7 @@
   },
   "charEditorContinue": "계속",
   "charEditorParticipants": "참여 캐릭터",
-  "charEditorSourceTarget": "SOURCE → TARGET",
+  "charEditorSourceTarget": "동작 주체 → 대상",
   "charEditorMutual": "상호",
   "jukeboxTitle": "주크박스",
   "jukeboxShuffleAll": "전체 무작위 재생",
@@ -1543,19 +1543,19 @@
   "jukeboxRepeat": "반복",
   "jukeboxShuffle": "무작위 재생",
   "jukeboxOn": "ON",
-  "jukeboxOff": "OFF",
+  "jukeboxOff": "끔",
   "jukeboxAddToQueue": "대기열에 추가",
   "jukeboxMusicUnavailable": "음악 재생을 사용할 수 없습니다",
   "jukeboxDllMissing": "FluidSynth DLL을 찾지 못했습니다",
-  "jukeboxCategoryAll": "ALL",
+  "jukeboxCategoryAll": "전체",
   "jukeboxCategoryClassical": "클래식",
   "jukeboxCategoryAnime": "애니메이션",
   "jukeboxCategoryGame": "게임",
-  "jukeboxCategoryJazz": "JAZZ",
+  "jukeboxCategoryJazz": "재즈",
   "jukeboxCategoryAmbient": "앰비언트",
   "jukeboxCategoryHoliday": "휴일",
-  "jukeboxCategoryMeme": "MEME",
-  "jukeboxCategoryRock": "ROCK",
+  "jukeboxCategoryMeme": "밈",
+  "jukeboxCategoryRock": "록",
   "jukeboxEnableMusic": "음악 활성화",
   "jukeboxMusicVolume": "음악 음량",
   "jukeboxKaraokeLyrics": "노래방 가사",
@@ -1572,9 +1572,9 @@
   "mlUpscale": "업스케일",
   "mlSegment": "영역 분할",
   "mlCanvas": "캔버스",
-  "mlSave": "SAVE",
+  "mlSave": "저장",
   "mlDiscard": "버리기",
-  "mlAddPoint": "ADD",
+  "mlAddPoint": "점 추가",
   "mlRemovePoint": "제거",
   "mlTierFast": "빠름",
   "mlTierBalanced": "균형",
