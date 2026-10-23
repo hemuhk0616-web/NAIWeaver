@@ -794,6 +794,18 @@ class GenerationNotifier extends ChangeNotifier {
     clearLockedNaiaPreview();
   }
 
+  void moveCharacter(int from, int to) {
+    final result = _characterManager.moveCharacter(
+      _state.characters, _state.interactions, from, to);
+    if (result == null || from == to) return;
+    _state = _state.copyWith(
+      characters: result.characters,
+      interactions: result.interactions,
+    );
+    clearLockedNaiaPreview();
+    notifyListeners();
+  }
+
   void removeCharacter(int index) {
     final result = _characterManager.removeCharacter(
       _state.characters, _state.interactions, index);
