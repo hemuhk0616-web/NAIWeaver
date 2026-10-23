@@ -406,13 +406,13 @@
   "helpFeatureThemesDesc": "Customize all colors, fonts, and scale",
   "helpFeaturePacks": "Packs",
   "helpFeaturePacksDesc": "Export/import presets, styles, wildcards as .vpack",
-  "wildcardManager": "WILDCARD MANAGER",
-  "wildcardManageDesc": "MANAGE AND EDIT YOUR WILDCARD FILES",
-  "wildcardFiles": "FILES",
-  "wildcardNew": "NEW WILDCARD",
-  "wildcardSelectOrCreate": "SELECT OR CREATE A WILDCARD FILE",
-  "wildcardValidateTags": "VALIDATE TAGS",
-  "wildcardRecognized": "{valid}/{total} RECOGNIZED",
+  "wildcardManager": "와일드카드 관리자",
+  "wildcardManageDesc": "와일드카드 파일 관리 및 편집",
+  "wildcardFiles": "파일",
+  "wildcardNew": "새 와일드카드",
+  "wildcardSelectOrCreate": "와일드카드 파일을 선택하거나 새로 만드세요",
+  "wildcardValidateTags": "태그 검사",
+  "wildcardRecognized": "{valid}/{total}개 인식됨",
   "@wildcardRecognized": {
     "placeholders": {
       "valid": {
@@ -423,9 +423,9 @@
       }
     }
   },
-  "wildcardClear": "CLEAR",
-  "wildcardStartTyping": "START TYPING TAGS...",
-  "wildcardUnrecognized": "{count} UNRECOGNIZED",
+  "wildcardClear": "지우기",
+  "wildcardStartTyping": "태그를 입력하세요...",
+  "wildcardUnrecognized": "인식되지 않은 태그 {count}개",
   "@wildcardUnrecognized": {
     "placeholders": {
       "count": {
@@ -433,28 +433,28 @@
       }
     }
   },
-  "wildcardCreateTitle": "CREATE WILDCARD",
-  "wildcardFileName": "FILE NAME",
-  "wildcardHelp": "WILDCARD HELP",
-  "wildcardHelpTitle": "WILDCARD HELP",
-  "wildcardHelpRandom": "__name__ picks a random line from that wildcard file",
-  "wildcardHelpDotSyntax": "Use dots for multi-word names",
-  "wildcardHelpBrowse": "Type __ to browse and insert a wildcard from autocomplete",
-  "wildcardHelpNesting": "Nesting",
-  "wildcardHelpNestingDesc": "Wildcards can reference other wildcards (up to 5 levels deep)",
-  "wildcardHelpTip": "Drag to reorder files — the order is used in autocomplete",
-  "wildcardMode": "MODE",
-  "wildcardModeRandom": "RANDOM",
-  "wildcardModeRandomDesc": "Picks a random line each time the wildcard is used",
-  "wildcardModeSequential": "SEQUENTIAL",
-  "wildcardModeSequentialDesc": "Cycles through lines in order, looping back to the start",
-  "wildcardModeShuffle": "SHUFFLE",
-  "wildcardModeShuffleDesc": "Shuffles all lines randomly, then cycles through without repeats",
-  "wildcardModeWeighted": "WEIGHTED",
-  "wildcardModeWeightedDesc": "Uses weight syntax (e.g. 10::option) to bias selection probability",
-  "wildcardHelpFavorites": "Favorited wildcards appear with a gold outline in tag completion",
-  "wildcardDeleteTitle": "DELETE WILDCARD",
-  "wildcardDeleteConfirm": "Are you sure you want to delete ''{name}''?",
+  "wildcardCreateTitle": "와일드카드 만들기",
+  "wildcardFileName": "파일 이름",
+  "wildcardHelp": "와일드카드 도움말",
+  "wildcardHelpTitle": "와일드카드 도움말",
+  "wildcardHelpRandom": "__name__은 해당 와일드카드 파일에서 임의의 한 줄을 선택합니다",
+  "wildcardHelpDotSyntax": "여러 단어로 된 이름에는 점을 사용하세요",
+  "wildcardHelpBrowse": "__를 입력하면 자동 완성에서 와일드카드를 찾아 삽입할 수 있습니다",
+  "wildcardHelpNesting": "중첩",
+  "wildcardHelpNestingDesc": "와일드카드 안에서 다른 와일드카드를 참조할 수 있습니다(최대 20단계)",
+  "wildcardHelpTip": "파일을 드래그해 순서를 바꾸세요. 이 순서는 자동 완성에 반영됩니다",
+  "wildcardMode": "선택 방식",
+  "wildcardModeRandom": "무작위",
+  "wildcardModeRandomDesc": "사용할 때마다 임의의 한 줄을 선택합니다",
+  "wildcardModeSequential": "순차",
+  "wildcardModeSequentialDesc": "위에서 아래로 차례로 선택하고 마지막 줄 이후 처음으로 돌아갑니다",
+  "wildcardModeShuffle": "섞기",
+  "wildcardModeShuffleDesc": "모든 줄을 무작위로 섞은 뒤 중복 없이 차례로 선택합니다",
+  "wildcardModeWeighted": "가중치",
+  "wildcardModeWeightedDesc": "가중치 문법(예: 10:option)으로 선택 확률을 조절합니다",
+  "wildcardHelpFavorites": "즐겨찾기 와일드카드는 태그 자동 완성에서 금색 테두리로 표시됩니다",
+  "wildcardDeleteTitle": "와일드카드 삭제",
+  "wildcardDeleteConfirm": "'{name}' 와일드카드를 삭제할까요?",
   "@wildcardDeleteConfirm": {
     "placeholders": {
       "name": {
@@ -462,22 +462,22 @@
       }
     }
   },
-  "wildcardRenameTitle": "RENAME WILDCARD",
-  "wildcardRenameExists": "A wildcard with this name already exists",
-  "tagLibTitle": "TAG LIBRARY",
-  "tagLibPreviewSettings": "PREVIEW SETTINGS",
+  "wildcardRenameTitle": "와일드카드 이름 변경",
+  "wildcardRenameExists": "같은 이름의 와일드카드가 이미 있습니다",
+  "tagLibTitle": "태그 라이브러리",
+  "tagLibPreviewSettings": "미리보기 설정",
   "tagLibAddTag": "ADD TAG",
-  "tagLibSearchTags": "SEARCH TAGS...",
+  "tagLibSearchTags": "태그 검색...",
   "tagLibAll": "ALL",
-  "tagLibFavorites": "FAVORITES",
-  "tagLibImages": "IMAGES",
-  "tagLibSort": "SORT:",
-  "tagLibSortCountDesc": "COUNT ↓",
-  "tagLibSortCountAsc": "COUNT ↑",
+  "tagLibFavorites": "즐겨찾기",
+  "tagLibImages": "이미지",
+  "tagLibSort": "정렬:",
+  "tagLibSortCountDesc": "사용 횟수 ↓",
+  "tagLibSortCountAsc": "사용 횟수 ↑",
   "tagLibSortAZ": "A-Z",
   "tagLibSortZA": "Z-A",
-  "tagLibSortFavsFirst": "FAVS FIRST",
-  "tagLibTagCount": "{count} TAGS",
+  "tagLibSortFavsFirst": "즐겨찾기 우선",
+  "tagLibTagCount": "태그 {count}개",
   "@tagLibTagCount": {
     "placeholders": {
       "count": {
@@ -485,8 +485,8 @@
       }
     }
   },
-  "tagLibDeleteTag": "DELETE TAG",
-  "tagLibRemoveConfirm": "REMOVE '{tag}' FROM LIBRARY?",
+  "tagLibDeleteTag": "태그 삭제",
+  "tagLibRemoveConfirm": "라이브러리에서 '{tag}' 태그를 제거할까요?",
   "@tagLibRemoveConfirm": {
     "placeholders": {
       "tag": {
@@ -494,14 +494,14 @@
       }
     }
   },
-  "tagLibTestTag": "TEST TAG",
+  "tagLibTestTag": "태그 테스트",
   "tagLibAddNewTag": "ADD NEW TAG",
-  "tagLibTagName": "TAG NAME",
-  "tagLibCount": "COUNT",
+  "tagLibTagName": "태그 이름",
+  "tagLibCount": "횟수",
   "tagLibAddTagBtn": "ADD TAG",
-  "tagLibDeleteExample": "DELETE EXAMPLE",
-  "tagLibDeleteExampleConfirm": "DELETE THIS VISUAL EXAMPLE?",
-  "tagLibTesting": "TESTING: {tag}",
+  "tagLibDeleteExample": "예시 삭제",
+  "tagLibDeleteExampleConfirm": "이 이미지 예시를 삭제할까요?",
+  "tagLibTesting": "테스트 중: {tag}",
   "@tagLibTesting": {
     "placeholders": {
       "tag": {
@@ -509,20 +509,20 @@
       }
     }
   },
-  "tagLibGeneratingPreview": "GENERATING PREVIEW...",
-  "tagLibGenerationFailed": "GENERATION FAILED",
-  "tagLibExampleSaved": "EXAMPLE SAVED",
-  "tagLibSaveAsExample": "SAVE AS EXAMPLE",
-  "tagLibPreviewSettingsTitle": "PREVIEW SETTINGS",
-  "tagLibPositivePromptBase": "POSITIVE PROMPT (BASE)",
-  "tagLibNegativePrompt": "NEGATIVE PROMPT",
-  "tagLibSampler": "SAMPLER",
-  "tagLibSteps": "STEPS",
-  "tagLibWidth": "WIDTH",
-  "tagLibHeight": "HEIGHT",
-  "tagLibScale": "SCALE",
-  "tagLibSeed": "SEED",
-  "tagLibRandom": "RANDOM",
+  "tagLibGeneratingPreview": "미리보기 생성 중...",
+  "tagLibGenerationFailed": "생성 실패",
+  "tagLibExampleSaved": "예시 저장됨",
+  "tagLibSaveAsExample": "예시로 저장",
+  "tagLibPreviewSettingsTitle": "미리보기 설정",
+  "tagLibPositivePromptBase": "긍정 프롬프트(기본)",
+  "tagLibNegativePrompt": "부정 프롬프트",
+  "tagLibSampler": "샘플러",
+  "tagLibSteps": "스텝 수",
+  "tagLibWidth": "너비",
+  "tagLibHeight": "높이",
+  "tagLibScale": "스케일",
+  "tagLibSeed": "시드",
+  "tagLibRandom": "무작위",
   "presetManager": "PRESET MANAGER",
   "presetManageDesc": "MANAGE AND EDIT YOUR GENERATION PRESETS",
   "presetList": "PRESETS",
@@ -1683,7 +1683,7 @@
       }
     }
   },
-  "naiApiKeyRequired": "API key required",
+  "naiApiKeyRequired": "API 키가 필요합니다",
   "comparisonBefore": "Before",
   "comparisonAfter": "After",
   "comparisonSideBySide": "Side by side",
