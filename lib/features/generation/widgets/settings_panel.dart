@@ -415,11 +415,79 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
     );
   }
 
+  void _showNaiaRuleHelp() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (dialogContext) => Padding(
+        padding: EdgeInsets.fromLTRB(
+          20, 12, 20, 20 + MediaQuery.viewInsetsOf(dialogContext).bottom,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Expanded(
+                    child: Text('NAIA 조건부 규칙 사용법',
+                        style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
+                  ),
+                  IconButton(
+                    tooltip: '닫기',
+                    onPressed: () => Navigator.pop(dialogContext),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              const Text('기본 형식: (조건):동작'),
+              const SizedBox(height: 10),
+              const SelectableText('(solo):main+=smile',
+                  style: TextStyle(fontFamily: 'monospace', fontSize: 15)),
+              const SizedBox(height: 8),
+              const Text('메인 프롬프트에 solo가 있으면 smile을 추가합니다.'),
+              const SizedBox(height: 16),
+              const Text('자주 쓰는 예시',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              const SelectableText(
+                '(1girl):main+=looking at viewer\\n'
+                '(solo):neg+=multiple girls\\n'
+                'char:1 (solo):main+=smile',
+                style: TextStyle(fontFamily: 'monospace'),
+              ),
+              const SizedBox(height: 12),
+              const Text('규칙을 입력하면 자동 저장됩니다. '
+                  '정적 규칙 검사는 문법 오류를 찾는 기능이며, '
+                  '검사 통과가 실제 적용을 보장하지는 않습니다. '
+                  '최종 프롬프트 미리보기에서 결과를 확인하세요.'),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildNaiaRules(GenerationNotifier notifier) {
     return ExpansionTile(
       title: const Text('NAIA 조건부 프롬프트'),
       subtitle: const Text('규칙은 기기에 자동 저장됩니다'),
       children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: _showNaiaRuleHelp,
+              icon: const Icon(Icons.help_outline),
+              label: const Text('규칙 작성법 · 예시 보기'),
+            ),
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Align(
