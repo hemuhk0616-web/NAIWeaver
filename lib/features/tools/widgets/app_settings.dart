@@ -12,6 +12,7 @@ import '../../../core/l10n/locale_notifier.dart';
 import '../../../core/services/device_storage.dart';
 import '../../../core/services/output_migration_service.dart';
 import '../../../core/services/path_service.dart';
+import '../../../core/services/app_backup_service.dart';
 import '../../../core/services/preferences_service.dart';
 import '../../../core/services/saf_export_service.dart';
 import '../../../core/services/update_service.dart';
@@ -65,6 +66,73 @@ class _AppSettingsState extends State<AppSettings> {
     _loadRemovableVolumes();
   }
 
+  Widget _buildBackupControls() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('설정 백업 및 복원',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        const Text('앱 설정, NAIA 규칙, 프리셋, 스타일, 와일드카드와 '
+            '캐릭터 데이터를 파일로 보관합니다. API 키 및 비밀번호는 제외됩니다.'),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            OutlinedButton.icon(
+              icon: const Icon(Icons.save_alt),
+              label: const Text('백업 파일 저장'),
+              onPressed: () async {
+                try {
+                  await AppBackupService().exportBackup(context.read<PathService>());
+                } catch (error) {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('백업 실패: $error')));
+                }
+              },
+            ),
+            OutlinedButton.icon(
+              icon: const Icon(Icons.restore),
+              label: const Text('백업 파일 복원'),
+              onPressed: () async {
+                final approved = await showDialog<bool>(
+                  context: context,
+                  builder: (dialogContext) => AlertDialog(
+                    title: const Text('설정을 복원할까요?'),
+                    content: const Text('현재 설정과 같은 이름의 파일이 덮어써집니다. '
+                        '복원 후 앱을 완전히 종료하고 다시 실행해야 합니다.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(dialogContext, false),
+                        child: const Text('취소')),
+                      FilledButton(
+                        onPressed: () => Navigator.pop(dialogContext, true),
+                        child: const Text('복원')),
+                    ],
+                  ),
+                );
+                if (approved != true || !mounted) return;
+                try {
+                  final imported = await AppBackupService()
+                      .importBackup(context.read<PathService>());
+                  if (!mounted || !imported) return;
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('복원 완료. 앱을 완전히 종료한 후 다시 실행하세요.')));
+                } catch (error) {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('복원 실패: $error')));
+                }
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Future<void> _loadRemovableVolumes() async {
     if (kIsWeb || !Platform.isAndroid) return;
     try {
@@ -112,6 +180,10 @@ class _AppSettingsState extends State<AppSettings> {
           const SizedBox(height: 16),
           _buildApiKeyField(notifier, t),
           const SizedBox(height: 32),
+          if (!kIsWeb && Platform.isAndroid) ...[
+            _buildBackupControls(),
+            const SizedBox(height: 32),
+          ],
           _buildHeader(l.settingsGeneralSettings.toUpperCase(), t),
           const SizedBox(height: 16),
           _buildAutoSaveToggle(notifier, state.autoSaveImages, t),
