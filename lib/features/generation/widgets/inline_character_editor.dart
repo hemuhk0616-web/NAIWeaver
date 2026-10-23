@@ -140,6 +140,95 @@ class InlineCharacterEditor extends StatelessWidget {
               ],
             ),
 
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.save_outlined, size: 16),
+                  label: const Text('전체 구성 저장'),
+                  onPressed: () async {
+                    final controller = TextEditingController();
+                    final name = await showDialog<String>(
+                      context: context,
+                      builder: (dialogContext) => AlertDialog(
+                        title: const Text('캐릭터 전체 구성 저장'),
+                        content: TextField(
+                          controller: controller,
+                          autofocus: true,
+                          decoration: const InputDecoration(hintText: '프리셋 이름'),
+                        ),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(dialogContext),
+                              child: const Text('취소')),
+                          TextButton(onPressed: () =>
+                              Navigator.pop(dialogContext, controller.text.trim()),
+                              child: const Text('저장')),
+                        ],
+                      ),
+                    );
+                    if (name == null || name.isEmpty) return;
+                    if (notifier.naiaCharacterSetPresets.containsKey(name)) {
+                      if (!context.mounted) return;
+                      final overwrite = await showDialog<bool>(
+                        context: context,
+                        builder: (dialogContext) => AlertDialog(
+                          title: const Text('같은 이름의 프리셋이 있어요'),
+                          content: Text('“$name” 구성을 덮어쓸까요?'),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(dialogContext, false),
+                                child: const Text('취소')),
+                            TextButton(onPressed: () => Navigator.pop(dialogContext, true),
+                                child: const Text('덮어쓰기')),
+                          ],
+                        ),
+                      );
+                      if (overwrite != true) return;
+                    }
+                    await notifier.saveNaiaCharacterSetPreset(name);
+                  },
+                ),
+                const SizedBox(width: 8),
+                PopupMenuButton<String>(
+                  tooltip: '전체 구성 불러오기 또는 삭제',
+                  onSelected: (value) async {
+                    final name = value.substring(2);
+                    if (value.startsWith('L:')) {
+                      if (!notifier.applyNaiaCharacterSetPreset(name) && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('현재 모델의 캐릭터 수 제한 또는 프리셋 데이터가 올바르지 않아요')),
+                        );
+                      }
+                    } else {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (dialogContext) => AlertDialog(
+                          title: const Text('프리셋 삭제'),
+                          content: Text('“$name”을 삭제할까요?'),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(dialogContext, false),
+                                child: const Text('취소')),
+                            TextButton(onPressed: () => Navigator.pop(dialogContext, true),
+                                child: const Text('삭제')),
+                          ],
+                        ),
+                      );
+                      if (confirmed == true) await notifier.deleteNaiaCharacterSetPreset(name);
+                    }
+                  },
+                  itemBuilder: (_) => [
+                    for (final name in notifier.naiaCharacterSetPresets.keys) ...[
+                      PopupMenuItem(value: 'L:$name', child: Text('불러오기 · $name')),
+                      PopupMenuItem(value: 'D:$name', child: Text('삭제 · $name')),
+                    ],
+                  ],
+                  child: const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Text('전체 구성 불러오기 ▾'),
+                  ),
+                ),
+              ],
+            ),
+
             if (!isExpanded) ...[
               const SizedBox(height: 8),
               Text(
