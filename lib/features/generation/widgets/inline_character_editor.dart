@@ -646,6 +646,11 @@ class _CharacterCardState extends State<_CharacterCard> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  Switch.adaptive(
+                    value: widget.character.enabled,
+                    onChanged: (value) => context.read<GenerationNotifier>()
+                        .setCharacterEnabled(widget.index, value),
+                  ),
                   IconButton(
                     onPressed: () => _confirmDelete(context),
                     icon: Icon(Icons.close, size: 14, color: t.textTertiary),
