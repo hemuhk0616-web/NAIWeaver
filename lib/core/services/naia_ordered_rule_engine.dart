@@ -145,7 +145,8 @@ class NaiaOrderedRuleEngine {
       }
 
       if (RegExp(r'^char_(set|replace)\(').hasMatch(action)) {
-        final result = actions.apply(currentCharacters, rule,
+        final expandedRule = await expandAction(rule);
+        final result = actions.apply(currentCharacters, expandedRule,
           initialEnabled: enabled,
           matches: (c, prompts, states) => conditions.matches(c, combined(),
             characterPrompts: prompts, characterEnabled: states));
