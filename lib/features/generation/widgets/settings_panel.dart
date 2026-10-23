@@ -523,6 +523,37 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
       subtitle: const Text('규칙은 기기에 자동 저장됩니다'),
       children: [
         Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextFormField(
+                key: const ValueKey('naia_leading_prompt'),
+                initialValue: notifier.naiaLeadingPrompt,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  labelText: '선행 프롬프트',
+                  helperText: '메인 앞에 추가 · 와일드카드 사용 가능',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: notifier.setNaiaLeadingPrompt,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                key: const ValueKey('naia_trailing_prompt'),
+                initialValue: notifier.naiaTrailingPrompt,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  labelText: '후행 프롬프트',
+                  helperText: '메인 뒤에 추가 · 그림체 보정 등에 사용',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: notifier.setNaiaTrailingPrompt,
+              ),
+            ],
+          ),
+        ),
+        Padding(
           padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
           child: Align(
             alignment: Alignment.centerLeft,
