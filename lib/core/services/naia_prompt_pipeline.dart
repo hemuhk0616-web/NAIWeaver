@@ -31,7 +31,7 @@ class NaiaPromptPipeline {
   String _chooseAlternatives(String value) {
     return value.split(',').map((part) {
       final choices = part.split('^');
-      if (choices.length == 1) return part;
+      if (choices.length == 1) return part.trim();
       final valid = choices.map((item) => item.trim())
           .where((item) => item.isNotEmpty).toList();
       if (valid.isEmpty) return part;
