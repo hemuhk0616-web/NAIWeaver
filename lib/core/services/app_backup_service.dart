@@ -27,10 +27,14 @@ class AppBackupService {
     final prefs = await SharedPreferences.getInstance();
     final settings = <String, Object>{};
     for (final key in prefs.getKeys()) {
-      if (!safeKey(key)) continue;
+      if (!safeKey(key)) {
+        continue;
+      }
       final value = prefs.get(key);
       if (value is String || value is bool || value is int ||
-          value is double || value is List<String>) settings[key] = value;
+          value is double || value is List<String>) {
+        settings[key] = value as Object;
+      }
     }
     final files = <String, String>{};
     Future<void> add(File file) async {
@@ -45,9 +49,13 @@ class AppBackupService {
     }
     for (final root in roots) {
       final dir = Directory(p.join(paths.baseDir, root));
-      if (!await dir.exists()) continue;
+      if (!await dir.exists()) {
+        continue;
+      }
       await for (final item in dir.list(recursive: true, followLinks: false)) {
-        if (item is File) await add(item);
+        if (item is File) {
+          await add(item);
+        }
       }
     }
     final temp = await getTemporaryDirectory();
@@ -88,7 +96,9 @@ class AppBackupService {
     }
     final settings = <String, Object>{};
     for (final entry in (decoded['settings'] as Map).entries) {
-      if (entry.key is! String || !safeKey(entry.key as String)) continue;
+      if (entry.key is! String || !safeKey(entry.key as String)) {
+        continue;
+      }
       final value = entry.value;
       if (value is String || value is bool || value is int ||
           value is double || (value is List &&
