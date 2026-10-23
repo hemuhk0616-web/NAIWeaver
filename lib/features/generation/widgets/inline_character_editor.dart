@@ -646,6 +646,23 @@ class _CharacterCardState extends State<_CharacterCard> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  IconButton(
+                    tooltip: '위로 이동',
+                    onPressed: widget.index == 0 ? null : () =>
+                        context.read<GenerationNotifier>()
+                            .moveCharacter(widget.index, widget.index - 1),
+                    icon: const Icon(Icons.arrow_upward, size: 16),
+                    constraints: const BoxConstraints(minWidth: 32, minHeight: 40),
+                  ),
+                  IconButton(
+                    tooltip: '아래로 이동',
+                    onPressed: widget.index >= context.read<GenerationNotifier>()
+                            .state.characters.length - 1 ? null : () =>
+                        context.read<GenerationNotifier>()
+                            .moveCharacter(widget.index, widget.index + 1),
+                    icon: const Icon(Icons.arrow_downward, size: 16),
+                    constraints: const BoxConstraints(minWidth: 32, minHeight: 40),
+                  ),
                   Switch.adaptive(
                     value: widget.character.enabled,
                     onChanged: (value) => context.read<GenerationNotifier>()
