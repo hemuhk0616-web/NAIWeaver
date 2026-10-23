@@ -27,6 +27,10 @@ jobs:
           cache: true
       - name: Install dependencies
         run: flutter pub get
+      - name: Analyze Flutter source
+        run: flutter analyze
+      - name: Run Flutter tests
+        run: flutter test
       # Store the same debug keystore as an encrypted repository secret.
       # Without it, every hosted runner would generate a different signing key.
       - name: Restore stable Android signing key
@@ -41,10 +45,6 @@ jobs:
           printf '%s' "$ANDROID_DEBUG_KEYSTORE_BASE64" | base64 --decode > "$HOME/.android/debug.keystore"
           chmod 600 "$HOME/.android/debug.keystore"
           keytool -list -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey > /dev/null
-      - name: Analyze Flutter source
-        run: flutter analyze
-      - name: Run Flutter tests
-        run: flutter test
       - name: Build Android debug APK
         run: flutter build apk --debug --build-number ${{ github.run_number }}
       - name: Upload installable APK
