@@ -159,4 +159,20 @@ void main() {
     expect(paired.main, contains('outfit result'));
   });
 
+  test('only matching rules expand action wildcards', () async {
+    final expanded = <String>[];
+    final result = await engine.applyAsync(
+      '1girl, bedroom', [],
+      '(forest):1girl+=__unused__\n'
+      '(bedroom):1girl+=__outfit__\n'
+      '(outfit):main+=finished',
+      expandAction: (value) async {
+        expanded.add(value);
+        return value.replaceAll('__outfit__', 'outfit');
+      },
+    );
+    expect(expanded, ['__outfit__', 'finished']);
+    expect(result.main, '1girl, outfit, bedroom, finished');
+  });
+
 }
