@@ -94,6 +94,24 @@ void main() {
     expect(result.main, 'start tag, solo, smile, end tag');
   });
 
+  test('weighted tags with omitted closing delimiter match ordinary targets', () {
+    final result = engine.apply(
+      '1.5::hat, 2::hat::, boots',
+      [],
+      '(boots):hat=cap',
+    );
+    expect(result.main, 'cap, cap, boots');
+  });
+
+  test('partial target matches weighted tag content', () {
+    final result = engine.apply(
+      '1.2::blue hair::, blue eyes',
+      [],
+      '(blue eyes):*hair=red hair',
+    );
+    expect(result.main, 'red hair, blue eyes');
+  });
+
   test('weighted duplicate tags are replaced across prompt segments', () {
     final result = engine.apply(
       '1.5::hat::, hat', [],
