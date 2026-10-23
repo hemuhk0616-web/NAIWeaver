@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'naia_conditional_processor.dart';
+import 'naia_ordered_rule_engine.dart';
 import 'wildcard_processor.dart';
 
 /// Expands wildcards, then evaluates the supported NAIA conditional rules.
@@ -18,10 +19,11 @@ class NaiaPromptPipeline {
   }) async {
     final expanded = await wildcards.process(prompt);
     if (rules.trim().isEmpty) return expanded;
-    final expandedRules = await expandActionValues(rules);
-    return conditions.apply(expanded, expandedRules,
-      characterPrompts: characterPrompts,
-      characterEnabled: characterEnabled);
+    final result = await const NaiaOrderedRuleEngine().applyAsync(
+      expanded, characterPrompts, rules,
+      expandAction: expandMatchedActionValue,
+    );
+    return result.main;
   }
 
   /// Expand only assigned action values. Conditions and function arguments
