@@ -52,6 +52,31 @@ class PreferencesService {
     await _prefs.setString(key, jsonEncode(presets));
   }
 
+  Map<String, Map<String, dynamic>> get naiaCharacterSetPresets {
+    try {
+      final raw = jsonDecode(_prefs.getString('naia_character_set_presets') ?? '{}');
+      if (raw is Map) {
+        return raw.map((key, value) => MapEntry(
+          key.toString(), Map<String, dynamic>.from(value as Map)));
+      }
+    } catch (e) {
+      debugPrint('Invalid character set presets: $e');
+    }
+    return {};
+  }
+
+  Future<void> saveNaiaCharacterSetPreset(String name, Map<String, dynamic> value) async {
+    final presets = naiaCharacterSetPresets;
+    presets[name] = value;
+    await _prefs.setString('naia_character_set_presets', jsonEncode(presets));
+  }
+
+  Future<void> deleteNaiaCharacterSetPreset(String name) async {
+    final presets = naiaCharacterSetPresets;
+    presets.remove(name);
+    await _prefs.setString('naia_character_set_presets', jsonEncode(presets));
+  }
+
   static const String _keyAutoSave = 'nai_auto_save';
   static const String _keyShowDirectorRefShelf = 'show_director_ref_shelf';
   static const String _keyShowVibeTransferShelf = 'show_vibe_transfer_shelf';
