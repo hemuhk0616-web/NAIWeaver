@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import '../models/nai_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -19,6 +20,37 @@ class PreferencesService {
   Future<void> setNaiaLeadingPrompt(String value) => _prefs.setString('naia_leading_prompt', value);
   String get naiaTrailingPrompt => _prefs.getString('naia_trailing_prompt') ?? '';
   Future<void> setNaiaTrailingPrompt(String value) => _prefs.setString('naia_trailing_prompt', value);
+
+  Map<String, String> get naiaLeadingPresets => _readNaiaPresets('naia_leading_presets');
+  Map<String, String> get naiaTrailingPresets => _readNaiaPresets('naia_trailing_presets');
+
+  Map<String, String> _readNaiaPresets(String key) {
+    try {
+      final decoded = jsonDecode(_prefs.getString(key) ?? '{}');
+      if (decoded is Map) {
+        return decoded.map((k, v) => MapEntry(k.toString(), v.toString()));
+      }
+    } catch (_) {}
+    return {};
+  }
+
+  Future<void> saveNaiaPromptPreset({
+    required bool leading, required String name, required String prompt,
+  }) async {
+    final key = leading ? 'naia_leading_presets' : 'naia_trailing_presets';
+    final presets = _readNaiaPresets(key);
+    presets[name] = prompt;
+    await _prefs.setString(key, jsonEncode(presets));
+  }
+
+  Future<void> deleteNaiaPromptPreset({
+    required bool leading, required String name,
+  }) async {
+    final key = leading ? 'naia_leading_presets' : 'naia_trailing_presets';
+    final presets = _readNaiaPresets(key);
+    presets.remove(name);
+    await _prefs.setString(key, jsonEncode(presets));
+  }
 
   static const String _keyAutoSave = 'nai_auto_save';
   static const String _keyShowDirectorRefShelf = 'show_director_ref_shelf';
