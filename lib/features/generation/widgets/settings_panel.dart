@@ -9,6 +9,8 @@ import '../../../core/l10n/l10n_extensions.dart';
 import '../../../core/models/nai_model.dart';
 import '../../../core/services/preferences_service.dart';
 import '../../../core/services/naia_rule_validator.dart';
+import '../../../core/services/naia_update7_preset.dart';
+import '../../tools/providers/wildcard_notifier.dart';
 import '../../../core/services/tag_service.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../core/utils/tag_suggestion_helper.dart';
@@ -469,6 +471,2598 @@ class _ExpandedSettingsContentState extends State<ExpandedSettingsContent> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _applyUpdate7Preset(GenerationNotifier notifier) async {
+    final wildcards = context.read<WildcardNotifier>();
+    await wildcards.refreshFiles();
+    if (!mounted) return;
+    final names = wildcards.state.files.map((file) {
+      final relative = file.path.replaceAll('\\\\', '/');
+      final root = wildcards.wildcardDir.replaceAll('\\\\', '/');
+      return relative.startsWith('$root/')
+          ? relative.substring(root.length + 1).replaceFirst(RegExp(r'\\.txt
+    return ExpansionTile(
+      title: const Text('NAIA 조건부 프롬프트'),
+      subtitle: const Text('규칙은 기기에 자동 저장됩니다'),
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: FilledButton.tonalIcon(
+              onPressed: () => _applyUpdate7Preset(notifier),
+              icon: const Icon(Icons.auto_awesome),
+              label: const Text('업데이트7 PDF 프리셋 불러오기'),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: _showNaiaRuleHelp,
+              icon: const Icon(Icons.help_outline),
+              label: const Text('규칙 작성법 · 예시 보기'),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.preview_outlined),
+              label: const Text('최종 프롬프트 미리보기'),
+              onPressed: () async {
+                try {
+                  final signature = notifier.naiaPreviewSignature;
+                  final previews = <String>[];
+                  for (var i = 0; i < 3; i++) {
+                    previews.add(await notifier.previewNaiaPrompt());
+                  }
+                  if (!mounted) return;
+                  var selected = 2;
+                  await showDialog<void>(
+                    context: context,
+                    builder: (dialogContext) => StatefulBuilder(
+                      builder: (dialogContext, updateDialog) => AlertDialog(
+                        title: const Text('프롬프트 미리보기 · 3회 추첨'),
+                        content: SizedBox(
+                          width: 500,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              DropdownButton<int>(
+                                value: selected,
+                                isExpanded: true,
+                                items: [
+                                  for (var i = 0; i < previews.length; i++)
+                                    DropdownMenuItem(
+                                      value: i,
+                                      child: Text('추첨 결과 ${i + 1}'),
+                                    ),
+                                ],
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    updateDialog(() => selected = value);
+                                  }
+                                },
+                              ),
+                              Flexible(
+                                child: SingleChildScrollView(
+                                  child: SelectableText(previews[selected]),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              notifier.clearLockedNaiaPreview();
+                              Navigator.pop(dialogContext);
+                            },
+                            child: const Text('고정 해제'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(dialogContext),
+                            child: const Text('닫기'),
+                          ),
+                          FilledButton(
+                            onPressed: () async {
+                              final locked = notifier.selectNaiaPreviewSample(selected, signature);
+                              if (!dialogContext.mounted) return;
+                              Navigator.pop(dialogContext);
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(locked
+                                    ? '선택한 추첨 결과가 생성 1회에 고정되었습니다.'
+                                    : '설정이 변경되어 고정할 수 없습니다. 다시 미리보기 해주세요.')),
+                              );
+                            },
+                            child: const Text('생성용으로 고정'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                } catch (error) {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('미리보기 실패: $error')),
+                  );
+                }
+              },
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Builder(builder: (context) {
+            final diagnostics = const NaiaRuleValidator()
+                .validate(notifier.naiaConditionalRules);
+            final errors = diagnostics.where((d) => !d.warning).length;
+            final warnings = diagnostics.length - errors;
+            if (diagnostics.isEmpty) {
+              return const Row(
+                children: [
+                  Icon(Icons.check_circle_outline, color: Colors.green, size: 18),
+                  SizedBox(width: 8),
+                  Expanded(child: Text('정적 규칙 검사 통과 · 실제 실행 결과는 미리보기로 확인하세요.')),
+                ],
+              );
+            }
+            final statusColor = errors > 0 ? Colors.red : Colors.orange;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(errors > 0 ? Icons.error_outline : Icons.warning_amber_outlined,
+                        color: statusColor, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text('규칙 검사: 오류 $errors개 · 경고 $warnings개',
+                          style: TextStyle(color: statusColor,
+                              fontWeight: FontWeight.w600)),
+                    ),
+                    TextButton.icon(
+                      icon: const Icon(Icons.list_alt, size: 18),
+                      label: const Text('전체 보기'),
+                      onPressed: () => showDialog<void>(
+                        context: context,
+                        builder: (dialogContext) => AlertDialog(
+                          title: Text('규칙 진단 · ${diagnostics.length}건'),
+                          content: SizedBox(
+                            width: 520,
+                            child: ListView.separated(
+                              shrinkWrap: true,
+                              itemCount: diagnostics.length,
+                              separatorBuilder: (context, index) => const Divider(height: 12),
+                              itemBuilder: (context, index) {
+                                final d = diagnostics[index];
+                                return ListTile(
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  leading: Icon(
+                                    d.warning ? Icons.warning_amber_outlined
+                                        : Icons.error_outline,
+                                    color: d.warning ? Colors.orange : Colors.red,
+                                  ),
+                                  title: Text('${d.line}행 · ${d.warning ? "경고" : "오류"}'),
+                                  subtitle: SelectableText(d.message),
+                                );
+                              },
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(dialogContext),
+                              child: const Text('닫기'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                for (final diagnostic in diagnostics.take(3))
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      '${diagnostic.line}행 [${diagnostic.warning ? "경고" : "오류"}] ${diagnostic.message}',
+                      style: TextStyle(
+                        color: diagnostic.warning ? Colors.orange : Colors.red,
+                      ),
+                    ),
+                  ),
+                if (diagnostics.length > 3)
+                  Text('외 ${diagnostics.length - 3}건 · 전체 보기에서 확인하세요.'),
+              ],
+            );
+          }),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: TextFormField(
+            key: const ValueKey('naia_conditional_rules_editor'),
+            initialValue: notifier.naiaConditionalRules,
+            minLines: 3,
+            maxLines: 12,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: '(solo):main+=smile',
+              helperText: 'Main·캐릭터·UC 규칙을 입력할 수 있습니다.',
+            ),
+            onChanged: notifier.setNaiaConditionalRules,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDimensionsSeed(GenerationNotifier notifier, GenerationState state, bool mobile, VisionTokens t, {bool compact = false}) {
+    final labelStyle = TextStyle(fontWeight: FontWeight.w900, fontSize: t.fontSize(mobile ? 12 : 9), letterSpacing: 2, color: t.secondaryText);
+
+    Widget dimensionsField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(context.l.panelDimensions.toUpperCase(), style: labelStyle),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String>(
+          // ignore: deprecated_member_use
+          value: AdvancedSettingsPanel.resolutionOptions(context).any((opt) => opt.width == state.width.toInt() && opt.height == state.height.toInt())
+              ? "${state.width.toInt()}x${state.height.toInt()}"
+              : null,
+          dropdownColor: t.surfaceHigh,
+          hint: Text(
+            "${state.width.toInt()}x${state.height.toInt()}${!AdvancedSettingsPanel.resolutionOptions(context).any((opt) => opt.width == state.width.toInt() && opt.height == state.height.toInt()) ? ' (${context.l.panelCustom.toUpperCase()})' : ''}",
+            style: TextStyle(color: t.textPrimary, fontSize: t.fontSize(11)),
+          ),
+          style: TextStyle(color: t.textPrimary, fontSize: t.fontSize(11), letterSpacing: 1),
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            fillColor: t.borderSubtle,
+            filled: true,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide.none),
+          ),
+          onChanged: (String? newValue) async {
+            if (newValue == '__custom__') {
+              final result = await showCustomResolutionDialog(context);
+              if (result != null) {
+                notifier.updateSettings(
+                  width: result.width.toDouble(),
+                  height: result.height.toDouble(),
+                );
+                if (mounted) setState(() {});
+              }
+              return;
+            }
+            if (newValue != null) {
+              final parts = newValue.split('x');
+              notifier.updateSettings(
+                width: double.parse(parts[0]),
+                height: double.parse(parts[1]),
+              );
+            }
+          },
+          items: [
+            ...AdvancedSettingsPanel.resolutionOptions(context).asMap().entries.map<DropdownMenuItem<String>>((entry) {
+              final opt = entry.value;
+              final builtInCount = 8;
+              return DropdownMenuItem<String>(
+                value: opt.value,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(child: Text(opt.displayLabel, style: TextStyle(fontSize: t.fontSize(10)), overflow: TextOverflow.ellipsis)),
+                    if (opt.isCustom)
+                      GestureDetector(
+                        onTap: () {
+                          final prefs = context.read<PreferencesService>();
+                          AdvancedSettingsPanel.deleteCustomResolution(prefs, entry.key - builtInCount);
+                          setState(() {});
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Icon(Icons.close, size: 14, color: t.textMinimal),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }),
+            DropdownMenuItem<String>(
+              value: '__custom__',
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add, size: 14, color: t.accent),
+                  const SizedBox(width: 8),
+                  Text(context.l.resCustomEntry.toUpperCase(), style: TextStyle(fontSize: t.fontSize(10), color: t.accent)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+
+    Widget seedField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(context.l.panelSeed.toUpperCase(), style: labelStyle),
+        const SizedBox(height: 12),
+        TextField(
+          controller: notifier.seedController,
+          readOnly: state.randomizeSeed,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          style: TextStyle(fontSize: t.fontSize(11), color: state.randomizeSeed ? t.textDisabled : t.textPrimary),
+          decoration: InputDecoration(
+            hintText: context.l.panelSeed.toUpperCase(),
+            hintStyle: TextStyle(fontSize: t.fontSize(9), color: t.textMinimal),
+            fillColor: t.borderSubtle,
+            filled: true,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide.none),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            suffixIcon: IconButton(
+              onPressed: () => notifier.updateSettings(randomizeSeed: !state.randomizeSeed),
+              icon: Icon(
+                state.randomizeSeed ? Icons.shuffle : Icons.tag,
+                size: 14,
+                color: state.randomizeSeed ? t.textSecondary : t.textDisabled,
+              ),
+              constraints: const BoxConstraints(),
+              padding: EdgeInsets.zero,
+            ),
+          ),
+        ),
+      ],
+    );
+
+    if (mobile || compact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          dimensionsField,
+          const SizedBox(height: 16),
+          seedField,
+        ],
+      );
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(flex: 2, child: dimensionsField),
+        const SizedBox(width: 24),
+        Expanded(flex: 1, child: seedField),
+      ],
+    );
+  }
+
+  Widget _buildStepsScale(GenerationNotifier notifier, GenerationState state, bool mobile, VisionTokens t, {bool compact = false}) {
+    Widget stepsSlider = _buildCompactSlider(context, context.l.panelSteps.toUpperCase(), state.steps, 1, 50, 1, (v) => notifier.updateSettings(steps: v), t, warnAbove: 28);
+    Widget scaleSlider = _buildCompactSlider(context, context.l.panelScale.toUpperCase(), state.scale, 1.0, 30.0, 0.5, (v) => notifier.updateSettings(scale: v), t, hardMax: 100.0, warnAbove: 30);
+
+    if (mobile || compact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          stepsSlider,
+          const SizedBox(height: 16),
+          scaleSlider,
+        ],
+      );
+    }
+    return Row(
+      children: [
+        Expanded(child: stepsSlider),
+        const SizedBox(width: 32),
+        Expanded(child: scaleSlider),
+      ],
+    );
+  }
+
+  Widget _buildSamplerPost(GenerationNotifier notifier, GenerationState state, bool mobile, VisionTokens t, {bool compact = false}) {
+    final labelStyle = TextStyle(fontWeight: FontWeight.w900, fontSize: t.fontSize(mobile ? 12 : 9), letterSpacing: 2, color: t.secondaryText);
+
+    Widget samplerField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(context.l.panelSampler.toUpperCase(), style: labelStyle),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String>(
+          // ignore: deprecated_member_use
+          value: state.sampler,
+          dropdownColor: t.surfaceHigh,
+          style: TextStyle(color: t.textPrimary, fontSize: t.fontSize(11), letterSpacing: 1),
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            fillColor: t.borderSubtle,
+            filled: true,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide.none),
+          ),
+          onChanged: (String? newValue) {
+            if (newValue != null) notifier.updateSettings(sampler: newValue);
+          },
+          items: _samplerItems(state).map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(value: value, child: Text(value.toUpperCase(), style: TextStyle(fontSize: t.fontSize(10))));
+          }).toList(),
+        ),
+      ],
+    );
+
+    final caps = state.model.caps;
+
+    // Noise schedule — only models that expose a picker (V4.5); V5 forces
+    // karras, so the control is hidden rather than shown as a no-op (#35).
+    Widget? noiseScheduleField;
+    if (caps.noiseSchedule) {
+      final schedules = state.model.noiseSchedules;
+      final value = schedules.contains(state.noiseSchedule)
+          ? state.noiseSchedule
+          : state.model.defaults.noiseSchedule;
+      noiseScheduleField = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('NOISE SCHEDULE', style: labelStyle),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            // ignore: deprecated_member_use
+            value: value,
+            dropdownColor: t.surfaceHigh,
+            style: TextStyle(color: t.textPrimary, fontSize: t.fontSize(11), letterSpacing: 1),
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              fillColor: t.borderSubtle,
+              filled: true,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide.none),
+            ),
+            onChanged: (String? newValue) {
+              if (newValue != null) notifier.updateSettings(noiseSchedule: newValue);
+            },
+            items: schedules.map<DropdownMenuItem<String>>((String v) {
+              return DropdownMenuItem<String>(value: v, child: Text(v.toUpperCase(), style: TextStyle(fontSize: t.fontSize(10))));
+            }).toList(),
+          ),
+        ],
+      );
+    }
+
+    // Prompt Guidance Rescale (`cfg_rescale`), 0 = off.
+    Widget? rescaleSlider;
+    if (caps.cfgRescale) {
+      rescaleSlider = _buildCompactSlider(
+        context,
+        'GUIDANCE RESCALE',
+        state.cfgRescale,
+        0.0,
+        1.0,
+        0.02,
+        (v) => notifier.updateSettings(cfgRescale: v),
+        t,
+      );
+    }
+
+    // Variety+ — a toggle, since NovelAI exposes it as one. On = the sigma
+    // floor their UI sends; off = null (key present but unset).
+    Widget? varietyToggle;
+    if (caps.varietyPlus) {
+      final on = state.varietyBoostSigma != null;
+      varietyToggle = InkWell(
+        onTap: () => notifier.updateSettings(
+          varietyBoostSigma: on ? null : _varietyDefaultSigma,
+          clearVarietyBoost: on,
+        ),
+        borderRadius: BorderRadius.circular(4),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: on ? t.accent : t.borderMedium),
+            color: on ? t.accent.withValues(alpha: 0.15) : Colors.transparent,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.auto_awesome, size: mobile ? 16 : 14, color: on ? t.accent : t.textDisabled),
+              const SizedBox(width: 8),
+              Text(
+                'VARIETY+',
+                style: TextStyle(
+                  color: on ? t.accent : t.textDisabled,
+                  fontSize: t.fontSize(mobile ? 10 : 9),
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    Widget furryToggle = InkWell(
+      onTap: () => notifier.updateSettings(furryMode: !state.furryMode),
+      borderRadius: BorderRadius.circular(4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: state.furryMode ? const Color(0xFFFF9800) : t.borderMedium,
+          ),
+          color: state.furryMode
+              ? const Color(0xFFFF9800).withValues(alpha: 0.15)
+              : Colors.transparent,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.pets,
+              size: mobile ? 16 : 14,
+              color: state.furryMode ? const Color(0xFFFF9800) : t.textDisabled,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'FURRY',
+              style: TextStyle(
+                color: state.furryMode ? const Color(0xFFFF9800) : t.textDisabled,
+                fontSize: t.fontSize(mobile ? 10 : 9),
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (mobile || compact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          samplerField,
+          if (noiseScheduleField != null) ...[
+            const SizedBox(height: 16),
+            noiseScheduleField,
+          ],
+          if (rescaleSlider != null) ...[
+            const SizedBox(height: 16),
+            rescaleSlider,
+          ],
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              if (varietyToggle != null) ...[
+                varietyToggle,
+                const SizedBox(width: 12),
+              ],
+              furryToggle,
+            ],
+          ),
+        ],
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(flex: 1, child: samplerField),
+            if (noiseScheduleField != null) ...[
+              const SizedBox(width: 24),
+              Expanded(flex: 1, child: noiseScheduleField),
+            ],
+            const SizedBox(width: 24),
+            if (varietyToggle != null) ...[
+              varietyToggle,
+              const SizedBox(width: 12),
+            ],
+            furryToggle,
+          ],
+        ),
+        if (rescaleSlider != null) ...[
+          const SizedBox(height: 16),
+          rescaleSlider,
+        ],
+      ],
+    );
+  }
+
+  /// Sigma floor NovelAI's frontend sends when Variety+ is switched on.
+  static const double _varietyDefaultSigma = 58.0;
+
+  /// Sampler list for the active model; keeps a now-unlisted sampler (e.g.
+  /// restored from an old session) visible so the dropdown never asserts.
+  List<String> _samplerItems(GenerationState state) {
+    final items = List<String>.from(state.model.samplers);
+    if (!items.contains(state.sampler)) items.add(state.sampler);
+    return items;
+  }
+
+  Widget _buildModelSection(GenerationNotifier notifier, GenerationState state, bool mobile, VisionTokens t, {bool compact = false}) {
+    final labelStyle = TextStyle(fontWeight: FontWeight.w900, fontSize: t.fontSize(mobile ? 12 : 9), letterSpacing: 2, color: t.secondaryText);
+    final model = state.model;
+    final caps = model.caps;
+    final usage = state.subscription?.usage;
+    final costKind = notifier.costKind;
+
+    // Pre-flight cost label (free / V5 allowance / costs Anlas).
+    String? costLabel;
+    Color costColor = t.textDisabled;
+    switch (costKind) {
+      case NaiCostKind.free:
+        costLabel = 'FREE ON OPUS';
+        costColor = const Color(0xFF4CAF50);
+      case NaiCostKind.allowance:
+        costLabel = usage != null
+            ? 'V5 ALLOWANCE · ${usage.remainingPercent.toStringAsFixed(0)}% (~${usage.imagesLeft} LEFT)'
+            : 'USES V5 ALLOWANCE';
+        costColor = usage != null && usage.isLow ? const Color(0xFFFF9800) : t.accent;
+      case NaiCostKind.anlas:
+        costLabel = 'COSTS ANLAS';
+        costColor = const Color(0xFFFF9800);
+      case NaiCostKind.unknown:
+        costLabel = null;
+    }
+
+    Widget modelChip(NaiModel m) {
+      final selected = m == model;
+      final color = m.isV5 ? t.accent : const Color(0xFF4CAF50);
+      return Tooltip(
+        message: '${m.capsHint}\n${context.l.modelStepsRemembered}',
+        child: InkWell(
+          onTap: () => notifier.updateSettings(model: m),
+          borderRadius: BorderRadius.circular(4),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: mobile ? 12 : 10, vertical: mobile ? 8 : 6),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: selected ? color : t.borderMedium),
+              color: selected ? color.withValues(alpha: 0.15) : Colors.transparent,
+            ),
+            child: Text(
+              m.label.toUpperCase(),
+              style: TextStyle(
+                color: selected ? color : t.textDisabled,
+                fontSize: t.fontSize(mobile ? 10 : 9),
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    Widget toggle({
+      required String label,
+      required IconData icon,
+      required bool value,
+      required Color color,
+      required VoidCallback onTap,
+      required String tooltip,
+    }) {
+      return Tooltip(
+        message: tooltip,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(4),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: value ? color : t.borderMedium),
+              color: value ? color.withValues(alpha: 0.15) : Colors.transparent,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: mobile ? 16 : 14, color: value ? color : t.textDisabled),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: value ? color : t.textDisabled,
+                    fontSize: t.fontSize(mobile ? 10 : 9),
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final defaultsTip = "Reset steps / scale / sampler to NovelAI's defaults for "
+        "${model.label} (${model.defaults.steps} steps, scale ${model.defaults.scale.toStringAsFixed(1)})";
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text('MODEL', style: labelStyle),
+            const Spacer(),
+            Tooltip(
+              message: defaultsTip,
+              child: InkWell(
+                onTap: notifier.applyModelDefaults,
+                borderRadius: BorderRadius.circular(4),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.restart_alt, size: mobile ? 14 : 12, color: t.textDisabled),
+                      const SizedBox(width: 4),
+                      Text('DEFAULTS', style: TextStyle(fontSize: t.fontSize(mobile ? 9 : 8), letterSpacing: 1.5, fontWeight: FontWeight.bold, color: t.textDisabled)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: NaiModel.values.map(modelChip).toList(),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          model.capsHint,
+          style: TextStyle(
+            fontSize: t.fontSize(mobile ? 9 : 8),
+            color: t.textMinimal,
+            letterSpacing: 0.5,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+        if (caps.transparency || costLabel != null) ...[
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              if (caps.transparency)
+                toggle(
+                  label: 'TRANSPARENT BG',
+                  icon: Icons.blur_on,
+                  value: state.transparentBackground,
+                  color: t.accent,
+                  tooltip: 'Native RGBA output: adds "transparent background" to the prompt and requests straight alpha (V5 only)',
+                  onTap: () => notifier.updateSettings(transparentBackground: !state.transparentBackground),
+                ),
+              if (costLabel != null)
+                Tooltip(
+                  message: usage != null
+                      ? 'Opus V5 allowance: ${usage.remainingPercent.toStringAsFixed(1)}% left (~${usage.imagesLeft} images), '
+                          'refills ~${usage.percentPerDay.toStringAsFixed(1)}%/day (~${usage.imagesPerDay} images). '
+                          'When empty, V5 renders cost Anlas; V4.5 stays free.'
+                      : 'Free on Opus: one image, no base image, up to 1024x1024, up to 28 steps. '
+                          'V5 draws from the Opus usage limit; V4.5 is unlimited.',
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: costColor.withValues(alpha: 0.6)),
+                      color: costColor.withValues(alpha: 0.08),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          costKind == NaiCostKind.allowance
+                              ? Icons.battery_charging_full
+                              : (costKind == NaiCostKind.anlas ? Icons.toll : Icons.check_circle_outline),
+                          size: mobile ? 14 : 12,
+                          color: costColor,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          costLabel,
+                          style: TextStyle(
+                            color: costColor,
+                            fontSize: t.fontSize(mobile ? 9 : 8),
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildStyleChip(PromptStyle style, bool isSelected, GenerationNotifier notifier, VisionTokens t) {
+    final tooltipBuffer = StringBuffer(style.name);
+    if (style.prefix.isNotEmpty) {
+      tooltipBuffer.write('\n+ ${style.prefix}');
+    }
+    if (style.suffix.isNotEmpty) {
+      tooltipBuffer.write('\n+ ${style.suffix}');
+    }
+    if (style.negativeContent.isNotEmpty) {
+      tooltipBuffer.write('\nNEG: ${style.negativeContent}');
+    }
+    return Tooltip(
+      message: tooltipBuffer.toString(),
+      waitDuration: const Duration(milliseconds: 200),
+      preferBelow: false,
+      textStyle: TextStyle(color: t.textPrimary, fontSize: t.fontSize(9)),
+      decoration: BoxDecoration(
+        color: t.surfaceHigh,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: t.borderMedium),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      child: GestureDetector(
+        onLongPress: widget.onEditStyle != null ? () => widget.onEditStyle!(style.name) : null,
+        child: FilterChip(
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 200),
+              child: Text(style.name.toUpperCase(),
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: t.fontSize(8), fontWeight: FontWeight.bold, letterSpacing: 1)),
+            ),
+            if (style.negativeContent.isNotEmpty) ...[
+              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                decoration: BoxDecoration(
+                  color: isSelected ? t.background.withValues(alpha: 0.2) : t.borderMedium,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                child: Text("NEG",
+                    style: TextStyle(
+                        fontSize: t.fontSize(6),
+                        fontWeight: FontWeight.w900,
+                        color: isSelected ? t.background : t.textTertiary)),
+              ),
+            ],
+            if (style.prefix.isNotEmpty || style.suffix.isNotEmpty) ...[
+              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                decoration: BoxDecoration(
+                  color: isSelected ? t.background.withValues(alpha: 0.2) : t.borderMedium,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                child: Text("POS",
+                    style: TextStyle(
+                        fontSize: t.fontSize(6),
+                        fontWeight: FontWeight.w900,
+                        color: isSelected ? t.background : t.textTertiary)),
+              ),
+            ],
+          ],
+        ),
+        selected: isSelected,
+        onSelected: (_) {
+          if (HardwareKeyboard.instance.isControlPressed && widget.onEditStyle != null) {
+            widget.onEditStyle!(style.name);
+          } else {
+            notifier.toggleStyle(style.name);
+          }
+        },
+        backgroundColor: t.borderSubtle,
+        selectedColor: t.accent,
+        checkmarkColor: t.background,
+        showCheckmark: false,
+        labelStyle: TextStyle(color: isSelected ? t.background : t.textTertiary),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+        side: BorderSide(color: isSelected ? t.accent : t.textMinimal, width: 0.5),
+      ),
+      ),
+    );
+  }
+
+  Widget _buildStyles(GenerationNotifier notifier, GenerationState state, VisionTokens t) {
+    final mobile = isMobile(context);
+    final labelStyle = TextStyle(fontWeight: FontWeight.w900, fontSize: t.fontSize(mobile ? 12 : 9), letterSpacing: 2, color: t.secondaryText);
+    // Only styles made for the active model's family are offered; the rest
+    // are counted in a hint so nothing looks lost on a model switch.
+    final visibleStyles = notifier.stylesForCurrentModel;
+    final hiddenCount = notifier.hiddenStyleCountForCurrentModel;
+    final otherFamily = state.model.isV5 ? NaiModelFamily.v45 : NaiModelFamily.v5;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(context.l.panelStyles.toUpperCase(), style: labelStyle),
+            Row(
+              children: [
+                if (state.styles.isNotEmpty)
+                  IconButton(
+                    icon: Icon(_stylesExpanded ? Icons.unfold_less : Icons.unfold_more, size: 14, color: t.textDisabled),
+                    tooltip: context.l.settingsStylesToggle,
+                    onPressed: () {
+                      setState(() => _stylesExpanded = !_stylesExpanded);
+                      context.read<PreferencesService>().setUiStylesExpanded(_stylesExpanded);
+                    },
+                    constraints: const BoxConstraints(),
+                    padding: const EdgeInsets.only(right: 12),
+                  ),
+                IconButton(
+                  icon: Icon(Icons.settings_outlined, size: 14, color: t.textDisabled),
+                  onPressed: widget.onManageStyles,
+                  tooltip: context.l.panelManageStyles.toUpperCase(),
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.only(right: 12),
+                ),
+                _buildChipToggle(context.l.panelEnabled.toUpperCase(), state.isStyleEnabled, (v) => notifier.updateSettings(isStyleEnabled: v), t),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (visibleStyles.isEmpty)
+          Text(context.l.panelNoStylesDefined.toUpperCase(), style: TextStyle(fontSize: t.fontSize(8), color: t.textMinimal, letterSpacing: 1))
+        else if (_stylesExpanded)
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: visibleStyles.map((style) {
+              final isSelected = state.activeStyleNames.contains(style.name);
+              return _buildStyleChip(style, isSelected, notifier, t);
+            }).toList(),
+          )
+        else
+          SizedBox(
+            height: 32,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: visibleStyles.length,
+              itemBuilder: (context, index) {
+                final style = visibleStyles[index];
+                final isSelected = state.activeStyleNames.contains(style.name);
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _buildStyleChip(style, isSelected, notifier, t),
+                );
+              },
+            ),
+          ),
+        if (hiddenCount > 0)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              context.l.panelStylesHidden(hiddenCount, otherFamily.label).toUpperCase(),
+              style: TextStyle(fontSize: t.fontSize(8), color: t.textMinimal, letterSpacing: 1),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildNegativePrompt(GenerationNotifier notifier, VisionTokens t) {
+    final mobile = isMobile(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          key: _negativePromptKey,
+          child: Text(context.l.panelNegativePrompt.toUpperCase(), style: TextStyle(fontWeight: FontWeight.w900, fontSize: t.fontSize(mobile ? 12 : 9), letterSpacing: 2, color: t.secondaryText)),
+        ),
+        const SizedBox(height: 12),
+        ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(
+            dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.stylus,
+            },
+          ),
+          child: TextField(
+            focusNode: _negativePromptFocus,
+            controller: notifier.negativePromptController,
+            maxLines: 3,
+            onTap: _scrollToNegativePrompt,
+            onChanged: (_) => _onNegativePromptChanged(),
+            style: TextStyle(fontSize: t.fontSize(11), color: t.textSecondary, height: 1.4),
+            decoration: InputDecoration(
+              fillColor: t.borderSubtle,
+              filled: true,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide.none),
+              contentPadding: const EdgeInsets.all(16),
+            ),
+          ),
+        ),
+        if (_negativeSuggestions.isNotEmpty)
+          TagSuggestionOverlay(
+            suggestions: _negativeSuggestions,
+            onTagSelected: (tag) {
+              TagSuggestionHelper.applyTag(notifier.negativePromptController, tag);
+              setState(() => _negativeSuggestions = []);
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _buildPresets(GenerationNotifier notifier, GenerationState state, VisionTokens t) {
+    final mobile = isMobile(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(context.l.panelPresets.toUpperCase(), style: TextStyle(fontWeight: FontWeight.w900, fontSize: t.fontSize(mobile ? 12 : 9), letterSpacing: 2, color: t.secondaryText)),
+            IconButton(
+              icon: Icon(Icons.add_circle_outline, size: 14, color: t.secondaryText),
+              tooltip: context.l.mainSavePreset,
+              onPressed: widget.onSavePreset,
+              constraints: const BoxConstraints(),
+              padding: EdgeInsets.zero,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (state.presets.isEmpty)
+          Text(context.l.panelNoPresetsSaved.toUpperCase(), style: TextStyle(fontSize: t.fontSize(8), color: t.textMinimal, letterSpacing: 1))
+        else
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: state.presets.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              final preset = state.presets[index];
+              return Container(
+                decoration: BoxDecoration(
+                  color: t.borderSubtle,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: ListTile(
+                  dense: true,
+                  title: Text(preset.name.toUpperCase(), style: TextStyle(fontSize: t.fontSize(10), letterSpacing: 1, color: t.textSecondary)),
+                  subtitle: Text("${preset.width.toInt()}x${preset.height.toInt()} • ${preset.sampler}", style: TextStyle(fontSize: t.fontSize(8), color: t.textDisabled)),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.download, size: 14, color: t.textTertiary),
+                        tooltip: context.l.presetLoad,
+                        onPressed: () => notifier.applyPreset(preset),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete_outline, size: 14, color: t.textMinimal),
+                        tooltip: context.l.commonDelete,
+                        onPressed: () => _confirmDeletePreset(context, notifier, index, preset.name),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _buildSaveToAlbum(BuildContext context, VisionTokens t, bool mobile) {
+    final gallery = context.watch<GalleryNotifier>();
+    final prefs = context.read<PreferencesService>();
+    final labelStyle = TextStyle(fontWeight: FontWeight.w900, fontSize: t.fontSize(mobile ? 12 : 9), letterSpacing: 2, color: t.secondaryText);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(context.l.panelSaveToAlbum.toUpperCase(), style: labelStyle),
+        const SizedBox(height: 12),
+        StatefulBuilder(
+          builder: (context, setChipState) {
+            final currentId = prefs.defaultSaveAlbumId;
+            return SizedBox(
+              height: mobile ? 42 : 34,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: gallery.albums.length + 1,
+                itemBuilder: (context, index) {
+                  // Last item is the "+" create-album chip
+                  if (index == gallery.albums.length) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ActionChip(
+                        avatar: Icon(Icons.add, size: mobile ? 14 : 12, color: t.textTertiary),
+                        label: Text(
+                          context.l.panelNew.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: t.fontSize(mobile ? 9 : 8),
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
+                            color: t.textTertiary,
+                          ),
+                        ),
+                        backgroundColor: t.borderSubtle,
+                        padding: EdgeInsets.symmetric(horizontal: mobile ? 8 : 6, vertical: 0),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+                        side: BorderSide(color: t.textMinimal, width: 0.5),
+                        onPressed: () => _showCreateAlbumDialog(context, gallery, prefs),
+                      ),
+                    );
+                  }
+                  final album = gallery.albums[index];
+                  final isActive = album.id == currentId;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Text(
+                        album.name.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: t.fontSize(mobile ? 9 : 8),
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      selected: isActive,
+                      onSelected: (_) {
+                        prefs.setDefaultSaveAlbumId(isActive ? null : album.id);
+                        setChipState(() {});
+                      },
+                      backgroundColor: t.borderSubtle,
+                      selectedColor: t.accentSuccess,
+                      checkmarkColor: t.background,
+                      showCheckmark: false,
+                      labelStyle: TextStyle(color: isActive ? t.background : t.textTertiary),
+                      padding: EdgeInsets.symmetric(horizontal: mobile ? 8 : 6, vertical: 0),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+                      side: BorderSide(color: isActive ? t.accentSuccess : t.textMinimal, width: 0.5),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  void _showCreateAlbumDialog(BuildContext context, GalleryNotifier gallery, PreferencesService prefs) {
+    final controller = TextEditingController();
+    final t = context.read<ThemeNotifier>().tokens;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: t.surfaceHigh,
+        title: Text(ctx.l.panelNewAlbum.toUpperCase(), style: TextStyle(fontSize: t.fontSize(10), letterSpacing: 2, color: t.textSecondary)),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          style: TextStyle(color: t.textPrimary, fontSize: t.fontSize(13)),
+          decoration: InputDecoration(
+            hintText: ctx.l.panelAlbumName.toUpperCase(),
+            hintStyle: TextStyle(color: t.textMinimal, fontSize: t.fontSize(9)),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: t.borderMedium)),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(ctx.l.commonCancel.toUpperCase(), style: TextStyle(color: t.textDisabled, fontSize: t.fontSize(9))),
+          ),
+          TextButton(
+            onPressed: () {
+              if (controller.text.isNotEmpty) {
+                gallery.createAlbum(controller.text.trim());
+                final newAlbum = gallery.albums.last;
+                prefs.setDefaultSaveAlbumId(newAlbum.id);
+                Navigator.pop(ctx);
+              }
+            },
+            child: Text(ctx.l.commonCreate.toUpperCase(), style: TextStyle(color: t.accent, fontSize: t.fontSize(9))),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmDeletePreset(BuildContext context, GenerationNotifier notifier, int index, String name) async {
+    final t = context.t;
+    final confirm = await showConfirmDialog(
+      context,
+      title: context.l.panelDeletePreset,
+      message: context.l.panelDeletePresetConfirm(name),
+      confirmLabel: context.l.commonDelete,
+      confirmColor: t.accentDanger,
+    );
+    if (confirm == true) {
+      notifier.deletePreset(index);
+    }
+  }
+
+  Widget _buildCompactSlider(BuildContext context, String label, double value, double min, double max, double step, Function(double) onChanged, VisionTokens t, {double? warnAbove, double? hardMin, double? hardMax}) {
+    final mobile = isMobile(context);
+    final isWarning = warnAbove != null && value > warnAbove;
+    final isInteger = step >= 1;
+    // The slider itself stays on [min, max]; if the typed value exceeds the
+    // soft max, pin the thumb to the end so the track stays valid.
+    final sliderValue = value.clamp(min, max).toDouble();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: TextStyle(fontSize: t.fontSize(mobile ? 12 : 9), fontWeight: FontWeight.bold, letterSpacing: 1, color: t.secondaryText)),
+            EditableSliderValue(
+              value: value,
+              softMin: min,
+              softMax: max,
+              hardMin: hardMin,
+              hardMax: hardMax,
+              isInteger: isInteger,
+              decimals: 1,
+              onChanged: onChanged,
+              style: TextStyle(fontSize: t.fontSize(mobile ? 13 : 10), fontWeight: FontWeight.bold, color: isWarning ? t.accentDanger : t.textSecondary),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        VisionSlider(
+          value: sliderValue,
+          min: min,
+          max: max,
+          divisions: ((max - min) / step).toInt(),
+          activeColor: isWarning ? t.accentDanger : t.accent,
+          inactiveColor: t.textMinimal,
+          thumbColor: isWarning ? t.accentDanger : t.accent,
+          thumbRadius: mobile ? 8 : 4,
+          overlayRadius: mobile ? 16 : 0,
+          trackHeight: 1,
+          onChanged: (v) => onChanged(isInteger ? v.roundToDouble() : double.parse(v.toStringAsFixed(1))),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChipToggle(String label, bool value, Function(bool) onChanged, VisionTokens t) {
+    return FilterChip(
+      label: Text(label, style: TextStyle(fontSize: t.fontSize(9), fontWeight: FontWeight.bold, letterSpacing: 1)),
+      selected: value,
+      onSelected: onChanged,
+      backgroundColor: t.borderSubtle,
+      selectedColor: t.accent,
+      checkmarkColor: t.background,
+      labelStyle: TextStyle(color: value ? t.background : t.textTertiary),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+      side: BorderSide(color: value ? t.accent : t.textMinimal, width: 0.5),
+    );
+  }
+}
+
+), '')
+          : relative.split('/').last.replaceFirst(RegExp(r'\\.txt
+    return ExpansionTile(
+      title: const Text('NAIA 조건부 프롬프트'),
+      subtitle: const Text('규칙은 기기에 자동 저장됩니다'),
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: _showNaiaRuleHelp,
+              icon: const Icon(Icons.help_outline),
+              label: const Text('규칙 작성법 · 예시 보기'),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.preview_outlined),
+              label: const Text('최종 프롬프트 미리보기'),
+              onPressed: () async {
+                try {
+                  final signature = notifier.naiaPreviewSignature;
+                  final previews = <String>[];
+                  for (var i = 0; i < 3; i++) {
+                    previews.add(await notifier.previewNaiaPrompt());
+                  }
+                  if (!mounted) return;
+                  var selected = 2;
+                  await showDialog<void>(
+                    context: context,
+                    builder: (dialogContext) => StatefulBuilder(
+                      builder: (dialogContext, updateDialog) => AlertDialog(
+                        title: const Text('프롬프트 미리보기 · 3회 추첨'),
+                        content: SizedBox(
+                          width: 500,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              DropdownButton<int>(
+                                value: selected,
+                                isExpanded: true,
+                                items: [
+                                  for (var i = 0; i < previews.length; i++)
+                                    DropdownMenuItem(
+                                      value: i,
+                                      child: Text('추첨 결과 ${i + 1}'),
+                                    ),
+                                ],
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    updateDialog(() => selected = value);
+                                  }
+                                },
+                              ),
+                              Flexible(
+                                child: SingleChildScrollView(
+                                  child: SelectableText(previews[selected]),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              notifier.clearLockedNaiaPreview();
+                              Navigator.pop(dialogContext);
+                            },
+                            child: const Text('고정 해제'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(dialogContext),
+                            child: const Text('닫기'),
+                          ),
+                          FilledButton(
+                            onPressed: () async {
+                              final locked = notifier.selectNaiaPreviewSample(selected, signature);
+                              if (!dialogContext.mounted) return;
+                              Navigator.pop(dialogContext);
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(locked
+                                    ? '선택한 추첨 결과가 생성 1회에 고정되었습니다.'
+                                    : '설정이 변경되어 고정할 수 없습니다. 다시 미리보기 해주세요.')),
+                              );
+                            },
+                            child: const Text('생성용으로 고정'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                } catch (error) {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('미리보기 실패: $error')),
+                  );
+                }
+              },
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Builder(builder: (context) {
+            final diagnostics = const NaiaRuleValidator()
+                .validate(notifier.naiaConditionalRules);
+            final errors = diagnostics.where((d) => !d.warning).length;
+            final warnings = diagnostics.length - errors;
+            if (diagnostics.isEmpty) {
+              return const Row(
+                children: [
+                  Icon(Icons.check_circle_outline, color: Colors.green, size: 18),
+                  SizedBox(width: 8),
+                  Expanded(child: Text('정적 규칙 검사 통과 · 실제 실행 결과는 미리보기로 확인하세요.')),
+                ],
+              );
+            }
+            final statusColor = errors > 0 ? Colors.red : Colors.orange;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(errors > 0 ? Icons.error_outline : Icons.warning_amber_outlined,
+                        color: statusColor, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text('규칙 검사: 오류 $errors개 · 경고 $warnings개',
+                          style: TextStyle(color: statusColor,
+                              fontWeight: FontWeight.w600)),
+                    ),
+                    TextButton.icon(
+                      icon: const Icon(Icons.list_alt, size: 18),
+                      label: const Text('전체 보기'),
+                      onPressed: () => showDialog<void>(
+                        context: context,
+                        builder: (dialogContext) => AlertDialog(
+                          title: Text('규칙 진단 · ${diagnostics.length}건'),
+                          content: SizedBox(
+                            width: 520,
+                            child: ListView.separated(
+                              shrinkWrap: true,
+                              itemCount: diagnostics.length,
+                              separatorBuilder: (context, index) => const Divider(height: 12),
+                              itemBuilder: (context, index) {
+                                final d = diagnostics[index];
+                                return ListTile(
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  leading: Icon(
+                                    d.warning ? Icons.warning_amber_outlined
+                                        : Icons.error_outline,
+                                    color: d.warning ? Colors.orange : Colors.red,
+                                  ),
+                                  title: Text('${d.line}행 · ${d.warning ? "경고" : "오류"}'),
+                                  subtitle: SelectableText(d.message),
+                                );
+                              },
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(dialogContext),
+                              child: const Text('닫기'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                for (final diagnostic in diagnostics.take(3))
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      '${diagnostic.line}행 [${diagnostic.warning ? "경고" : "오류"}] ${diagnostic.message}',
+                      style: TextStyle(
+                        color: diagnostic.warning ? Colors.orange : Colors.red,
+                      ),
+                    ),
+                  ),
+                if (diagnostics.length > 3)
+                  Text('외 ${diagnostics.length - 3}건 · 전체 보기에서 확인하세요.'),
+              ],
+            );
+          }),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: TextFormField(
+            key: const ValueKey('naia_conditional_rules_editor'),
+            initialValue: notifier.naiaConditionalRules,
+            minLines: 3,
+            maxLines: 12,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: '(solo):main+=smile',
+              helperText: 'Main·캐릭터·UC 규칙을 입력할 수 있습니다.',
+            ),
+            onChanged: notifier.setNaiaConditionalRules,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDimensionsSeed(GenerationNotifier notifier, GenerationState state, bool mobile, VisionTokens t, {bool compact = false}) {
+    final labelStyle = TextStyle(fontWeight: FontWeight.w900, fontSize: t.fontSize(mobile ? 12 : 9), letterSpacing: 2, color: t.secondaryText);
+
+    Widget dimensionsField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(context.l.panelDimensions.toUpperCase(), style: labelStyle),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String>(
+          // ignore: deprecated_member_use
+          value: AdvancedSettingsPanel.resolutionOptions(context).any((opt) => opt.width == state.width.toInt() && opt.height == state.height.toInt())
+              ? "${state.width.toInt()}x${state.height.toInt()}"
+              : null,
+          dropdownColor: t.surfaceHigh,
+          hint: Text(
+            "${state.width.toInt()}x${state.height.toInt()}${!AdvancedSettingsPanel.resolutionOptions(context).any((opt) => opt.width == state.width.toInt() && opt.height == state.height.toInt()) ? ' (${context.l.panelCustom.toUpperCase()})' : ''}",
+            style: TextStyle(color: t.textPrimary, fontSize: t.fontSize(11)),
+          ),
+          style: TextStyle(color: t.textPrimary, fontSize: t.fontSize(11), letterSpacing: 1),
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            fillColor: t.borderSubtle,
+            filled: true,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide.none),
+          ),
+          onChanged: (String? newValue) async {
+            if (newValue == '__custom__') {
+              final result = await showCustomResolutionDialog(context);
+              if (result != null) {
+                notifier.updateSettings(
+                  width: result.width.toDouble(),
+                  height: result.height.toDouble(),
+                );
+                if (mounted) setState(() {});
+              }
+              return;
+            }
+            if (newValue != null) {
+              final parts = newValue.split('x');
+              notifier.updateSettings(
+                width: double.parse(parts[0]),
+                height: double.parse(parts[1]),
+              );
+            }
+          },
+          items: [
+            ...AdvancedSettingsPanel.resolutionOptions(context).asMap().entries.map<DropdownMenuItem<String>>((entry) {
+              final opt = entry.value;
+              final builtInCount = 8;
+              return DropdownMenuItem<String>(
+                value: opt.value,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(child: Text(opt.displayLabel, style: TextStyle(fontSize: t.fontSize(10)), overflow: TextOverflow.ellipsis)),
+                    if (opt.isCustom)
+                      GestureDetector(
+                        onTap: () {
+                          final prefs = context.read<PreferencesService>();
+                          AdvancedSettingsPanel.deleteCustomResolution(prefs, entry.key - builtInCount);
+                          setState(() {});
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Icon(Icons.close, size: 14, color: t.textMinimal),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }),
+            DropdownMenuItem<String>(
+              value: '__custom__',
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add, size: 14, color: t.accent),
+                  const SizedBox(width: 8),
+                  Text(context.l.resCustomEntry.toUpperCase(), style: TextStyle(fontSize: t.fontSize(10), color: t.accent)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+
+    Widget seedField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(context.l.panelSeed.toUpperCase(), style: labelStyle),
+        const SizedBox(height: 12),
+        TextField(
+          controller: notifier.seedController,
+          readOnly: state.randomizeSeed,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          style: TextStyle(fontSize: t.fontSize(11), color: state.randomizeSeed ? t.textDisabled : t.textPrimary),
+          decoration: InputDecoration(
+            hintText: context.l.panelSeed.toUpperCase(),
+            hintStyle: TextStyle(fontSize: t.fontSize(9), color: t.textMinimal),
+            fillColor: t.borderSubtle,
+            filled: true,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide.none),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            suffixIcon: IconButton(
+              onPressed: () => notifier.updateSettings(randomizeSeed: !state.randomizeSeed),
+              icon: Icon(
+                state.randomizeSeed ? Icons.shuffle : Icons.tag,
+                size: 14,
+                color: state.randomizeSeed ? t.textSecondary : t.textDisabled,
+              ),
+              constraints: const BoxConstraints(),
+              padding: EdgeInsets.zero,
+            ),
+          ),
+        ),
+      ],
+    );
+
+    if (mobile || compact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          dimensionsField,
+          const SizedBox(height: 16),
+          seedField,
+        ],
+      );
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(flex: 2, child: dimensionsField),
+        const SizedBox(width: 24),
+        Expanded(flex: 1, child: seedField),
+      ],
+    );
+  }
+
+  Widget _buildStepsScale(GenerationNotifier notifier, GenerationState state, bool mobile, VisionTokens t, {bool compact = false}) {
+    Widget stepsSlider = _buildCompactSlider(context, context.l.panelSteps.toUpperCase(), state.steps, 1, 50, 1, (v) => notifier.updateSettings(steps: v), t, warnAbove: 28);
+    Widget scaleSlider = _buildCompactSlider(context, context.l.panelScale.toUpperCase(), state.scale, 1.0, 30.0, 0.5, (v) => notifier.updateSettings(scale: v), t, hardMax: 100.0, warnAbove: 30);
+
+    if (mobile || compact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          stepsSlider,
+          const SizedBox(height: 16),
+          scaleSlider,
+        ],
+      );
+    }
+    return Row(
+      children: [
+        Expanded(child: stepsSlider),
+        const SizedBox(width: 32),
+        Expanded(child: scaleSlider),
+      ],
+    );
+  }
+
+  Widget _buildSamplerPost(GenerationNotifier notifier, GenerationState state, bool mobile, VisionTokens t, {bool compact = false}) {
+    final labelStyle = TextStyle(fontWeight: FontWeight.w900, fontSize: t.fontSize(mobile ? 12 : 9), letterSpacing: 2, color: t.secondaryText);
+
+    Widget samplerField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(context.l.panelSampler.toUpperCase(), style: labelStyle),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String>(
+          // ignore: deprecated_member_use
+          value: state.sampler,
+          dropdownColor: t.surfaceHigh,
+          style: TextStyle(color: t.textPrimary, fontSize: t.fontSize(11), letterSpacing: 1),
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            fillColor: t.borderSubtle,
+            filled: true,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide.none),
+          ),
+          onChanged: (String? newValue) {
+            if (newValue != null) notifier.updateSettings(sampler: newValue);
+          },
+          items: _samplerItems(state).map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(value: value, child: Text(value.toUpperCase(), style: TextStyle(fontSize: t.fontSize(10))));
+          }).toList(),
+        ),
+      ],
+    );
+
+    final caps = state.model.caps;
+
+    // Noise schedule — only models that expose a picker (V4.5); V5 forces
+    // karras, so the control is hidden rather than shown as a no-op (#35).
+    Widget? noiseScheduleField;
+    if (caps.noiseSchedule) {
+      final schedules = state.model.noiseSchedules;
+      final value = schedules.contains(state.noiseSchedule)
+          ? state.noiseSchedule
+          : state.model.defaults.noiseSchedule;
+      noiseScheduleField = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('NOISE SCHEDULE', style: labelStyle),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            // ignore: deprecated_member_use
+            value: value,
+            dropdownColor: t.surfaceHigh,
+            style: TextStyle(color: t.textPrimary, fontSize: t.fontSize(11), letterSpacing: 1),
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              fillColor: t.borderSubtle,
+              filled: true,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide.none),
+            ),
+            onChanged: (String? newValue) {
+              if (newValue != null) notifier.updateSettings(noiseSchedule: newValue);
+            },
+            items: schedules.map<DropdownMenuItem<String>>((String v) {
+              return DropdownMenuItem<String>(value: v, child: Text(v.toUpperCase(), style: TextStyle(fontSize: t.fontSize(10))));
+            }).toList(),
+          ),
+        ],
+      );
+    }
+
+    // Prompt Guidance Rescale (`cfg_rescale`), 0 = off.
+    Widget? rescaleSlider;
+    if (caps.cfgRescale) {
+      rescaleSlider = _buildCompactSlider(
+        context,
+        'GUIDANCE RESCALE',
+        state.cfgRescale,
+        0.0,
+        1.0,
+        0.02,
+        (v) => notifier.updateSettings(cfgRescale: v),
+        t,
+      );
+    }
+
+    // Variety+ — a toggle, since NovelAI exposes it as one. On = the sigma
+    // floor their UI sends; off = null (key present but unset).
+    Widget? varietyToggle;
+    if (caps.varietyPlus) {
+      final on = state.varietyBoostSigma != null;
+      varietyToggle = InkWell(
+        onTap: () => notifier.updateSettings(
+          varietyBoostSigma: on ? null : _varietyDefaultSigma,
+          clearVarietyBoost: on,
+        ),
+        borderRadius: BorderRadius.circular(4),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: on ? t.accent : t.borderMedium),
+            color: on ? t.accent.withValues(alpha: 0.15) : Colors.transparent,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.auto_awesome, size: mobile ? 16 : 14, color: on ? t.accent : t.textDisabled),
+              const SizedBox(width: 8),
+              Text(
+                'VARIETY+',
+                style: TextStyle(
+                  color: on ? t.accent : t.textDisabled,
+                  fontSize: t.fontSize(mobile ? 10 : 9),
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    Widget furryToggle = InkWell(
+      onTap: () => notifier.updateSettings(furryMode: !state.furryMode),
+      borderRadius: BorderRadius.circular(4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: state.furryMode ? const Color(0xFFFF9800) : t.borderMedium,
+          ),
+          color: state.furryMode
+              ? const Color(0xFFFF9800).withValues(alpha: 0.15)
+              : Colors.transparent,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.pets,
+              size: mobile ? 16 : 14,
+              color: state.furryMode ? const Color(0xFFFF9800) : t.textDisabled,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'FURRY',
+              style: TextStyle(
+                color: state.furryMode ? const Color(0xFFFF9800) : t.textDisabled,
+                fontSize: t.fontSize(mobile ? 10 : 9),
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (mobile || compact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          samplerField,
+          if (noiseScheduleField != null) ...[
+            const SizedBox(height: 16),
+            noiseScheduleField,
+          ],
+          if (rescaleSlider != null) ...[
+            const SizedBox(height: 16),
+            rescaleSlider,
+          ],
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              if (varietyToggle != null) ...[
+                varietyToggle,
+                const SizedBox(width: 12),
+              ],
+              furryToggle,
+            ],
+          ),
+        ],
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(flex: 1, child: samplerField),
+            if (noiseScheduleField != null) ...[
+              const SizedBox(width: 24),
+              Expanded(flex: 1, child: noiseScheduleField),
+            ],
+            const SizedBox(width: 24),
+            if (varietyToggle != null) ...[
+              varietyToggle,
+              const SizedBox(width: 12),
+            ],
+            furryToggle,
+          ],
+        ),
+        if (rescaleSlider != null) ...[
+          const SizedBox(height: 16),
+          rescaleSlider,
+        ],
+      ],
+    );
+  }
+
+  /// Sigma floor NovelAI's frontend sends when Variety+ is switched on.
+  static const double _varietyDefaultSigma = 58.0;
+
+  /// Sampler list for the active model; keeps a now-unlisted sampler (e.g.
+  /// restored from an old session) visible so the dropdown never asserts.
+  List<String> _samplerItems(GenerationState state) {
+    final items = List<String>.from(state.model.samplers);
+    if (!items.contains(state.sampler)) items.add(state.sampler);
+    return items;
+  }
+
+  Widget _buildModelSection(GenerationNotifier notifier, GenerationState state, bool mobile, VisionTokens t, {bool compact = false}) {
+    final labelStyle = TextStyle(fontWeight: FontWeight.w900, fontSize: t.fontSize(mobile ? 12 : 9), letterSpacing: 2, color: t.secondaryText);
+    final model = state.model;
+    final caps = model.caps;
+    final usage = state.subscription?.usage;
+    final costKind = notifier.costKind;
+
+    // Pre-flight cost label (free / V5 allowance / costs Anlas).
+    String? costLabel;
+    Color costColor = t.textDisabled;
+    switch (costKind) {
+      case NaiCostKind.free:
+        costLabel = 'FREE ON OPUS';
+        costColor = const Color(0xFF4CAF50);
+      case NaiCostKind.allowance:
+        costLabel = usage != null
+            ? 'V5 ALLOWANCE · ${usage.remainingPercent.toStringAsFixed(0)}% (~${usage.imagesLeft} LEFT)'
+            : 'USES V5 ALLOWANCE';
+        costColor = usage != null && usage.isLow ? const Color(0xFFFF9800) : t.accent;
+      case NaiCostKind.anlas:
+        costLabel = 'COSTS ANLAS';
+        costColor = const Color(0xFFFF9800);
+      case NaiCostKind.unknown:
+        costLabel = null;
+    }
+
+    Widget modelChip(NaiModel m) {
+      final selected = m == model;
+      final color = m.isV5 ? t.accent : const Color(0xFF4CAF50);
+      return Tooltip(
+        message: '${m.capsHint}\n${context.l.modelStepsRemembered}',
+        child: InkWell(
+          onTap: () => notifier.updateSettings(model: m),
+          borderRadius: BorderRadius.circular(4),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: mobile ? 12 : 10, vertical: mobile ? 8 : 6),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: selected ? color : t.borderMedium),
+              color: selected ? color.withValues(alpha: 0.15) : Colors.transparent,
+            ),
+            child: Text(
+              m.label.toUpperCase(),
+              style: TextStyle(
+                color: selected ? color : t.textDisabled,
+                fontSize: t.fontSize(mobile ? 10 : 9),
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    Widget toggle({
+      required String label,
+      required IconData icon,
+      required bool value,
+      required Color color,
+      required VoidCallback onTap,
+      required String tooltip,
+    }) {
+      return Tooltip(
+        message: tooltip,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(4),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: value ? color : t.borderMedium),
+              color: value ? color.withValues(alpha: 0.15) : Colors.transparent,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: mobile ? 16 : 14, color: value ? color : t.textDisabled),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: value ? color : t.textDisabled,
+                    fontSize: t.fontSize(mobile ? 10 : 9),
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final defaultsTip = "Reset steps / scale / sampler to NovelAI's defaults for "
+        "${model.label} (${model.defaults.steps} steps, scale ${model.defaults.scale.toStringAsFixed(1)})";
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text('MODEL', style: labelStyle),
+            const Spacer(),
+            Tooltip(
+              message: defaultsTip,
+              child: InkWell(
+                onTap: notifier.applyModelDefaults,
+                borderRadius: BorderRadius.circular(4),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.restart_alt, size: mobile ? 14 : 12, color: t.textDisabled),
+                      const SizedBox(width: 4),
+                      Text('DEFAULTS', style: TextStyle(fontSize: t.fontSize(mobile ? 9 : 8), letterSpacing: 1.5, fontWeight: FontWeight.bold, color: t.textDisabled)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: NaiModel.values.map(modelChip).toList(),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          model.capsHint,
+          style: TextStyle(
+            fontSize: t.fontSize(mobile ? 9 : 8),
+            color: t.textMinimal,
+            letterSpacing: 0.5,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+        if (caps.transparency || costLabel != null) ...[
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              if (caps.transparency)
+                toggle(
+                  label: 'TRANSPARENT BG',
+                  icon: Icons.blur_on,
+                  value: state.transparentBackground,
+                  color: t.accent,
+                  tooltip: 'Native RGBA output: adds "transparent background" to the prompt and requests straight alpha (V5 only)',
+                  onTap: () => notifier.updateSettings(transparentBackground: !state.transparentBackground),
+                ),
+              if (costLabel != null)
+                Tooltip(
+                  message: usage != null
+                      ? 'Opus V5 allowance: ${usage.remainingPercent.toStringAsFixed(1)}% left (~${usage.imagesLeft} images), '
+                          'refills ~${usage.percentPerDay.toStringAsFixed(1)}%/day (~${usage.imagesPerDay} images). '
+                          'When empty, V5 renders cost Anlas; V4.5 stays free.'
+                      : 'Free on Opus: one image, no base image, up to 1024x1024, up to 28 steps. '
+                          'V5 draws from the Opus usage limit; V4.5 is unlimited.',
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: costColor.withValues(alpha: 0.6)),
+                      color: costColor.withValues(alpha: 0.08),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          costKind == NaiCostKind.allowance
+                              ? Icons.battery_charging_full
+                              : (costKind == NaiCostKind.anlas ? Icons.toll : Icons.check_circle_outline),
+                          size: mobile ? 14 : 12,
+                          color: costColor,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          costLabel,
+                          style: TextStyle(
+                            color: costColor,
+                            fontSize: t.fontSize(mobile ? 9 : 8),
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildStyleChip(PromptStyle style, bool isSelected, GenerationNotifier notifier, VisionTokens t) {
+    final tooltipBuffer = StringBuffer(style.name);
+    if (style.prefix.isNotEmpty) {
+      tooltipBuffer.write('\n+ ${style.prefix}');
+    }
+    if (style.suffix.isNotEmpty) {
+      tooltipBuffer.write('\n+ ${style.suffix}');
+    }
+    if (style.negativeContent.isNotEmpty) {
+      tooltipBuffer.write('\nNEG: ${style.negativeContent}');
+    }
+    return Tooltip(
+      message: tooltipBuffer.toString(),
+      waitDuration: const Duration(milliseconds: 200),
+      preferBelow: false,
+      textStyle: TextStyle(color: t.textPrimary, fontSize: t.fontSize(9)),
+      decoration: BoxDecoration(
+        color: t.surfaceHigh,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: t.borderMedium),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      child: GestureDetector(
+        onLongPress: widget.onEditStyle != null ? () => widget.onEditStyle!(style.name) : null,
+        child: FilterChip(
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 200),
+              child: Text(style.name.toUpperCase(),
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: t.fontSize(8), fontWeight: FontWeight.bold, letterSpacing: 1)),
+            ),
+            if (style.negativeContent.isNotEmpty) ...[
+              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                decoration: BoxDecoration(
+                  color: isSelected ? t.background.withValues(alpha: 0.2) : t.borderMedium,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                child: Text("NEG",
+                    style: TextStyle(
+                        fontSize: t.fontSize(6),
+                        fontWeight: FontWeight.w900,
+                        color: isSelected ? t.background : t.textTertiary)),
+              ),
+            ],
+            if (style.prefix.isNotEmpty || style.suffix.isNotEmpty) ...[
+              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                decoration: BoxDecoration(
+                  color: isSelected ? t.background.withValues(alpha: 0.2) : t.borderMedium,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                child: Text("POS",
+                    style: TextStyle(
+                        fontSize: t.fontSize(6),
+                        fontWeight: FontWeight.w900,
+                        color: isSelected ? t.background : t.textTertiary)),
+              ),
+            ],
+          ],
+        ),
+        selected: isSelected,
+        onSelected: (_) {
+          if (HardwareKeyboard.instance.isControlPressed && widget.onEditStyle != null) {
+            widget.onEditStyle!(style.name);
+          } else {
+            notifier.toggleStyle(style.name);
+          }
+        },
+        backgroundColor: t.borderSubtle,
+        selectedColor: t.accent,
+        checkmarkColor: t.background,
+        showCheckmark: false,
+        labelStyle: TextStyle(color: isSelected ? t.background : t.textTertiary),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+        side: BorderSide(color: isSelected ? t.accent : t.textMinimal, width: 0.5),
+      ),
+      ),
+    );
+  }
+
+  Widget _buildStyles(GenerationNotifier notifier, GenerationState state, VisionTokens t) {
+    final mobile = isMobile(context);
+    final labelStyle = TextStyle(fontWeight: FontWeight.w900, fontSize: t.fontSize(mobile ? 12 : 9), letterSpacing: 2, color: t.secondaryText);
+    // Only styles made for the active model's family are offered; the rest
+    // are counted in a hint so nothing looks lost on a model switch.
+    final visibleStyles = notifier.stylesForCurrentModel;
+    final hiddenCount = notifier.hiddenStyleCountForCurrentModel;
+    final otherFamily = state.model.isV5 ? NaiModelFamily.v45 : NaiModelFamily.v5;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(context.l.panelStyles.toUpperCase(), style: labelStyle),
+            Row(
+              children: [
+                if (state.styles.isNotEmpty)
+                  IconButton(
+                    icon: Icon(_stylesExpanded ? Icons.unfold_less : Icons.unfold_more, size: 14, color: t.textDisabled),
+                    tooltip: context.l.settingsStylesToggle,
+                    onPressed: () {
+                      setState(() => _stylesExpanded = !_stylesExpanded);
+                      context.read<PreferencesService>().setUiStylesExpanded(_stylesExpanded);
+                    },
+                    constraints: const BoxConstraints(),
+                    padding: const EdgeInsets.only(right: 12),
+                  ),
+                IconButton(
+                  icon: Icon(Icons.settings_outlined, size: 14, color: t.textDisabled),
+                  onPressed: widget.onManageStyles,
+                  tooltip: context.l.panelManageStyles.toUpperCase(),
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.only(right: 12),
+                ),
+                _buildChipToggle(context.l.panelEnabled.toUpperCase(), state.isStyleEnabled, (v) => notifier.updateSettings(isStyleEnabled: v), t),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (visibleStyles.isEmpty)
+          Text(context.l.panelNoStylesDefined.toUpperCase(), style: TextStyle(fontSize: t.fontSize(8), color: t.textMinimal, letterSpacing: 1))
+        else if (_stylesExpanded)
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: visibleStyles.map((style) {
+              final isSelected = state.activeStyleNames.contains(style.name);
+              return _buildStyleChip(style, isSelected, notifier, t);
+            }).toList(),
+          )
+        else
+          SizedBox(
+            height: 32,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: visibleStyles.length,
+              itemBuilder: (context, index) {
+                final style = visibleStyles[index];
+                final isSelected = state.activeStyleNames.contains(style.name);
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _buildStyleChip(style, isSelected, notifier, t),
+                );
+              },
+            ),
+          ),
+        if (hiddenCount > 0)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              context.l.panelStylesHidden(hiddenCount, otherFamily.label).toUpperCase(),
+              style: TextStyle(fontSize: t.fontSize(8), color: t.textMinimal, letterSpacing: 1),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildNegativePrompt(GenerationNotifier notifier, VisionTokens t) {
+    final mobile = isMobile(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          key: _negativePromptKey,
+          child: Text(context.l.panelNegativePrompt.toUpperCase(), style: TextStyle(fontWeight: FontWeight.w900, fontSize: t.fontSize(mobile ? 12 : 9), letterSpacing: 2, color: t.secondaryText)),
+        ),
+        const SizedBox(height: 12),
+        ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(
+            dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.stylus,
+            },
+          ),
+          child: TextField(
+            focusNode: _negativePromptFocus,
+            controller: notifier.negativePromptController,
+            maxLines: 3,
+            onTap: _scrollToNegativePrompt,
+            onChanged: (_) => _onNegativePromptChanged(),
+            style: TextStyle(fontSize: t.fontSize(11), color: t.textSecondary, height: 1.4),
+            decoration: InputDecoration(
+              fillColor: t.borderSubtle,
+              filled: true,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide.none),
+              contentPadding: const EdgeInsets.all(16),
+            ),
+          ),
+        ),
+        if (_negativeSuggestions.isNotEmpty)
+          TagSuggestionOverlay(
+            suggestions: _negativeSuggestions,
+            onTagSelected: (tag) {
+              TagSuggestionHelper.applyTag(notifier.negativePromptController, tag);
+              setState(() => _negativeSuggestions = []);
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _buildPresets(GenerationNotifier notifier, GenerationState state, VisionTokens t) {
+    final mobile = isMobile(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(context.l.panelPresets.toUpperCase(), style: TextStyle(fontWeight: FontWeight.w900, fontSize: t.fontSize(mobile ? 12 : 9), letterSpacing: 2, color: t.secondaryText)),
+            IconButton(
+              icon: Icon(Icons.add_circle_outline, size: 14, color: t.secondaryText),
+              tooltip: context.l.mainSavePreset,
+              onPressed: widget.onSavePreset,
+              constraints: const BoxConstraints(),
+              padding: EdgeInsets.zero,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (state.presets.isEmpty)
+          Text(context.l.panelNoPresetsSaved.toUpperCase(), style: TextStyle(fontSize: t.fontSize(8), color: t.textMinimal, letterSpacing: 1))
+        else
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: state.presets.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              final preset = state.presets[index];
+              return Container(
+                decoration: BoxDecoration(
+                  color: t.borderSubtle,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: ListTile(
+                  dense: true,
+                  title: Text(preset.name.toUpperCase(), style: TextStyle(fontSize: t.fontSize(10), letterSpacing: 1, color: t.textSecondary)),
+                  subtitle: Text("${preset.width.toInt()}x${preset.height.toInt()} • ${preset.sampler}", style: TextStyle(fontSize: t.fontSize(8), color: t.textDisabled)),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.download, size: 14, color: t.textTertiary),
+                        tooltip: context.l.presetLoad,
+                        onPressed: () => notifier.applyPreset(preset),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete_outline, size: 14, color: t.textMinimal),
+                        tooltip: context.l.commonDelete,
+                        onPressed: () => _confirmDeletePreset(context, notifier, index, preset.name),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _buildSaveToAlbum(BuildContext context, VisionTokens t, bool mobile) {
+    final gallery = context.watch<GalleryNotifier>();
+    final prefs = context.read<PreferencesService>();
+    final labelStyle = TextStyle(fontWeight: FontWeight.w900, fontSize: t.fontSize(mobile ? 12 : 9), letterSpacing: 2, color: t.secondaryText);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(context.l.panelSaveToAlbum.toUpperCase(), style: labelStyle),
+        const SizedBox(height: 12),
+        StatefulBuilder(
+          builder: (context, setChipState) {
+            final currentId = prefs.defaultSaveAlbumId;
+            return SizedBox(
+              height: mobile ? 42 : 34,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: gallery.albums.length + 1,
+                itemBuilder: (context, index) {
+                  // Last item is the "+" create-album chip
+                  if (index == gallery.albums.length) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ActionChip(
+                        avatar: Icon(Icons.add, size: mobile ? 14 : 12, color: t.textTertiary),
+                        label: Text(
+                          context.l.panelNew.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: t.fontSize(mobile ? 9 : 8),
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
+                            color: t.textTertiary,
+                          ),
+                        ),
+                        backgroundColor: t.borderSubtle,
+                        padding: EdgeInsets.symmetric(horizontal: mobile ? 8 : 6, vertical: 0),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+                        side: BorderSide(color: t.textMinimal, width: 0.5),
+                        onPressed: () => _showCreateAlbumDialog(context, gallery, prefs),
+                      ),
+                    );
+                  }
+                  final album = gallery.albums[index];
+                  final isActive = album.id == currentId;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Text(
+                        album.name.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: t.fontSize(mobile ? 9 : 8),
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      selected: isActive,
+                      onSelected: (_) {
+                        prefs.setDefaultSaveAlbumId(isActive ? null : album.id);
+                        setChipState(() {});
+                      },
+                      backgroundColor: t.borderSubtle,
+                      selectedColor: t.accentSuccess,
+                      checkmarkColor: t.background,
+                      showCheckmark: false,
+                      labelStyle: TextStyle(color: isActive ? t.background : t.textTertiary),
+                      padding: EdgeInsets.symmetric(horizontal: mobile ? 8 : 6, vertical: 0),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+                      side: BorderSide(color: isActive ? t.accentSuccess : t.textMinimal, width: 0.5),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  void _showCreateAlbumDialog(BuildContext context, GalleryNotifier gallery, PreferencesService prefs) {
+    final controller = TextEditingController();
+    final t = context.read<ThemeNotifier>().tokens;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: t.surfaceHigh,
+        title: Text(ctx.l.panelNewAlbum.toUpperCase(), style: TextStyle(fontSize: t.fontSize(10), letterSpacing: 2, color: t.textSecondary)),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          style: TextStyle(color: t.textPrimary, fontSize: t.fontSize(13)),
+          decoration: InputDecoration(
+            hintText: ctx.l.panelAlbumName.toUpperCase(),
+            hintStyle: TextStyle(color: t.textMinimal, fontSize: t.fontSize(9)),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: t.borderMedium)),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(ctx.l.commonCancel.toUpperCase(), style: TextStyle(color: t.textDisabled, fontSize: t.fontSize(9))),
+          ),
+          TextButton(
+            onPressed: () {
+              if (controller.text.isNotEmpty) {
+                gallery.createAlbum(controller.text.trim());
+                final newAlbum = gallery.albums.last;
+                prefs.setDefaultSaveAlbumId(newAlbum.id);
+                Navigator.pop(ctx);
+              }
+            },
+            child: Text(ctx.l.commonCreate.toUpperCase(), style: TextStyle(color: t.accent, fontSize: t.fontSize(9))),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmDeletePreset(BuildContext context, GenerationNotifier notifier, int index, String name) async {
+    final t = context.t;
+    final confirm = await showConfirmDialog(
+      context,
+      title: context.l.panelDeletePreset,
+      message: context.l.panelDeletePresetConfirm(name),
+      confirmLabel: context.l.commonDelete,
+      confirmColor: t.accentDanger,
+    );
+    if (confirm == true) {
+      notifier.deletePreset(index);
+    }
+  }
+
+  Widget _buildCompactSlider(BuildContext context, String label, double value, double min, double max, double step, Function(double) onChanged, VisionTokens t, {double? warnAbove, double? hardMin, double? hardMax}) {
+    final mobile = isMobile(context);
+    final isWarning = warnAbove != null && value > warnAbove;
+    final isInteger = step >= 1;
+    // The slider itself stays on [min, max]; if the typed value exceeds the
+    // soft max, pin the thumb to the end so the track stays valid.
+    final sliderValue = value.clamp(min, max).toDouble();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: TextStyle(fontSize: t.fontSize(mobile ? 12 : 9), fontWeight: FontWeight.bold, letterSpacing: 1, color: t.secondaryText)),
+            EditableSliderValue(
+              value: value,
+              softMin: min,
+              softMax: max,
+              hardMin: hardMin,
+              hardMax: hardMax,
+              isInteger: isInteger,
+              decimals: 1,
+              onChanged: onChanged,
+              style: TextStyle(fontSize: t.fontSize(mobile ? 13 : 10), fontWeight: FontWeight.bold, color: isWarning ? t.accentDanger : t.textSecondary),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        VisionSlider(
+          value: sliderValue,
+          min: min,
+          max: max,
+          divisions: ((max - min) / step).toInt(),
+          activeColor: isWarning ? t.accentDanger : t.accent,
+          inactiveColor: t.textMinimal,
+          thumbColor: isWarning ? t.accentDanger : t.accent,
+          thumbRadius: mobile ? 8 : 4,
+          overlayRadius: mobile ? 16 : 0,
+          trackHeight: 1,
+          onChanged: (v) => onChanged(isInteger ? v.roundToDouble() : double.parse(v.toStringAsFixed(1))),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChipToggle(String label, bool value, Function(bool) onChanged, VisionTokens t) {
+    return FilterChip(
+      label: Text(label, style: TextStyle(fontSize: t.fontSize(9), fontWeight: FontWeight.bold, letterSpacing: 1)),
+      selected: value,
+      onSelected: onChanged,
+      backgroundColor: t.borderSubtle,
+      selectedColor: t.accent,
+      checkmarkColor: t.background,
+      labelStyle: TextStyle(color: value ? t.background : t.textTertiary),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+      side: BorderSide(color: value ? t.accent : t.textMinimal, width: 0.5),
+    );
+  }
+}
+
+), '');
+    }).toSet();
+    final missing = NaiaUpdate7Preset.requiredWildcards
+        .where((name) => !names.contains(name)).toList();
+    final accepted = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('업데이트7 프리셋 적용'),
+        content: SingleChildScrollView(
+          child: Text(
+            'PDF의 선행 프롬프트와 조건부 규칙을 적용합니다. '
+            '현재 메인 프롬프트와 조건부 규칙이 교체됩니다.\\n\\n'
+            '기존 와일드카드 목록 검사: '
+            '${names.length}개 파일 확인\\n'
+            '${missing.isEmpty ? "필요한 파일 이름 모두 확인" : "없는 파일: ${missing.join(", ")}"}\\n\\n'
+            '그림체와 후행 보정 프롬프트는 적용 후 직접 추가하세요.',
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('취소')),
+          FilledButton(onPressed: missing.isNotEmpty ? null
+              : () => Navigator.pop(dialogContext, true),
+            child: const Text('적용')),
+        ],
+      ),
+    );
+    if (accepted != true || !mounted) return;
+    notifier.promptController.text = NaiaUpdate7Preset.leadingPrompt;
+    notifier.setNaiaConditionalRules(NaiaUpdate7Preset.rules);
+    setState(() {});
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('업데이트7 프리셋을 적용했습니다. 미리보기로 결과를 확인하세요.')),
     );
   }
 
