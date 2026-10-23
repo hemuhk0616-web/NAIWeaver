@@ -175,4 +175,48 @@ void main() {
     expect(result.main, '1girl, outfit, bedroom, finished');
   });
 
+  test('async character replacement expands only replacement value', () async {
+    final expanded = <String>[];
+    final result = await engine.applyAsync(
+      'solo', ['blue hair'],
+      '(solo):char_replace(1, blue hair, __new_hair__)\\n'
+      '(char_in(1, pink hair)):main+=smile',
+      expandAction: (value) async {
+        expanded.add(value);
+        return value.replaceAll('__new_hair__', 'pink hair');
+      },
+    );
+    expect(expanded, ['__new_hair__', 'smile']);
+    expect(result.characters, ['pink hair']);
+    expect(result.main, 'solo, smile');
+  });
+
+  test('unmatched character rules never expand wildcard values', () async {
+    final expanded = <String>[];
+    final result = await engine.applyAsync(
+      'solo', ['blue hair'],
+      '(forest):char_replace(1, blue hair, __unused__)\\n'
+      '(solo):char_set(1, disabled)',
+      expandAction: (value) async {
+        expanded.add(value);
+        return value;
+      },
+    );
+    expect(expanded, isEmpty);
+    expect(result.characters, ['blue hair']);
+    expect(result.enabled, [false]);
+  });
+
+  test('async rules honor initially disabled character slots', () async {
+    final result = await engine.applyAsync(
+      'solo', ['blue hair', 'green eyes'],
+      '(char_on(2)):main+=wrong\\n'
+      '(~char_on(2)):main+=correct',
+      characterEnabled: [true, false],
+      expandAction: (value) async => value,
+    );
+    expect(result.main, 'solo, correct');
+    expect(result.enabled, [true, false]);
+  });
+
 }
