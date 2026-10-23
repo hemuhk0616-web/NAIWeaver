@@ -1298,22 +1298,24 @@ class GenerationNotifier extends ChangeNotifier {
 
   Future<({String prompt, String negative, List<NaiCharacter> characters, List<NaiInteraction> interactions, int? width, int? height})> _resolveNaiaGenerationInputs() async {
     final pipeline = NaiaPromptPipeline(_wildcardProcessor);
-    // Resolve all character wildcards before evaluating cross-character rules.
-    final expandedCharacterPrompts = await Future.wait(
-      _state.characters.map((c) async =>
-          _tagService.resolveAliases(await _wildcardProcessor.process(c.prompt))),
-    );
+    // Keep wildcard rolls deterministic and never consume rolls for disabled
+    // character slots. Cross-character rules see expanded active prompts only.
     final initialCharacterEnabled =
         _state.characters.map((c) => c.enabled).toList();
-    var processedCharacters = await Future.wait(
-      _state.characters.asMap().entries.map((entry) async {
-        final c = entry.value;
-        return c.copyWith(
-          prompt: expandedCharacterPrompts[entry.key],
-          uc: _tagService.resolveAliases(await _wildcardProcessor.process(c.uc)),
-        );
-      }),
-    );
+    final processedCharactersBeforeRules = <NaiCharacter>[];
+    for (final character in _state.characters) {
+      if (!character.enabled) {
+        processedCharactersBeforeRules.add(character);
+        continue;
+      }
+      processedCharactersBeforeRules.add(character.copyWith(
+        prompt: _tagService.resolveAliases(
+            await _wildcardProcessor.process(character.prompt)),
+        uc: _tagService.resolveAliases(
+            await _wildcardProcessor.process(character.uc)),
+      ));
+    }
+    var processedCharacters = processedCharactersBeforeRules;
     final expandedMain = await _wildcardProcessor.process(
       [naiaLeadingPrompt, promptController.text, naiaTrailingPrompt]
           .where((part) => part.trim().isNotEmpty).join(', '));
