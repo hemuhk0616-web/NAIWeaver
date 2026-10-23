@@ -4,6 +4,45 @@ import 'package:naiweaver/core/services/naia_prompt_pipeline.dart';
 import 'package:naiweaver/core/services/wildcard_processor.dart';
 
 void main() {
+  test('nested wildcards resolve before caret choice in action values', () async {
+    final directory = await Directory.systemTemp.createTemp('naia_nested_caret_');
+    try {
+      await File('${directory.path}/outer.txt')
+          .writeAsString('__inner__');
+      await File('${directory.path}/inner.txt')
+          .writeAsString('red^blue');
+      final pipeline = NaiaPromptPipeline(
+        WildcardProcessor(wildcardDir: directory.path));
+      for (var i = 0; i < 10; i++) {
+        final expanded = await pipeline.expandActionValues(
+          '(solo):main+=__outer__');
+        expect(
+          ['(solo):main+=red', '(solo):main+=blue'],
+          contains(expanded),
+        );
+      }
+    } finally {
+      await directory.delete(recursive: true);
+    }
+  });
+
+  test('nested wildcards do not rewrite conditional syntax', () async {
+    final directory = await Directory.systemTemp.createTemp('naia_nested_rules_');
+    try {
+      await File('${directory.path}/outer.txt')
+          .writeAsString('__inner__');
+      await File('${directory.path}/inner.txt')
+          .writeAsString('pink hair');
+      final pipeline = NaiaPromptPipeline(
+        WildcardProcessor(wildcardDir: directory.path));
+      final expanded = await pipeline.expandActionValues(
+        '((solo&char_on(1))|hat):main+=__outer__');
+      expect(expanded, '((solo&char_on(1))|hat):main+=pink hair');
+    } finally {
+      await directory.delete(recursive: true);
+    }
+  });
+
   test('caret alternatives select one conditional action value', () async {
     final directory = await Directory.systemTemp.createTemp('naia_caret_');
     try {
