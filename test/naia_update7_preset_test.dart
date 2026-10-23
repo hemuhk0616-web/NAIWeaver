@@ -1,5 +1,9 @@
 import 'dart:io';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:naiweaver/core/services/naia_prompt_pipeline.dart';
+import 'package:naiweaver/core/services/wildcard_processor.dart';
 import 'package:naiweaver/core/services/naia_prompt_pipeline.dart';
 import 'package:naiweaver/core/services/wildcard_processor.dart';
 import 'package:naiweaver/core/services/naia_update7_preset.dart';
@@ -26,6 +30,37 @@ void main() {
       expect(rules, isNot(contains('^')));
       expect(const NaiaRuleValidator().validate(rules)
           .where((issue) => !issue.warning), isEmpty);
+    } finally {
+      await root.delete(recursive: true);
+    }
+  });
+
+  test('update7 preset expands imported wildcards and applies ordered rules', () async {
+    final root = await Directory.systemTemp.createTemp('naia_update7_integration_');
+    try {
+      for (final name in NaiaUpdate7Preset.requiredWildcards) {
+        final file = File('${root.path}/$name.txt');
+        await file.parent.create(recursive: true);
+        final value = switch (name) {
+          '대분류' => 'masturbation',
+          '사정여부' => 'no ejaculation',
+          '배경_의상' => 'bedroom',
+          '체위/자위' => 'solo pose',
+          '의상/의상' => 'casual clothes',
+          _ => 'test placeholder',
+        };
+        await file.writeAsString(value);
+      }
+      final pipeline = NaiaPromptPipeline(
+        WildcardProcessor(wildcardDir: root.path));
+      final output = await pipeline.process(
+        NaiaUpdate7Preset.leadingPrompt,
+        rules: NaiaUpdate7Preset.rules,
+      );
+      expect(output, contains('solo'));
+      expect(output, contains('solo pose'));
+      expect(output, contains('casual clothes'));
+      expect(output, isNot(contains('__')));
     } finally {
       await root.delete(recursive: true);
     }
