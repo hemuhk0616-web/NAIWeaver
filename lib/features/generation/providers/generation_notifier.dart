@@ -788,6 +788,12 @@ class GenerationNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setCharacterEnabled(int index, bool enabled) {
+    if (index < 0 || index >= _state.characters.length) return;
+    updateCharacter(index, _state.characters[index].copyWith(enabled: enabled));
+    clearLockedNaiaPreview();
+  }
+
   void removeCharacter(int index) {
     final result = _characterManager.removeCharacter(
       _state.characters, _state.interactions, index);
@@ -1239,7 +1245,7 @@ class GenerationNotifier extends ChangeNotifier {
           _tagService.resolveAliases(await _wildcardProcessor.process(c.prompt))),
     );
     final initialCharacterEnabled =
-        List<bool>.filled(_state.characters.length, true);
+        _state.characters.map((c) => c.enabled).toList();
     var processedCharacters = await Future.wait(
       _state.characters.asMap().entries.map((entry) async {
         final c = entry.value;
@@ -1279,10 +1285,13 @@ class GenerationNotifier extends ChangeNotifier {
     );
     final processedPrompt = ordered.main;
     final processedInteractions = const NaiaInteractionRemapper().remap(
-      _state.interactions, ordered.enabled);
+      _state.interactions, [
+        for (var i = 0; i < ordered.enabled.length; i++)
+          ordered.enabled[i] && initialCharacterEnabled[i],
+      ]);
     processedCharacters = [
       for (var i = 0; i < processedCharacters.length; i++)
-        if (ordered.enabled[i])
+        if (ordered.enabled[i] && initialCharacterEnabled[i])
           processedCharacters[i].copyWith(
             prompt: ordered.characters[i], uc: ordered.characterUc[i]),
     ];
