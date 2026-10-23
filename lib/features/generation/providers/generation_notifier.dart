@@ -1181,6 +1181,19 @@ class GenerationNotifier extends ChangeNotifier {
 
   /// Conditional rules are kept separately from user-authored prompt text.
   /// An empty rule set retains NAIWeaver's existing generation behavior.
+  String get naiaLeadingPrompt => _prefs.naiaLeadingPrompt;
+  String get naiaTrailingPrompt => _prefs.naiaTrailingPrompt;
+  void setNaiaLeadingPrompt(String value) {
+    _prefs.setNaiaLeadingPrompt(value);
+    clearLockedNaiaPreview();
+    notifyListeners();
+  }
+  void setNaiaTrailingPrompt(String value) {
+    _prefs.setNaiaTrailingPrompt(value);
+    clearLockedNaiaPreview();
+    notifyListeners();
+  }
+
   String get naiaConditionalRules => _prefs.naiaConditionalRules;
 
   void setNaiaConditionalRules(String rules) {
@@ -1219,7 +1232,9 @@ class GenerationNotifier extends ChangeNotifier {
         );
       }),
     );
-    final expandedMain = await _wildcardProcessor.process(promptController.text);
+    final expandedMain = await _wildcardProcessor.process(
+      [naiaLeadingPrompt, promptController.text, naiaTrailingPrompt]
+          .where((part) => part.trim().isNotEmpty).join(', '));
     final expandedNegative = await _wildcardProcessor.process(negativePromptController.text);
     final expandedRules = await pipeline.expandActionValues(
       naiaConditionalRules.split(RegExp(r'\r?\n'))
@@ -1272,6 +1287,8 @@ class GenerationNotifier extends ChangeNotifier {
     promptController.text,
     negativePromptController.text,
     naiaConditionalRules,
+    naiaLeadingPrompt,
+    naiaTrailingPrompt,
     _naiaWildcardRevision(),
     _state.characters.map((c) => [c.prompt, c.uc, c.center.x, c.center.y].join('\u0002')).join('\u0003'),
     _state.interactions.map((item) => item.toJson().toString()).join('\u0003'),
