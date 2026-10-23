@@ -145,40 +145,11 @@ class NaiaOrderedRuleEngine {
   }
 
   static String _unweight(String value) {
-    final match = RegExp(r'^[-+]?\d+(?:\.\d+)?::(.*?)(?:::)?
-    return (match?.group(1) ?? value).replaceFirst(RegExp(r'::
-  }
-
-  static bool _matchesTag(String tag, String target) {
-    final partial = target.startsWith('*');
-    final needle = _unweight(partial ? target.substring(1) : target);
-    final value = _unweight(tag);
-    return partial ? needle.isNotEmpty && value.contains(needle) : value == needle;
-  }
-}
-).firstMatch(value.trim());
-    return (match?.group(1) ?? value).trim();
-  }
-
-  static bool _matchesTag(String tag, String target) {
-    final partial = target.startsWith('*');
-    final needle = _unweight(partial ? target.substring(1) : target);
-    final value = _unweight(tag);
-    return partial ? needle.isNotEmpty && value.contains(needle) : value == needle;
-  }
-}
-), '').trim();
-  }
-
-  static bool _matchesTag(String tag, String target) {
-    final partial = target.startsWith('*');
-    final needle = _unweight(partial ? target.substring(1) : target);
-    final value = _unweight(tag);
-    return partial ? needle.isNotEmpty && value.contains(needle) : value == needle;
-  }
-}
-).firstMatch(value.trim());
-    return (match?.group(1) ?? value).trim();
+    final trimmed = value.trim();
+    final match = RegExp(r'^[-+]?\d+(?:\.\d+)?::(.*?)(?:::)?$')
+        .firstMatch(trimmed);
+    if (match == null) return trimmed;
+    return match.group(1)!.replaceFirst(RegExp(r'::$'), '').trim();
   }
 
   static bool _matchesTag(String tag, String target) {
