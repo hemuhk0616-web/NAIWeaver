@@ -713,11 +713,11 @@
   "packExportDesc": "Bundle presets, styles, and wildcards",
   "packImportLabel": "팩 가져오기",
   "packImportDesc": "Load a .vpack file",
-  "packGalleryExport": "GALLERY EXPORT",
+  "packGalleryExport": "갤러리 내보내기",
   "packGalleryExportDesc": "Export gallery images as a ZIP file, organized by album folders.",
-  "packExportGalleryZip": "EXPORT GALLERY AS ZIP",
-  "packExportGalleryZipDesc": "Preserve album hierarchy in folders",
-  "packImportDialogTitle": "Import NAIWeaver Pack",
+  "packExportGalleryZip": "갤러리를 ZIP으로 내보내기",
+  "packExportGalleryZipDesc": "앨범 폴더 구조 유지",
+  "packImportDialogTitle": "NAIWeaver 팩 가져오기",
   "packFailedRead": "Failed to read pack: {error}",
   "@packFailedRead": {
     "placeholders": {
@@ -727,7 +727,7 @@
     }
   },
   "packExportDialogTitle": "팩 내보내기",
-  "packName": "PACK NAME",
+  "packName": "팩 이름",
   "packDescriptionOptional": "DESCRIPTION (OPTIONAL)",
   "packPresetsSection": "PRESETS ({selected}/{total})",
   "@packPresetsSection": {
@@ -820,7 +820,7 @@
   "packSettingsSection": "APP & JUKEBOX SETTINGS",
   "packSettingsItem": "App & jukebox settings",
   "packImportRestartHint": "Imported. Restart the app to fully apply settings and themes.",
-  "packExportSuccess": "Pack exported successfully",
+  "packExportSuccess": "팩을 내보냈습니다",
   "packExportFailed": "Export failed: {error}",
   "@packExportFailed": {
     "placeholders": {
@@ -838,7 +838,7 @@
       }
     }
   },
-  "packImportSuccess": "Pack imported successfully",
+  "packImportSuccess": "팩을 가져왔습니다",
   "packImportFailed": "Import failed: {error}",
   "@packImportFailed": {
     "placeholders": {
@@ -847,8 +847,8 @@
       }
     }
   },
-  "packExportGalleryTitle": "EXPORT GALLERY",
-  "packAlbums": "ALBUMS",
+  "packExportGalleryTitle": "갤러리 내보내기",
+  "packAlbums": "앨범",
   "packUnsortedCount": "UNSORTED ({count})",
   "@packUnsortedCount": {
     "placeholders": {
@@ -857,9 +857,9 @@
       }
     }
   },
-  "packOptions": "OPTIONS",
-  "packStripMetadata": "STRIP METADATA",
-  "packFavoritesOnly": "FAVORITES ONLY",
+  "packOptions": "옵션",
+  "packStripMetadata": "메타데이터 제거",
+  "packFavoritesOnly": "즐겨찾기만",
   "packExportCount": "EXPORT ({count})",
   "@packExportCount": {
     "placeholders": {
@@ -868,8 +868,8 @@
       }
     }
   },
-  "packSaveDialogTitle": "Save NAIWeaver Pack",
-  "packExportGalleryZipDialog": "Export Gallery ZIP",
+  "packSaveDialogTitle": "NAIWeaver 팩 저장",
+  "packExportGalleryZipDialog": "갤러리 ZIP 내보내기",
   "packExportedToZip": "Exported {count} images to ZIP",
   "@packExportedToZip": {
     "placeholders": {
@@ -878,48 +878,48 @@
       }
     }
   },
-  "themeSelectToEdit": "SELECT A THEME TO EDIT",
-  "themeList": "THEMES",
-  "themeNew": "New Theme",
+  "themeSelectToEdit": "편집할 테마 선택",
+  "themeList": "테마",
+  "themeNew": "새 테마",
   "themeSave": "SAVE",
-  "themeReset": "RESET",
-  "themePreview": "PREVIEW",
-  "themeColors": "COLORS",
-  "themeColorBackground": "Background",
-  "themeColorSurfaceHigh": "Surface High",
-  "themeColorSurfaceMid": "Surface Mid",
-  "themeColorTextPrimary": "Text Primary",
-  "themeColorTextSecondary": "Text Secondary",
-  "themeColorTextTertiary": "Text Tertiary",
-  "themeColorTextDisabled": "Text Disabled",
-  "themeColorTextMinimal": "Text Minimal",
-  "themeColorBorderStrong": "Border Strong",
-  "themeColorBorderMedium": "Border Medium",
-  "themeColorBorderSubtle": "Border Subtle",
-  "themeColorAccent": "Accent",
-  "themeColorAccentEdit": "Accent Edit",
-  "themeColorAccentSuccess": "Accent Success",
-  "themeColorAccentDanger": "Accent Danger",
+  "themeReset": "초기화",
+  "themePreview": "미리보기",
+  "themeColors": "색상",
+  "themeColorBackground": "배경",
+  "themeColorSurfaceHigh": "상위 표면",
+  "themeColorSurfaceMid": "중간 표면",
+  "themeColorTextPrimary": "기본 텍스트",
+  "themeColorTextSecondary": "보조 텍스트",
+  "themeColorTextTertiary": "3차 텍스트",
+  "themeColorTextDisabled": "비활성 텍스트",
+  "themeColorTextMinimal": "최소 텍스트",
+  "themeColorBorderStrong": "강한 테두리",
+  "themeColorBorderMedium": "중간 테두리",
+  "themeColorBorderSubtle": "약한 테두리",
+  "themeColorAccent": "강조색",
+  "themeColorAccentEdit": "편집 강조색",
+  "themeColorAccentSuccess": "성공 강조색",
+  "themeColorAccentDanger": "위험 강조색",
   "themeColorLogo": "Logo",
   "themeColorCascade": "캐스케이드",
   "themeReferences": "참조 이미지",
   "themeColorVibeTransfer": "바이브 전송",
-  "themeColorRefCharacter": "Ref Character",
-  "themeColorRefStyle": "Ref Style",
+  "themeColorRefCharacter": "캐릭터 참조",
+  "themeColorRefStyle": "스타일 참조",
   "themeColorRefCharStyle": "Ref Char+Style",
   "themeColorFavorite": "즐겨찾기",
-  "themeColorCharacter": "Character",
-  "themeColorPositive": "Positive",
-  "themeColorNegative": "Negative",
+  "themeColorCharacter": "캐릭터",
+  "themeColorPositive": "긍정",
+  "themeColorNegative": "부정",
   "themeFont": "FONT",
-  "themeTextScale": "TEXT SCALE",
-  "themeHeaderScale": "HEADER SCALE",
-  "themeTitleScale": "TITLE SCALE",
-  "themeButtonScale": "BUTTON SCALE",
-  "themeSmall": "SMALL",
-  "themeLarge": "LARGE",
-  "themePromptInput": "PROMPT INPUT",
-  "themeFontSize": "FONT SIZE",
+  "themeTextScale": "텍스트 배율",
+  "themeHeaderScale": "헤더 배율",
+  "themeTitleScale": "제목 배율",
+  "themeButtonScale": "버튼 배율",
+  "themeSmall": "작게",
+  "themeLarge": "크게",
+  "themePromptInput": "프롬프트 입력",
+  "themeFontSize": "글자 크기",
   "themeHeightLabel": "높이",
   "themeLines": "{count} lines",
   "@themeLines": {
@@ -929,12 +929,12 @@
       }
     }
   },
-  "themeBrightMode": "BRIGHT MODE",
-  "themeBrightText": "BRIGHT TEXT",
-  "themeBrightDesc": "Use brighter text colors for improved readability",
-  "themePanelLayout": "PANEL LAYOUT",
-  "themePanelLayoutDesc": "Drag to reorder Advanced Settings sections",
-  "themeDeleteTitle": "DELETE THEME",
+  "themeBrightMode": "밝은 모드",
+  "themeBrightText": "밝은 텍스트",
+  "themeBrightDesc": "가독성을 높이기 위해 텍스트 색상을 밝게 표시",
+  "themePanelLayout": "패널 배치",
+  "themePanelLayoutDesc": "드래그하여 고급 설정 섹션 순서 변경",
+  "themeDeleteTitle": "테마 삭제",
   "themeDeleteConfirm": "ARE YOU SURE YOU WANT TO DELETE ''{name}''?",
   "@themeDeleteConfirm": {
     "placeholders": {
@@ -943,9 +943,9 @@
       }
     }
   },
-  "themeNewTitle": "NEW THEME",
-  "themeCustomTheme": "Custom Theme",
-  "themeThemeName": "THEME NAME",
+  "themeNewTitle": "새 테마",
+  "themeCustomTheme": "사용자 지정 테마",
+  "themeThemeName": "테마 이름",
   "themeCreateFailed": "Failed to create theme: {error}",
   "@themeCreateFailed": {
     "placeholders": {
@@ -954,31 +954,31 @@
       }
     }
   },
-  "themeSectionModel": "MODEL",
+  "themeSectionModel": "모델",
   "themeSectionDimSeed": "DIMENSIONS + SEED",
   "themeSectionStepsScale": "STEPS + SCALE",
   "themeSectionSamplerPost": "SAMPLER + POST-PROCESSING",
   "themeSectionStyles": "스타일",
   "themeSectionNegPrompt": "부정 프롬프트",
   "themeSectionPresets": "프리셋",
-  "themeSectionSaveAlbum": "SAVE TO ALBUM",
-  "themePreviewHeader": "HEADER TEXT",
-  "themePreviewSecondary": "Secondary text content",
+  "themeSectionSaveAlbum": "앨범에 저장",
+  "themePreviewHeader": "헤더 텍스트",
+  "themePreviewSecondary": "보조 텍스트 내용",
   "themePreviewHint": "Hint / tertiary text",
-  "themePreviewGenerate": "GENERATE",
+  "themePreviewGenerate": "생성",
   "themePreviewEdit": "EDIT",
-  "cascadeEditorLabel": "CASCADE EDITOR",
-  "cascadeSavedToLibrary": "CASCADE SAVED TO LIBRARY",
-  "cascadeNoBeatSelected": "NO BEAT SELECTED",
+  "cascadeEditorLabel": "캐스케이드 편집기",
+  "cascadeSavedToLibrary": "캐스케이드를 라이브러리에 저장했습니다",
+  "cascadeNoBeatSelected": "선택한 비트가 없습니다",
   "cascadeScenePrompt": "SCENE / ACTION",
   "cascadeSceneSubLabel": "what's happening + framing",
   "cascadeSceneHint": "what's happening: e.g. 2girls, hugging, wide shot, from above",
-  "cascadeEnvironmentPrompt": "ENVIRONMENT PROMPT",
+  "cascadeEnvironmentPrompt": "환경 프롬프트",
   "cascadeEnvSubLabel": "where it takes place",
   "cascadeEnvHint": "where: e.g. forest, night, indoors, cinematic lighting",
-  "cascadeApplyToAll": "Apply to all",
-  "cascadeSceneApplied": "SCENE APPLIED TO ALL BEATS",
-  "cascadeCharacterSlots": "CHARACTER SLOTS",
+  "cascadeApplyToAll": "전체 적용",
+  "cascadeSceneApplied": "모든 비트에 장면을 적용했습니다",
+  "cascadeCharacterSlots": "캐릭터 슬롯",
   "cascadeCharacterSlotN": "CHARACTER SLOT {n}",
   "@cascadeCharacterSlotN": {
     "placeholders": {
@@ -987,13 +987,13 @@
       }
     }
   },
-  "cascadePosition": "POSITION",
-  "cascadeAiPosition": "AI POSITION",
-  "cascadePositivePrompt": "POSITIVE PROMPT",
+  "cascadePosition": "위치",
+  "cascadeAiPosition": "AI 위치",
+  "cascadePositivePrompt": "긍정 프롬프트",
   "cascadeCharHint": "Character tags, appearance, state...",
   "cascadeNegativePrompt": "부정 프롬프트",
   "cascadeAvoidHint": "Avoid tags...",
-  "cascadeLinkAction": "Link Action",
+  "cascadeLinkAction": "동작 연결",
   "cascadeCastMemberN": "CHARACTER {n}",
   "@cascadeCastMemberN": {
     "placeholders": {
@@ -1002,27 +1002,27 @@
       }
     }
   },
-  "cascadeNewCharacter": "New character",
-  "cascadeAddCharacter": "Add character",
-  "cascadeRemoveCharacter": "Remove character",
-  "cascadePlacementManual": "MANUAL",
+  "cascadeNewCharacter": "새 캐릭터",
+  "cascadeAddCharacter": "캐릭터 추가",
+  "cascadeRemoveCharacter": "캐릭터 제거",
+  "cascadePlacementManual": "수동",
   "cascadePlacementAi": "AI",
   "cascadeNoCharactersInBeat": "No characters in this beat. Add one to place or prompt them.",
-  "interactionEditorTitle": "INTERACTION EDITOR",
-  "interactionActionLabel": "ACTION",
+  "interactionEditorTitle": "상호작용 편집기",
+  "interactionActionLabel": "동작",
   "interactionActionHint": "ENTER ACTION (e.g., hugging)",
-  "interactionDirectionLabel": "DIRECTION",
+  "interactionDirectionLabel": "방향",
   "interactionWithLabel": "WITH",
-  "interactionNeedPartner": "Add another character to set an interaction",
-  "interactionSave": "SAVE INTERACTION",
-  "cascadeBeatSettings": "BEAT SETTINGS",
-  "cascadeResolution": "RESOLUTION",
+  "interactionNeedPartner": "상호작용을 설정하려면 캐릭터를 하나 더 추가하세요",
+  "interactionSave": "상호작용 저장",
+  "cascadeBeatSettings": "비트 설정",
+  "cascadeResolution": "해상도",
   "cascadeSampler": "샘플러",
   "cascadeSteps": "스텝",
   "cascadeScale": "스케일",
   "cascadeStyles": "스타일",
-  "cascadeNoStyles": "NO STYLES AVAILABLE",
-  "cascadeLibrary": "CASCADE LIBRARY",
+  "cascadeNoStyles": "사용 가능한 스타일이 없습니다",
+  "cascadeLibrary": "캐스케이드 라이브러리",
   "cascadeSequencesSaved": "{count} SEQUENCES SAVED",
   "@cascadeSequencesSaved": {
     "placeholders": {
@@ -1031,8 +1031,8 @@
       }
     }
   },
-  "cascadeNew": "NEW CASCADE",
-  "cascadeNoCascades": "NO CASCADES FOUND",
+  "cascadeNew": "새 캐스케이드",
+  "cascadeNoCascades": "캐스케이드를 찾지 못했습니다",
   "cascadeBeatsAndSlots": "{beats} BEATS • {slots} CHARACTER SLOTS",
   "@cascadeBeatsAndSlots": {
     "placeholders": {
@@ -1044,9 +1044,9 @@
       }
     }
   },
-  "cascadeCreateNew": "CREATE NEW CASCADE",
-  "cascadeName": "CASCADE NAME",
-  "cascadeCharSlotsLabel": "CHARACTER SLOTS",
+  "cascadeCreateNew": "새 캐스케이드 만들기",
+  "cascadeName": "캐스케이드 이름",
+  "cascadeCharSlotsLabel": "캐릭터 슬롯",
   "cascadeAutoPosition": "AUTO POSITION (LET AI DECIDE)",
   "cascadeDeleteTitle": "DELETE CASCADE?",
   "cascadeDeleteConfirm": "Are you sure you want to delete \"{name}\"?",
@@ -1057,8 +1057,8 @@
       }
     }
   },
-  "cascadeSelect": "SELECT CASCADE",
-  "cascadeNoSaved": "NO SAVED CASCADES FOUND",
+  "cascadeSelect": "캐스케이드 선택",
+  "cascadeNoSaved": "저장된 캐스케이드가 없습니다",
   "cascadeCharactersAndBeats": "{chars} CHARACTERS • {beats} BEATS",
   "@cascadeCharactersAndBeats": {
     "placeholders": {
@@ -1082,13 +1082,13 @@
   "cascadeGlobalStyle": "GLOBAL STYLE / INJECTION",
   "cascadeCaptionHint": "Narrate this beat... (shown over the preview)",
   "cascadeCaptionToggle": "Show / hide captions",
-  "cascadeExportTooltip": "Export with captions",
+  "cascadeExportTooltip": "캡션과 함께 내보내기",
   "cascadeExportBeat": "Export this beat (caption burned in)",
   "cascadeExportStripVertical": "Storyboard strip — vertical",
   "cascadeExportStripHorizontal": "Storyboard strip — horizontal",
-  "cascadeExportSaved": "EXPORTED",
-  "cascadeExportFailed": "Export failed",
-  "cascadeStripDownscaled": "Storyboard shrunk to fit memory limits",
+  "cascadeExportSaved": "내보내기 완료",
+  "cascadeExportFailed": "내보내기에 실패했습니다",
+  "cascadeStripDownscaled": "메모리 제한에 맞게 스토리보드 크기를 줄였습니다",
   "cascadeRegenerateBeat": "REGENERATE BEAT {n}",
   "@cascadeRegenerateBeat": {
     "placeholders": {
@@ -1105,16 +1105,16 @@
       }
     }
   },
-  "cascadeSkipToNext": "Skip to next",
+  "cascadeSkipToNext": "다음으로 건너뛰기",
   "cascadeBeatRenderError": "Couldn't build this beat. Check character appearances are set.",
   "cascadeStartCasting": "Cast",
-  "cascadeBackToLibrary": "Library",
-  "cascadeUnsavedTitle": "Unsaved Changes",
+  "cascadeBackToLibrary": "라이브러리",
+  "cascadeUnsavedTitle": "저장하지 않은 변경 사항",
   "cascadeUnsavedMessage": "You have unsaved changes to this cascade. Discard them?",
-  "cascadeDiscard": "Discard",
-  "cascadeExitCascade": "Exit Cascade",
-  "img2imgResult": "RESULT",
-  "img2imgSource": "SOURCE",
+  "cascadeDiscard": "버리기",
+  "cascadeExitCascade": "캐스케이드 종료",
+  "img2imgResult": "결과",
+  "img2imgSource": "원본",
   "img2imgCanvas": "CANVAS",
   "img2imgUseAsSource": "USE AS SOURCE",
   "img2imgInpainting": "INPAINTING",
@@ -1122,7 +1122,7 @@
   "img2imgEditorLabel": "EDITOR",
   "img2imgBackToPicker": "Back to picker",
   "img2imgGenerating": "GENERATING...",
-  "img2imgGenerate": "GENERATE",
+  "img2imgGenerate": "생성",
   "img2imgGenerationFailed": "Generation failed: {error}",
   "@img2imgGenerationFailed": {
     "placeholders": {
@@ -1140,7 +1140,7 @@
   "img2imgNoise": "NOISE",
   "img2imgMaskBlur": "MASK BLUR",
   "img2imgColorCorrect": "COLOR CORRECT",
-  "img2imgSourceInfo": "SOURCE",
+  "img2imgSourceInfo": "원본",
   "img2imgMaskStrokes": "MASK: {count} strokes",
   "@img2imgMaskStrokes": {
     "placeholders": {
@@ -1164,7 +1164,7 @@
   "slideshowNoConfigs": "NO SLIDESHOW CONFIGS YET.\nTAP + TO CREATE ONE.",
   "slideshowSelectOrCreate": "SELECT OR CREATE A SLIDESHOW CONFIG",
   "slideshowNameLabel": "NAME",
-  "slideshowSourceLabel": "SOURCE",
+  "slideshowSourceLabel": "원본",
   "slideshowTransition": "TRANSITION",
   "slideshowTransitionDuration": "TRANSITION DURATION",
   "slideshowTiming": "TIMING",
