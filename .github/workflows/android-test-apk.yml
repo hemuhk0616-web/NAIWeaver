@@ -46,7 +46,7 @@ jobs:
           chmod 600 "$HOME/.android/debug.keystore"
           keytool -list -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey > /dev/null
       - name: Build Android debug APK
-        run: flutter build apk --debug --build-number ${{ github.run_number }}
+        run: flutter build apk --debug --build-number $((1000 + ${{ github.run_number }}))
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
