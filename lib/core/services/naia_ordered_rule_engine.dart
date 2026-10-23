@@ -24,6 +24,17 @@ class NaiaOrderedRuleEngine {
     String combined() => [...prefix, ...mainTags, ...postfix].join(', ');
     for (final line in rules.split(RegExp(r'\r?\n'))) {
       final rule = line.trim();
+      final scopedLine = RegExp(r'^char:(\\d+)\\s+(\\(.*)$').firstMatch(rule);
+      if (scopedLine != null) {
+        final index = int.parse(scopedLine.group(1)!) - 1;
+        if (index >= 0 && index < currentCharacters.length && enabled[index]) {
+          final nested = apply(currentCharacters[index], currentCharacters,
+              scopedLine.group(2)!, negative: currentNegative,
+              characterUc: uc);
+          currentCharacters[index] = nested.main;
+        }
+        continue;
+      }
       if (!rule.startsWith('(')) continue;
       final end = _matchingParen(rule);
       if (end < 0 || end + 1 >= rule.length || rule[end + 1] != ':') {
@@ -132,6 +143,18 @@ class NaiaOrderedRuleEngine {
     String combined() => [...prefix, ...mainTags, ...postfix].join(', ');
     for (final line in rules.split(RegExp(r'\r?\n'))) {
       final rule = line.trim();
+      final scopedLine = RegExp(r'^char:(\\d+)\\s+(\\(.*)$').firstMatch(rule);
+      if (scopedLine != null) {
+        final index = int.parse(scopedLine.group(1)!) - 1;
+        if (index >= 0 && index < currentCharacters.length && enabled[index]) {
+          final nested = await applyAsync(currentCharacters[index],
+              currentCharacters, scopedLine.group(2)!,
+              negative: currentNegative, characterUc: uc,
+              characterEnabled: enabled, expandAction: expandAction);
+          currentCharacters[index] = nested.main;
+        }
+        continue;
+      }
       if (!rule.startsWith('(')) continue;
       final end = _matchingParen(rule);
       if (end < 0 || end + 1 >= rule.length || rule[end + 1] != ':') {
