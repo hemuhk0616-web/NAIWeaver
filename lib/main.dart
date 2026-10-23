@@ -1354,6 +1354,64 @@ class _SimpleGeneratorAppState extends State<SimpleGeneratorApp> with SingleTick
               SizedBox(
                 height: mobile ? 64 : 58,
                 width: mobile ? 64 : 58,
+                child: OutlinedButton(
+                  onPressed: notifier.isAutoLoopRunning
+                      ? notifier.stopAutoLoop
+                      : state.isLoading ? null : () async {
+                          final countController = TextEditingController(text: '10');
+                          bool unlimited = false;
+                          final count = await showDialog<int>(
+                            context: context,
+                            builder: (dialogContext) => StatefulBuilder(
+                              builder: (dialogContext, setDialogState) => AlertDialog(
+                                title: const Text('자동 이미지 생성'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Text('매번 와일드카드를 새로 전개하고 이미지를 자동 저장합니다.'),
+                                    CheckboxListTile(
+                                      title: const Text('정지할 때까지 무제한 반복'),
+                                      value: unlimited,
+                                      onChanged: (value) => setDialogState(() => unlimited = value ?? false),
+                                    ),
+                                    if (!unlimited)
+                                      TextField(
+                                        controller: countController,
+                                        keyboardType: TextInputType.number,
+                                        decoration: const InputDecoration(labelText: '생성 횟수 (1 이상)'),
+                                      ),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('취소')),
+                                  FilledButton(
+                                    onPressed: () {
+                                      final value = unlimited ? 0 : int.tryParse(countController.text);
+                                      if (value == null || value < 0 || (!unlimited && value == 0)) return;
+                                      Navigator.pop(dialogContext, value);
+                                    },
+                                    child: const Text('시작'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                          countController.dispose();
+                          if (count != null && context.mounted) {
+                            notifier.startAutoLoop(count: count == 0 ? null : count);
+                          }
+                        },
+                  style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
+                  child: Icon(
+                    notifier.isAutoLoopRunning ? Icons.stop_circle_outlined : Icons.repeat,
+                    color: notifier.isAutoLoopRunning ? Colors.redAccent : t.accent,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+              SizedBox(
+                height: mobile ? 64 : 58,
+                width: mobile ? 64 : 58,
                 child: ElevatedButton(
                   onPressed: state.isLoading ? null : () {
                     FocusScope.of(context).unfocus();
