@@ -229,7 +229,7 @@ void main() {
       expandAction: (value) async => value,
     );
     expect(result.main, 'solo, happy');
-    expect(result.characters, ['blue hair, smile']);
+    expect(result.characters, ['pink hair, smile']);
   });
 
   test('disabled character state is visible to following rules', () async {
