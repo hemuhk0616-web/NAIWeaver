@@ -1181,6 +1181,35 @@ class GenerationNotifier extends ChangeNotifier {
 
   /// Conditional rules are kept separately from user-authored prompt text.
   /// An empty rule set retains NAIWeaver's existing generation behavior.
+  Map<String, String> get naiaLeadingPresets => _prefs.naiaLeadingPresets;
+  Map<String, String> get naiaTrailingPresets => _prefs.naiaTrailingPresets;
+
+  Future<void> saveNaiaPromptPreset(bool leading, String name) async {
+    final normalized = name.trim();
+    if (normalized.isEmpty) throw ArgumentError('Preset name cannot be empty');
+    await _prefs.saveNaiaPromptPreset(
+      leading: leading,
+      name: normalized,
+      prompt: leading ? naiaLeadingPrompt : naiaTrailingPrompt,
+    );
+    notifyListeners();
+  }
+
+  Future<void> deleteNaiaPromptPreset(bool leading, String name) async {
+    await _prefs.deleteNaiaPromptPreset(leading: leading, name: name);
+    notifyListeners();
+  }
+
+  void applyNaiaPromptPreset(bool leading, String name) {
+    final prompt = (leading ? naiaLeadingPresets : naiaTrailingPresets)[name];
+    if (prompt == null) return;
+    if (leading) {
+      setNaiaLeadingPrompt(prompt);
+    } else {
+      setNaiaTrailingPrompt(prompt);
+    }
+  }
+
   String get naiaLeadingPrompt => _prefs.naiaLeadingPrompt;
   String get naiaTrailingPrompt => _prefs.naiaTrailingPrompt;
   void setNaiaLeadingPrompt(String value) {
