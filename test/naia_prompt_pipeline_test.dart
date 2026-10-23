@@ -4,6 +4,42 @@ import 'package:naiweaver/core/services/naia_prompt_pipeline.dart';
 import 'package:naiweaver/core/services/wildcard_processor.dart';
 
 void main() {
+  test('caret alternatives select one conditional action value', () async {
+    final directory = await Directory.systemTemp.createTemp('naia_caret_');
+    try {
+      final pipeline = NaiaPromptPipeline(
+        WildcardProcessor(wildcardDir: directory.path));
+      for (var i = 0; i < 20; i++) {
+        final result = await pipeline.expandActionValues(
+          '(solo):main+=red^blue^green');
+        expect(
+          ['(solo):main+=red', '(solo):main+=blue',
+           '(solo):main+=green'],
+          contains(result),
+        );
+      }
+    } finally {
+      await directory.delete(recursive: true);
+    }
+  });
+
+  test('caret alternatives preserve independent comma tags', () async {
+    final directory = await Directory.systemTemp.createTemp('naia_caret_tags_');
+    try {
+      final pipeline = NaiaPromptPipeline(
+        WildcardProcessor(wildcardDir: directory.path));
+      final result = await pipeline.expandActionValues(
+        '(solo):main+=hat, red^blue, smile');
+      expect(
+        ['(solo):main+=hat, red, smile',
+         '(solo):main+=hat, blue, smile'],
+        contains(result),
+      );
+    } finally {
+      await directory.delete(recursive: true);
+    }
+  });
+
   test('nested conditions preserve syntax and expand only action values', () async {
     final directory = await Directory.systemTemp.createTemp('naia_pipeline_');
     try {
