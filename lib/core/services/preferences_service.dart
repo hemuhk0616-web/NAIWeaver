@@ -15,6 +15,11 @@ class PreferencesService {
   String get naiaConditionalRules => _prefs.getString(_keyNaiaConditionalRules) ?? '';
   Future<void> setNaiaConditionalRules(String value) => _prefs.setString(_keyNaiaConditionalRules, value);
 
+  String get naiaLeadingPrompt => _prefs.getString('naia_leading_prompt') ?? '';
+  Future<void> setNaiaLeadingPrompt(String value) => _prefs.setString('naia_leading_prompt', value);
+  String get naiaTrailingPrompt => _prefs.getString('naia_trailing_prompt') ?? '';
+  Future<void> setNaiaTrailingPrompt(String value) => _prefs.setString('naia_trailing_prompt', value);
+
   static const String _keyAutoSave = 'nai_auto_save';
   static const String _keyShowDirectorRefShelf = 'show_director_ref_shelf';
   static const String _keyShowVibeTransferShelf = 'show_vibe_transfer_shelf';
