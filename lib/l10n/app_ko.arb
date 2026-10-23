@@ -82,7 +82,7 @@
   "settingsEnterCurrentPin": "현재 PIN 입력",
   "settingsEnterPinHint": "PIN 입력",
   "settingsIncorrectPin": "PIN이 올바르지 않습니다",
-  "settingsDemoModeDesc": "Only show demo-safe images in the gallery",
+  "settingsDemoModeDesc": "갤러리에 데모 모드에서 허용되는 이미지만 표시",
   "settingsSelectDemoImages": "데모 이미지 선택",
   "settingsTagSuggestionsHidden": "데모 모드에서는 태그 추천이 표시되지 않습니다",
   "settingsPositivePrefix": "긍정 프롬프트 접두어",
@@ -90,13 +90,13 @@
   "settingsEditPositivePrefix": "긍정 접두어 편집",
   "settingsEditNegativePrefix": "부정 접두어 편집",
   "settingsDemoPrefixes": "데모 접두어",
-  "settingsNotSet": "(not set)",
+  "settingsNotSet": "(설정되지 않음)",
   "settingsGithubRepository": "GitHub 저장소",
   "settingsGithubPlaceholder": "GitHub 링크 입력란",
   "galleryTitle": "갤러리",
-  "galleryDemoTitle": "Gallery (Demo)",
-  "gallerySearchTags": "Search Tags...",
-  "gallerySelectedCount": "{count} Selected",
+  "galleryDemoTitle": "갤러리(데모)",
+  "gallerySearchTags": "태그 검색...",
+  "gallerySelectedCount": "{count}개 선택됨",
   "@gallerySelectedCount": {
     "placeholders": {
       "count": {
@@ -107,9 +107,9 @@
   "galleryDeselectAll": "전체 선택 해제",
   "gallerySelectAll": "전체 선택",
   "galleryFavoritesFilter": "즐겨찾기 필터",
-  "gallerySort": "Sort",
+  "gallerySort": "정렬",
   "gallerySelectMode": "선택 모드",
-  "galleryColumnsCount": "{count} columns",
+  "galleryColumnsCount": "{count}열",
   "@galleryColumnsCount": {
     "placeholders": {
       "count": {
@@ -117,18 +117,18 @@
       }
     }
   },
-  "gallerySortDateNewest": "Date (Newest)",
-  "gallerySortDateOldest": "Date (Oldest)",
-  "gallerySortNameAZ": "Name (A-Z)",
-  "gallerySortNameZA": "Name (Z-A)",
-  "gallerySortSizeLargest": "Size (Largest)",
-  "gallerySortSizeSmallest": "Size (Smallest)",
+  "gallerySortDateNewest": "날짜(최신순)",
+  "gallerySortDateOldest": "날짜(오래된순)",
+  "gallerySortNameAZ": "이름(가나다순)",
+  "gallerySortNameZA": "이름(가나다 역순)",
+  "gallerySortSizeLargest": "크기(큰 순)",
+  "gallerySortSizeSmallest": "크기(작은 순)",
   "galleryNoDemoImages": "선택한 데모 이미지가 없습니다",
   "galleryNoFavorites": "즐겨찾기가 없습니다",
   "galleryNoImagesInAlbum": "앨범에 이미지가 없습니다",
   "galleryNoImagesFound": "이미지를 찾지 못했습니다",
-  "galleryAll": "All",
-  "galleryCopiedCount": "{count} Copied",
+  "galleryAll": "전체",
+  "galleryCopiedCount": "{count}개 복사됨",
   "@galleryCopiedCount": {
     "placeholders": {
       "count": {
@@ -136,7 +136,7 @@
       }
     }
   },
-  "galleryImagesCopiedCount": "{count} Images Copied",
+  "galleryImagesCopiedCount": "이미지 {count}장 복사됨",
   "@galleryImagesCopiedCount": {
     "placeholders": {
       "count": {
@@ -144,7 +144,7 @@
       }
     }
   },
-  "galleryPasteInto": "Paste Into {name}",
+  "galleryPasteInto": "{name}에 붙여넣기",
   "@galleryPasteInto": {
     "placeholders": {
       "name": {
@@ -152,7 +152,7 @@
       }
     }
   },
-  "galleryPastedIntoAlbum": "{count} images pasted into {name}",
+  "galleryPastedIntoAlbum": "{name}에 이미지 {count}장 붙여넣음",
   "@galleryPastedIntoAlbum": {
     "placeholders": {
       "count": {
@@ -168,7 +168,7 @@
   "galleryAlbumName": "앨범 이름",
   "galleryRenameAlbum": "앨범 이름 변경",
   "galleryAddToAlbum": "앨범에 추가",
-  "galleryDeleteCount": "Delete {count} images?",
+  "galleryDeleteCount": "이미지 {count}장을 삭제할까요?",
   "@galleryDeleteCount": {
     "placeholders": {
       "count": {
@@ -176,17 +176,17 @@
       }
     }
   },
-  "galleryCannotUndo": "This cannot be undone.",
+  "galleryCannotUndo": "이 작업은 되돌릴 수 없습니다.",
   "galleryCompare": "비교",
   "galleryCopy": "복사",
   "galleryCopiedToClipboard": "클립보드에 복사됨",
   "galleryPinControls": "조작 버튼 항상 표시",
-  "galleryUnpinControls": "Auto-hide controls",
+  "galleryUnpinControls": "조작 버튼 자동 숨김",
   "galleryShare": "공유",
   "galleryPaste": "붙여넣기",
   "galleryAlbum": "앨범",
   "galleryFavorite": "즐겨찾기",
-  "gallerySavedToDeviceCount": "Saved {saved}/{total} to device gallery",
+  "gallerySavedToDeviceCount": "기기 갤러리에 {saved}/{total}장 저장",
   "@gallerySavedToDeviceCount": {
     "placeholders": {
       "saved": {
@@ -197,7 +197,7 @@
       }
     }
   },
-  "galleryExportDialogTitle": "Export {count} Images",
+  "galleryExportDialogTitle": "이미지 {count}장 내보내기",
   "@galleryExportDialogTitle": {
     "placeholders": {
       "count": {
@@ -205,7 +205,7 @@
       }
     }
   },
-  "galleryExportedToFolder": "Exported {count} images to {folder}",
+  "galleryExportedToFolder": "{folder}에 이미지 {count}장 내보냄",
   "@galleryExportedToFolder": {
     "placeholders": {
       "count": {
@@ -216,7 +216,7 @@
       }
     }
   },
-  "galleryExportFailed": "Export failed: {error}",
+  "galleryExportFailed": "내보내기 실패: {error}",
   "@galleryExportFailed": {
     "placeholders": {
       "error": {
@@ -224,7 +224,7 @@
       }
     }
   },
-  "galleryImagesCopied": "{count} images copied",
+  "galleryImagesCopied": "이미지 {count}장 복사됨",
   "@galleryImagesCopied": {
     "placeholders": {
       "count": {
@@ -232,7 +232,7 @@
       }
     }
   },
-  "galleryImagesPasted": "{count} images pasted",
+  "galleryImagesPasted": "이미지 {count}장 붙여넣음",
   "@galleryImagesPasted": {
     "placeholders": {
       "count": {
@@ -240,10 +240,10 @@
       }
     }
   },
-  "galleryDeleteImage": "Delete Image?",
+  "galleryDeleteImage": "이미지를 삭제할까요?",
   "gallerySavedToDevice": "기기 갤러리에 저장됨",
   "galleryExportImageDialog": "이미지 내보내기",
-  "gallerySavedTo": "Saved to {name}",
+  "gallerySavedTo": "{name}에 저장됨",
   "@gallerySavedTo": {
     "placeholders": {
       "name": {
@@ -257,13 +257,13 @@
   "galleryNoPrompt": "프롬프트 없음",
   "galleryNoMetadata": "메타데이터 없음",
   "galleryPrompt": "프롬프트",
-  "galleryImg2img": "IMG2IMG",
+  "galleryImg2img": "이미지 투 이미지",
   "galleryCharRef": "캐릭터 참조",
-  "galleryVibe": "Vibe",
+  "galleryVibe": "바이브",
   "gallerySlideshow": "슬라이드쇼",
   "galleryAddedAsCharRef": "캐릭터 참조로 추가됨",
   "galleryAddedAsVibe": "바이브 전송으로 추가됨",
-  "galleryVibeTransferFailed": "Vibe transfer failed: {error}",
+  "galleryVibeTransferFailed": "바이브 전송 실패: {error}",
   "@galleryVibeTransferFailed": {
     "placeholders": {
       "error": {
@@ -275,12 +275,12 @@
   "gallerySteps": "스텝",
   "gallerySampler": "샘플러",
   "gallerySeed": "시드",
-  "galleryResolution": "Res",
+  "galleryResolution": "해상도",
   "galleryEnhance": "향상",
   "galleryDirectorTools": "디렉터",
   "galleryImport": "이미지 가져오기",
-  "galleryImporting": "Importing...",
-  "galleryImportProgress": "Importing {current}/{total}...",
+  "galleryImporting": "가져오는 중...",
+  "galleryImportProgress": "가져오는 중 {current}/{total}...",
   "@galleryImportProgress": {
     "placeholders": {
       "current": {
@@ -291,8 +291,8 @@
       }
     }
   },
-  "galleryImportPreparing": "Preparing...",
-  "galleryImportSuccess": "Imported {count} images ({metadata} with NovelAI metadata)",
+  "galleryImportPreparing": "준비 중...",
+  "galleryImportSuccess": "이미지 {count}장 가져옴(NovelAI 메타데이터 포함 {metadata}장)",
   "@galleryImportSuccess": {
     "placeholders": {
       "count": {
@@ -303,7 +303,7 @@
       }
     }
   },
-  "galleryImportConverted": "Imported {count} images ({converted} converted to PNG)",
+  "galleryImportConverted": "이미지 {count}장 가져옴(PNG 변환 {converted}장)",
   "@galleryImportConverted": {
     "placeholders": {
       "count": {
@@ -314,7 +314,7 @@
       }
     }
   },
-  "galleryImportFailed": "Import failed: {error}",
+  "galleryImportFailed": "가져오기 실패: {error}",
   "@galleryImportFailed": {
     "placeholders": {
       "error": {
@@ -329,9 +329,9 @@
   "panelSteps": "스텝",
   "panelScale": "스케일",
   "panelSampler": "샘플러",
-  "panelPostProcessing": "Post-Processing",
+  "panelPostProcessing": "후처리",
   "panelStyles": "스타일",
-  "modelStepsRemembered": "Steps and CFG are remembered per model (V4.5 / V5)",
+  "modelStepsRemembered": "스텝과 CFG는 모델별로 기억됩니다(V4.5 / V5)",
   "panelManageStyles": "스타일 관리",
   "panelEnabled": "활성화",
   "panelNoStylesDefined": "등록된 스타일 없음",
@@ -339,7 +339,7 @@
   "panelPresets": "프리셋",
   "panelNoPresetsSaved": "저장된 프리셋 없음",
   "panelDeletePreset": "프리셋 삭제",
-  "panelDeletePresetConfirm": "Delete \"{name}\"?",
+  "panelDeletePresetConfirm": "\"{name}\" 프리셋을 삭제할까요?",
   "@panelDeletePresetConfirm": {
     "placeholders": {
       "name": {
@@ -348,7 +348,7 @@
     }
   },
   "panelSaveToAlbum": "앨범에 저장",
-  "panelNew": "New",
+  "panelNew": "새로 만들기",
   "panelNewAlbum": "새 앨범",
   "panelAlbumName": "앨범 이름",
   "resNormalPortrait": "일반 세로",
@@ -367,7 +367,7 @@
   "toolsStyles": "스타일",
   "toolsReferences": "참조 이미지",
   "toolsCascadeEditor": "캐스케이드 편집기",
-  "toolsImg2imgEditor": "IMG2IMG Editor",
+  "toolsImg2imgEditor": "이미지 투 이미지 편집기",
   "toolsSlideshow": "슬라이드쇼",
   "toolsPacks": "팩",
   "toolsTheme": "테마",
@@ -375,7 +375,7 @@
   "helpTitle": "NAIWeaver",
   "helpShortcuts": "단축키",
   "helpFeatures": "기능",
-  "helpShortcutWildcard": "Random line from wildcards/name.txt",
+  "helpShortcutWildcard": "wildcards/name.txt에서 무작위 한 줄 선택",
   "helpShortcutWildcardBrowse": "삽입할 와일드카드 파일 찾기",
   "helpShortcutHoldDismiss": "태그 추천 닫기",
   "helpShortcutFavorites": "즐겨찾기 태그 모두 보기",
@@ -384,28 +384,28 @@
   "helpShortcutSourceAction": "동작을 수행하는 캐릭터",
   "helpShortcutTargetAction": "동작을 받는 캐릭터",
   "helpShortcutMutualAction": "캐릭터 간 상호 동작",
-  "helpShortcutEnter": "Generate (or select tag suggestion)",
+  "helpShortcutEnter": "이미지 생성(또는 추천 태그 선택)",
   "helpShortcutDragDrop": "생성 설정 가져오기",
   "helpFeatureGallery": "갤러리",
-  "helpFeatureGalleryDesc": "Browse, favorite, compare, and album-sort outputs",
+  "helpFeatureGalleryDesc": "결과 이미지를 탐색하고 즐겨찾기·비교·앨범별 정리",
   "helpFeatureWildcards": "와일드카드",
-  "helpFeatureWildcardsDesc": "__pattern__ random substitution from text files",
+  "helpFeatureWildcardsDesc": "텍스트 파일의 __pattern__을 무작위로 치환",
   "helpFeatureStyles": "스타일",
-  "helpFeatureStylesDesc": "Auto-inject prefix/suffix/negative into prompts",
+  "helpFeatureStylesDesc": "프롬프트에 접두어·접미어·부정 프롬프트 자동 삽입",
   "helpFeaturePresets": "프리셋",
-  "helpFeaturePresetsDesc": "Save & restore full generation configurations",
+  "helpFeaturePresetsDesc": "전체 생성 설정 저장 및 복원",
   "helpFeatureDirectorRef": "디렉터 참조",
-  "helpFeatureDirectorRefDesc": "Guide character/style appearance with ref images",
+  "helpFeatureDirectorRefDesc": "참조 이미지로 캐릭터·그림체의 외형 유도",
   "helpFeatureVibeTransfer": "바이브 전송",
-  "helpFeatureVibeTransferDesc": "Influence composition & mood with ref images",
+  "helpFeatureVibeTransferDesc": "참조 이미지로 구도와 분위기 조절",
   "helpFeatureCascade": "캐스케이드",
-  "helpFeatureCascadeDesc": "Multi-beat sequential scene generation",
+  "helpFeatureCascadeDesc": "여러 비트로 이어지는 장면 순차 생성",
   "helpFeatureImg2img": "IMG2IMG",
-  "helpFeatureImg2imgDesc": "Edit/refine images with inpainting & variation",
+  "helpFeatureImg2imgDesc": "인페인팅과 변형으로 이미지 수정·개선",
   "helpFeatureThemes": "테마",
-  "helpFeatureThemesDesc": "Customize all colors, fonts, and scale",
+  "helpFeatureThemesDesc": "색상·글꼴·배율 사용자 지정",
   "helpFeaturePacks": "팩",
-  "helpFeaturePacksDesc": "Export/import presets, styles, wildcards as .vpack",
+  "helpFeaturePacksDesc": "프리셋·스타일·와일드카드를 .vpack으로 내보내기·가져오기",
   "wildcardManager": "와일드카드 관리자",
   "wildcardManageDesc": "와일드카드 파일 관리 및 편집",
   "wildcardFiles": "파일",
@@ -468,7 +468,7 @@
   "tagLibPreviewSettings": "미리보기 설정",
   "tagLibAddTag": "태그 추가",
   "tagLibSearchTags": "태그 검색...",
-  "tagLibAll": "ALL",
+  "tagLibAll": "전체",
   "tagLibFavorites": "즐겨찾기",
   "tagLibImages": "이미지",
   "tagLibSort": "정렬:",
@@ -527,7 +527,7 @@
   "presetManageDesc": "생성 프리셋 관리 및 편집",
   "presetList": "프리셋",
   "presetNew": "새 프리셋",
-  "presetCharsInfo": "{chars} CHARS, {ints} INTS",
+  "presetCharsInfo": "캐릭터 {chars}명, 상호작용 {ints}개",
   "@presetCharsInfo": {
     "placeholders": {
       "chars": {
@@ -538,7 +538,7 @@
       }
     }
   },
-  "presetCharsRefsInfo": "{chars} CHARS, {ints} INTS, {refs} REFS",
+  "presetCharsRefsInfo": "캐릭터 {chars}명, 상호작용 {ints}개, 참조 {refs}개",
   "@presetCharsRefsInfo": {
     "placeholders": {
       "chars": {
@@ -554,7 +554,7 @@
   },
   "presetSelectToEdit": "편집할 프리셋 선택",
   "presetIdentity": "기본 정보",
-  "presetName": "NAME",
+  "presetName": "이름",
   "presetPrompts": "프롬프트",
   "presetPrompt": "프롬프트",
   "presetNegativePrompt": "부정 프롬프트",
@@ -564,9 +564,9 @@
   "presetScale": "스케일",
   "presetSteps": "스텝",
   "presetSampler": "샘플러",
-  "presetCharsAndInteractions": "CHARACTERS & INTERACTIONS",
+  "presetCharsAndInteractions": "캐릭터 및 상호작용",
   "presetNoChars": "이 프리셋에 저장된 캐릭터가 없습니다",
-  "presetCharacterN": "CHARACTER {n}",
+  "presetCharacterN": "캐릭터 {n}",
   "@presetCharacterN": {
     "placeholders": {
       "n": {
@@ -580,7 +580,7 @@
   "presetProcessing": "처리 중...",
   "presetAddReference": "참조 이미지 추가",
   "presetDeleteTitle": "프리셋 삭제",
-  "presetDeleteConfirm": "ARE YOU SURE YOU WANT TO DELETE ''{name}''?",
+  "presetDeleteConfirm": "\"{name}\" 프리셋을 정말 삭제할까요?",
   "@presetDeleteConfirm": {
     "placeholders": {
       "name": {
@@ -589,7 +589,7 @@
     }
   },
   "presetOverwriteTitle": "프리셋 덮어쓰기",
-  "presetOverwriteConfirm": "A PRESET WITH THE NAME ''{name}'' ALREADY EXISTS. OVERWRITE?",
+  "presetOverwriteConfirm": "\"{name}\" 프리셋이 이미 있습니다. 덮어쓸까요?",
   "@presetOverwriteConfirm": {
     "placeholders": {
       "name": {
@@ -604,7 +604,7 @@
   "styleResetDefaults": "스타일을 기본값으로 초기화",
   "styleSelectToEdit": "편집할 스타일 선택",
   "styleIdentity": "기본 정보",
-  "styleName": "NAME",
+  "styleName": "이름",
   "styleDefaultOnLaunch": "실행 시 기본 적용",
   "styleTargetPrompt": "대상 프롬프트",
   "stylePositive": "긍정",
@@ -613,10 +613,10 @@
   "stylePositiveContent": "긍정 프롬프트 내용",
   "styleContent": "내용",
   "stylePlacement": "삽입 위치",
-  "styleBeginningPrefix": "BEGINNING (PREFIX)",
-  "styleEndSuffix": "END (SUFFIX)",
+  "styleBeginningPrefix": "시작 부분(접두어)",
+  "styleEndSuffix": "끝 부분(접미어)",
   "styleDeleteTitle": "스타일 삭제",
-  "styleDeleteConfirm": "ARE YOU SURE YOU WANT TO DELETE ''{name}''?",
+  "styleDeleteConfirm": "\"{name}\" 스타일을 정말 삭제할까요?",
   "@styleDeleteConfirm": {
     "placeholders": {
       "name": {
@@ -626,7 +626,7 @@
   },
   "styleSaveAsNew": "새 항목으로 저장",
   "styleWorksWith": "적용 대상",
-  "panelStylesHidden": "{count} styles hidden (made for {model})",
+  "panelStylesHidden": "{model}용 스타일 {count}개 숨김",
   "@panelStylesHidden": {
     "placeholders": {
       "count": {
@@ -639,9 +639,9 @@
   },
   "styleRenderOverride": "이 스타일에 사용자 지정 스텝 및 CFG 적용",
   "styleSteps": "스텝",
-  "styleCfg": "CFG (GUIDANCE)",
+  "styleCfg": "CFG(가이던스)",
   "styleOverwriteTitle": "스타일 덮어쓰기",
-  "styleOverwriteConfirm": "A STYLE WITH THE NAME ''{name}'' ALREADY EXISTS. OVERWRITE?",
+  "styleOverwriteConfirm": "\"{name}\" 스타일이 이미 있습니다. 덮어쓸까요?",
   "@styleOverwriteConfirm": {
     "placeholders": {
       "name": {
