@@ -1372,7 +1372,71 @@ class GenerationNotifier extends ChangeNotifier {
     return preview;
   }
 
+  // Sequential unattended generation. Each iteration resolves fresh NAIA wildcards.
+  bool _loopRunning = false;
+  bool _loopStopRequested = false;
+  int _loopCompleted = 0;
+  int? _loopTarget;
+
+  bool get isAutoLoopRunning => _loopRunning;
+  int get autoLoopCompleted => _loopCompleted;
+  int? get autoLoopTarget => _loopTarget;
+
+  /// Starts a bounded or continuous loop. Never overlaps generation requests.
+  /// The loop stops on authentication, generation, or save failure.
+  Future<void> startAutoLoop({int? count, Duration delay = const Duration(seconds: 2)}) async {
+    if (_loopRunning || _state.isLoading) return;
+    if (count != null && count < 1) {
+      throw ArgumentError.value(count, 'count', 'Must be positive');
+    }
+    _loopRunning = true;
+    _loopStopRequested = false;
+    _loopCompleted = 0;
+    _loopTarget = count;
+    final previousAutoSave = _state.autoSaveImages;
+    if (!previousAutoSave) {
+      _state = _state.copyWith(autoSaveImages: true);
+    }
+    notifyListeners();
+    try {
+      while (!_loopStopRequested && (count == null || _loopCompleted < count)) {
+        // Do not reuse a manually locked preview on later iterations.
+        if (_loopCompleted > 0) clearLockedNaiaPreview();
+        await generate();
+        if (_state.hasAuthError || _state.errorMessage != null ||
+            !_imageSaved || _state.generatedImage == null) {
+          break;
+        }
+        _loopCompleted++;
+        notifyListeners();
+        if (_loopStopRequested || (count != null && _loopCompleted >= count)) break;
+        // Delay in small increments to make Stop responsive.
+        var remaining = delay;
+        while (!_loopStopRequested && remaining > Duration.zero) {
+          final slice = remaining > const Duration(milliseconds: 200)
+              ? const Duration(milliseconds: 200) : remaining;
+          await Future<void>.delayed(slice);
+          remaining -= slice;
+        }
+      }
+    } finally {
+      _loopRunning = false;
+      _loopStopRequested = false;
+      if (!previousAutoSave) {
+        _state = _state.copyWith(autoSaveImages: false);
+      }
+      notifyListeners();
+    }
+  }
+
+  /// Stops after the in-flight request completes.
+  void stopAutoLoop() {
+    _loopStopRequested = true;
+    notifyListeners();
+  }
+
   Future<void> generate() async {
+    if (_state.isLoading) return;
     clearTagSuggestions();
 
     _state = _state.copyWith(isLoading: true, hasAuthError: false);
