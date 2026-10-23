@@ -244,4 +244,29 @@ void main() {
     expect(result.main, 'solo, solo focus');
   });
 
+  test('scoped character rules follow global changes in source order', () async {
+    final result = await engine.applyAsync(
+      'solo', ['blue hair'],
+      '(solo):char:1+=smile\\n'
+      'char:1 (smile):main+=happy\\n'
+      '(char_in(1, happy)):main+=finished',
+      characterEnabled: [true],
+      expandAction: (value) async => value,
+    );
+    expect(result.characters, ['blue hair, smile, happy']);
+    expect(result.main, 'solo, finished');
+  });
+
+  test('scoped character rules do not run on disabled slots', () async {
+    final result = await engine.applyAsync(
+      'solo', ['blue hair'],
+      '(solo):char_set(1, disabled)\\n'
+      'char:1 (blue hair):main+=wrong',
+      characterEnabled: [true],
+      expandAction: (value) async => value,
+    );
+    expect(result.characters, ['blue hair']);
+    expect(result.enabled, [false]);
+  });
+
 }
